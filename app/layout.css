@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  /* *{ 
+    @apply ring-1;
+  } */
+
+  *::selection {
+    background-color: rgba(62, 220, 214, 0.35);
+  }
+
+  .grid-center {
+    @apply grid place-items-center;
+  }
+
+  .absolute-center {
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+  }
+}

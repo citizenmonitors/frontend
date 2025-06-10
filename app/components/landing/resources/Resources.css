@@ -1,0 +1,13 @@
+#resources-tab {
+  > .ant-tabs-nav::before {
+    @apply !border-gray-300;
+  }
+
+  > .ant-tabs-nav {
+    @apply overflow-hidden isolate;
+
+    > .ant-tabs-nav-operations {
+      @apply z-50;
+    }
+  }
+}

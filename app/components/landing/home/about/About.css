@@ -1,0 +1,37 @@
+.about-header h3 {
+  @apply transition-colors cursor-pointer;
+}
+.about-content p {
+  @apply transition-colors duration-500;
+}
+
+.about-main-content {
+  &:has(h3:hover) .about-content {
+    @apply text-gray-300;
+  }
+  &:has(h3:hover) .about-header {
+    @apply text-gray-300;
+  }
+
+  &:has(h3:hover:nth-child(1)) .about-content :nth-child(1) {
+    @apply text-brand-500;
+  }
+  &:has(h3:hover:nth-child(2)) .about-content :nth-child(2) {
+    @apply text-brand-500;
+  }
+  &:has(h3:hover:nth-child(3)) .about-content :nth-child(3) {
+    @apply text-brand-500;
+  }
+
+  &:has(h3:hover:nth-child(1)) .about-header :nth-child(1) {
+    @apply text-brand-500;
+  }
+  &:has(h3:hover:nth-child(2)) .about-header :nth-child(2) {
+    @apply text-brand-500;
+  }
+  &:has(h3:hover:nth-child(3)) .about-header :nth-child(3) {
+    @apply text-brand-500;
+  }
+
+  
+}

@@ -1,0 +1,15 @@
+.ant-input-number-affix-wrapper {
+  @apply !pr-0;
+}
+.ant-input-number {
+  @apply !grid;
+}
+.ant-input-number-input-wrap {
+  @apply !my-auto;
+}
+
+#privacy-policy, #terms {
+  .section-link {
+    @apply !text-brand-500 border-b border-brand-500 cursor-pointer;
+  }
+}

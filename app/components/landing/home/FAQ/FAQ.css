@@ -1,0 +1,17 @@
+.faq-container {
+  .ant-collapse-header {
+    @apply !items-center;
+  }
+
+  .ant-collapse-item {
+    .ant-collapse-header-text > .faq-panel-header {
+      @apply transition-colors;
+    }
+  }
+  
+  .ant-collapse-item-active {
+    .ant-collapse-header-text > .faq-panel-header {
+      @apply !text-brand-500 ;
+    }
+  }
+}

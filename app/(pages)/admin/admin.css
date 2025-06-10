@@ -1,0 +1,158 @@
+.ant-table-column-title {
+  @apply whitespace-nowrap;
+}
+
+.ant-collapse-item {
+  @apply !border-b !border-gray-200;
+}
+.ant-collapse-header {
+  @apply !items-center !text-gray-600 !px-10;
+}
+.ant-collapse-content-box {
+  @apply !pt-0;
+}
+
+#verify-form {
+  .ant-upload {
+    @apply bg-white h-fit;
+  }
+}
+
+#elections-tab {
+  > .ant-tabs-nav::before {
+    @apply !border-gray-300;
+  }
+
+  > .ant-tabs-nav {
+    @apply overflow-hidden isolate;
+
+    > .ant-tabs-nav-operations {
+      @apply z-50;
+    }
+  }
+}
+
+#outbox-tab {
+  > .ant-tabs-nav::before {
+    @apply !border-gray-300;
+  }
+
+  > .ant-tabs-nav {
+    @apply overflow-hidden isolate;
+
+    > .ant-tabs-nav-operations {
+      @apply z-50;
+    }
+  }
+}
+
+#time-scroll-picker {
+  .picker-container > .picker-inner > .picker-column > .picker-scroller > .picker-item {
+    @apply !w-[56px];
+  }
+}
+
+#election-time-picker {
+  .react-time-picker__wrapper {
+    @apply border-0 text-gray-500 text-base;
+
+    .react-time-picker__inputGroup__leadingZero {
+        @apply text-gray-500 mt-[3.5px];
+    }
+
+    .react-time-picker__inputGroup {
+      @apply flex gap-1;
+    }
+
+    .react-time-picker__clear-button {
+      > svg {
+        @apply !fill-gray-500;
+      }
+      &:hover > svg {
+        @apply !fill-gray-700;
+      }
+    }
+
+    input, select {
+      @apply bg-gray-100/0 rounded;
+
+      &.react-time-picker__inputGroup__input--hasLeadingZero {
+        @apply pl-[.5ch];
+      }
+
+      &:focus {
+        @apply ring-2 ring-brand-500 border-0 outline-none;
+      }
+    }
+  }
+}
+
+
+#election-result-upload {
+  .ant-input-number-group-addon:first-of-type {
+    @apply bg-gray-50 text-gray-500;
+  }
+
+  .ant-upload {
+    @apply bg-white h-fit;
+  }
+}
+
+#election-report-upload {
+  .ant-upload {
+    @apply bg-white h-fit;
+  }
+}
+
+#settings-tab {
+  > .ant-tabs-nav::before {
+    @apply !border-gray-300;
+  }
+
+  > .ant-tabs-nav > .ant-tabs-nav-wrap > .ant-tabs-nav-list {
+    @apply w-full md:w-auto justify-center md:justify-start;
+  }
+}
+
+#settings-profile-details {
+  .ant-upload {
+    @apply flex flex-col md:flex-row items-center gap-2 md:gap-4 justify-center;
+  }
+}
+
+#settings-verify {
+  .ant-upload {
+    @apply bg-white h-fit;
+  }
+}
+
+#settings-email-otp {
+  #otp-input {
+    -moz-appearance: textfield;
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  #otp-input {
+    @apply transition-all
+    !w-[35px] !h-[35px] sm:!w-[45px] sm:!h-[45px] md:!w-[55px] md:!h-[55px]
+    bg-gray-50 !text-sm sm:!text-base md:!text-lg text-gray-600 font-medium
+    border border-gray-300 hover:border-brand-400 focus:border-brand-500
+    ring-0 ring-white/0 focus:ring-2 focus:ring-brand-700/10
+    rounded-md outline-none;
+  }
+}
+
+#verification-tab {
+  > .ant-tabs-nav::before {
+    @apply !border-gray-300;
+  }
+
+  > .ant-tabs-nav > .ant-tabs-nav-wrap > .ant-tabs-nav-list {
+    @apply w-full md:w-auto justify-center md:justify-start;
+  }
+}
+

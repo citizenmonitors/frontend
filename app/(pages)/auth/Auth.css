@@ -1,0 +1,31 @@
+#signup-otp-form {
+  #otp-input {
+    -moz-appearance: textfield;
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  #otp-input {
+    @apply transition-all
+    !w-[35px] !h-[35px] sm:!w-[45px] sm:!h-[45px] md:!w-[55px] md:!h-[55px]
+    bg-gray-50 !text-sm sm:!text-base md:!text-lg text-gray-600 font-medium
+    border border-gray-300 hover:border-brand-400 focus:border-brand-500
+    ring-0 ring-white/0 focus:ring-2 focus:ring-brand-700/10
+    rounded-md outline-none;
+  }
+}
+
+#signup-stage-two-form {
+  .ant-upload {
+    @apply flex flex-col md:flex-row items-center gap-2 md:gap-4 justify-center;
+  }
+}
+
+#signup-stage-four-form {
+  .ant-upload {
+    @apply bg-white h-fit;
+  }
+}

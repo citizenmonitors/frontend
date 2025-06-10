@@ -1,0 +1,15 @@
+.intro-container {
+  .ant-collapse-item {
+    .ant-collapse-header {
+      @apply !pl-0 !py-0;
+    }
+
+    .ant-collapse-content-box {
+      @apply !px-0 !pb-4;
+    }
+  }
+
+  .ant-collapse-item-active {
+    @apply !border-brand-500;
+  }
+}
