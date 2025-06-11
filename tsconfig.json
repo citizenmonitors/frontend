@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(pages)/portal/elections/(tabs)/previous", "app/(pages)/portal/live/[id]", "app/components/shared/time-scroll-picker/Picker.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(pages)/portal/elections/(tabs)/_previous", "app/(pages)/portal/live/[id]", "app/components/shared/time-scroll-picker/Picker.jsx"],
   "exclude": ["node_modules"]
 }

@@ -14,11 +14,11 @@ export default function ElectionsTabs() {
       children: null,
       active: true,
     },
-    {
-      key: "/portal/elections/previous",
-      label: "Previous Elections",
-      children: null,
-    },
+    // {
+    //   key: "/portal/elections/previous",
+    //   label: "Previous Elections",
+    //   children: null,
+    // },
   ];
 
   function handleTabChange(key: string) {
