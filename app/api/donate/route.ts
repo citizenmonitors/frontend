@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
-    // handle other errors (e.g. network issues, parsing errors)
+    // handle other errors  (e.g. network issues, parsing errors)
     return NextResponse.json(
       { error: `Internal Server Error: ${error}` },
       { status: 500 }
