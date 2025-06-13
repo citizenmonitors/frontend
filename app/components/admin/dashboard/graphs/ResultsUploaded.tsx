@@ -25,7 +25,6 @@ export default function ResultsUploaded() {
   };
   const negativeTrend = useMemo(() => data.lastMonthComparison < 0, [data]);
   function handleViewResults() {
-    console.log("View Results");
   }
 
   return (

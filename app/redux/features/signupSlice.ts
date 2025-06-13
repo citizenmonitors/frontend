@@ -114,13 +114,11 @@ const signupSlice = createSlice({
     builder.addCase(submitRole.fulfilled, (state, action) => {
       state.status.roleSubmission = 'fulfilled';
 
-      console.log("selecting role.. setting cookie...")
-      const cookie = Cookies.set(
+      const _cookie = Cookies.set(
         cookieData.login.name,
         action.payload.token,
         { expires: cookieData.login.expiration }
       );
-      console.log("Cookie set: ", cookie)
     });
   }
 });

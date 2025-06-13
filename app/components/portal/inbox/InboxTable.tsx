@@ -22,8 +22,6 @@ export default function InboxTable({ filteredPodcasts }: OutboxTableProps) {
   const currentPodcasts = filteredPodcasts.slice(indexOfFirstItem, indexOfLastItem);
 
   const items = currentPodcasts.map((podcast) => {
-    console.log(podcast);
-    console.log(formatString.stringToHTML(podcast.content));
     return ({
     key: podcast._id,
     label: (

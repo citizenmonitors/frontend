@@ -11,7 +11,6 @@ export default function RegisteredUsers() {
   const graphData = graphs.registeredUsers;
 
   function handleDownloadDetails() {
-    console.log("Download Details");
   }
 
   return (

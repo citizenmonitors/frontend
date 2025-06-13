@@ -29,7 +29,6 @@ export default function useCalendarEvents() {
     if (a.startDate > b.startDate) return 1;
     return 0;
   }).forEach((election, index) => {
-    console.log(election, "hey")
     if (user && election.startDate <= now && now <= election.endDate) {
       events.elections.push({
         name: getElectionName(election, "detailed", user),
