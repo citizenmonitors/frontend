@@ -21,31 +21,33 @@ export default function InboxTable({ filteredPodcasts }: OutboxTableProps) {
   const indexOfFirstItem = indexOfLastItem - PAGE_SIZE;
   const currentPodcasts = filteredPodcasts.slice(indexOfFirstItem, indexOfLastItem);
 
-  const items = currentPodcasts.map((podcast) => ({
+  const items = currentPodcasts.map((podcast) => {
+    console.log(podcast);
+    console.log(formatString.stringToHTML(podcast.content));
+    return ({
     key: podcast._id,
     label: (
       <div className="flex items-center justify-between">
         <h3 className="text-base">{podcast.title}</h3>
-        <span className="text-sm">
-          {moment(podcast.createdAt).format("MMM DD")}
-        </span>
+        <span className="text-sm">{moment(podcast.createdAt).format("MMM DD")}</span>
       </div>
     ),
     className: podcast.read ? "read-podcast" : "unread-podcast",
     children: (
       <div className="pl-14 px-10">
-        <div className="text-gray-500 text-base">{podcast.content}</div>
+        <div
+          className="text-gray-500 text-base"
+          dangerouslySetInnerHTML={{ __html: formatString.stringToHTML(podcast.content) }}
+        />
       </div>
     ),
-  }));
+  })
+  });
 
   if (filteredPodcasts.length === 0) {
     return (
       <div className="flex justify-center py-8">
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No messages in inbox."
-        />
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No messages in inbox." />
       </div>
     );
   }

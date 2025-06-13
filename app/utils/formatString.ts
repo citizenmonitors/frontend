@@ -22,6 +22,21 @@ const formatString = {
       .split('-')
       .map((word) => this.capitaliseFirst(word, onlyFirst))
       .join(' ');
+  },
+  stringToHTML(str: string): string {
+    const specialCharDict = [
+      ['\n', '<br>'],
+      ['\t', '&nbsp;&nbsp;&nbsp;&nbsp;'],
+    ];
+
+    let newStr = str;
+
+    for (const [char, replacement] of specialCharDict) {
+      newStr = newStr.split(char).join(replacement);
+    }
+
+    console.table([str, newStr])
+    return newStr;
   }
 };
 
