@@ -10,5 +10,5 @@ const press: Array<Press> = [
 ];
 
 const currentPress = press.filter((p) => new Date(p.date) <= new Date());
-
+ 
 export default currentPress;
