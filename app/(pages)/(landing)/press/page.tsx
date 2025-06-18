@@ -20,7 +20,7 @@ export default function Press() {
       otherArticles: [],
     });
 
-  // This isn't strictly necessary since we initialize the state with the data,
+  // This isn't strictly necessary since we initialize the state with  the data,
   useEffect(() => {
     const currentPressData = pressData.filter(
       (p) => new Date(p.date) <= new Date()
