@@ -25,9 +25,7 @@ module.exports = {
       '/privacy-policy': 0.5,
       '/terms-of-use': 0.5,
     };
-
     const priority = priorityMap[path] ?? 0.5;
-
     return {
       loc: path,
       changefreq: config.changefreq,
