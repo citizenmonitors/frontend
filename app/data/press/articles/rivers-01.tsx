@@ -7,6 +7,8 @@ const press: Press = {
   shortTitle: "Democracy Under Siege",
   title:
     "Democracy Under Siege: Tinubu’s Unconstitutional Takeover in Rivers State Must Be Resisted",
+  description:
+    "Citizen Monitors condemns the unconstitutional suspension of Rivers State’s elected officials, calling for the restoration of democracy and rule of law.",
   readingTimeInMinutes: 5,
   date: "2025-03-19",
   author: "Press Office",

@@ -6,6 +6,7 @@ export type PressSection = {
 export type Press = {
   id: string;
   author: string;
+  description: string;
   date: string;
   readingTimeInMinutes: number;
   title: string;

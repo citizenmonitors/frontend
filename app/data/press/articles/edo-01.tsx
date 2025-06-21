@@ -7,6 +7,8 @@ const press: Press = {
   shortTitle: "Edo Tribunal Verdict Deepens Crisis",
   title:
     "Edo Tribunal Verdict Deepens Crisis of Confidence in Electoral and Judicial Institutions",
+  description:
+    "Citizen Monitors reacts to the Edo State Tribunal verdict, highlighting deepening mistrust in Nigeria’s electoral and judicial institutions and calling for accountability and reform.",
   readingTimeInMinutes: 5,
   date: "2025-04-03",
   author: "Press Office",

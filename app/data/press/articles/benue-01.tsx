@@ -7,6 +7,8 @@ const press: Press = {
   shortTitle: "Benue Massacre",
   title:
     "Benue Massacre: We Asked for Leadership, Not Neutrality in the Face of Evil",
+  description:
+    "Citizen Monitors responds to the Benue massacre, calling for leadership, accountability, and justice in the face of tragedy.",
   readingTimeInMinutes: 5,
   date: "2025-06-18",
   author: "Press Office",
