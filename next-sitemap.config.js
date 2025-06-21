@@ -2,6 +2,7 @@
 module.exports = {
   siteUrl: process.env.METADATA_BASEURL,
   generateRobotsTxt: true,
+  generateIndexSitemap: false,
   changefreq: 'weekly',
   priority: 0.7,
   exclude: [
