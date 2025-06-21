@@ -79,7 +79,7 @@ export const privacyPolicy: Sections = [
     content: [
       {
         title: "Cookies",
-        description: `We use cookies and similar tracking technologies to enhance user experience, track usage patterns, and gather information about your preferences.`
+        description: `We use cookies and similar tracking technologies to enhance user experience.`
       },
       {
         title: "Opt-Out",
