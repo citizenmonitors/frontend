@@ -1,8 +1,7 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: process.env.METADATA_BASEURL || 'https://citizenmonitors.org',
+  siteUrl: process.env.METADATA_BASEURL,
   generateRobotsTxt: true,
-  generateIndexSitemap: true,
   changefreq: 'weekly',
   priority: 0.7,
   exclude: [
