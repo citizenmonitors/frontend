@@ -1,4 +1,5 @@
 import "./layout.css";
+import "@/app/(pages)/(landing)/landing.css";
 
 import inter from "./fonts/inter";
 import league_spartan from "./fonts/league_spartan";

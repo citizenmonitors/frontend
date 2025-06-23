@@ -5,7 +5,13 @@ import About from "@/app/components/landing/home/about/About";
 import Showcase from "@/app/components/landing/home/showcase/Showcase";
 import Disclaimer from "@/app/components/shared/Disclaimer";
 import FAQ from "@/app/components/landing/home/FAQ/FAQ";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  alternates: {
+    canonical: `${process.env.METADATA_BASEURL!}/`,
+  }
+}
 
 export default function Home() {
   return (
