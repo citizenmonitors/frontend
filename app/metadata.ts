@@ -1,3 +1,4 @@
+import { resetPassword } from './redux/features/userSlice';
 const primaryMetadata = {
   title: "Citizen Monitors - Crowdsourcing Electoral Data for Africa",
   description:
@@ -124,6 +125,34 @@ export const signupMetadata = {
     title: "Sign Up - Citizen Monitors",
     description: "Create an account to start contributing to electoral transparency in Africa.",
     url: `${process.env.METADATA_BASEURL!}/auth/signup`,
+    siteName: "Citizen Monitors",
+    type: "website",
+    locale: "en_GB",
+  },
+};
+
+export const resetPasswordMetadata = {
+  title: "Reset Password - Citizen Monitors",
+  description: "Reset your Citizen Monitors account password securely.",
+  keywords: ["reset password", "citizen monitors", "account recovery", "password reset"],
+  openGraph: {
+    title: "Reset Password - Citizen Monitors",
+    description: "Recover access to your Citizen Monitors account by resetting your password.",
+    url: `${process.env.METADATA_BASEURL!}/auth/reset-password`,
+    siteName: "Citizen Monitors",
+    type: "website",
+    locale: "en_GB",
+  },
+};
+
+export const forgotPasswordMetadata = {
+  title: "Account Recovery - Citizen Monitors",
+  description: "Request a password reset link to regain access to your Citizen Monitors account.",
+  keywords: ["forgot password", "citizen monitors", "account recovery", "password assistance"],
+  openGraph: {
+    title: "Forgot Password - Citizen Monitors",
+    description: "If you've forgotten your password, request a reset link to recover your account.",
+    url: `${process.env.METADATA_BASEURL!}/auth/forgot-password`,
     siteName: "Citizen Monitors",
     type: "website",
     locale: "en_GB",

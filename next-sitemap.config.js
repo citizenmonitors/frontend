@@ -7,11 +7,16 @@ module.exports = {
   exclude: [
     '/admin/*',
     '/portal/*',
+    '/resources/*',
+    '/auth/reset-password',
+    '/admin',
+    '/portal',
     '/manifest.webmanifest',
     '/apple-icon*.png',
     '/icon*.png',
     '/opengraph-image.png',
     '/twitter-image.png',
+    '/auth/signup/*',
   ],
   transform: async (config, path) => {
     const priorityMap = {
