@@ -93,6 +93,10 @@ const settingsRoutes = [
     name: "Observer Verification",
   },
   {
+    route: `${settingsPath}/notifications`,
+    name: "Notifications",
+  },
+  {
     route: `${settingsPath}/password`,
     name: "Password",
   },
