@@ -1,5 +1,4 @@
-import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
-import { User } from "@/app/redux/types";
+import { useAppSelector } from "@/app/hooks/redux";
 import React, { useState } from "react";
 import RoleTag from "../../shared/RoleTag";
 import moment from "moment";
@@ -19,7 +18,6 @@ type UsersTableProps = {
 
 export default function UsersTable({ filteredUsers }: UsersTableProps) {
   const userState = useAppSelector((state) => state.adminUser);
-  const dispatch = useAppDispatch();
   const [deleteUserModalData, setDeleteUserModalData] = useState<AdminTableUser | null>(
     null
   );
@@ -42,7 +40,7 @@ export default function UsersTable({ filteredUsers }: UsersTableProps) {
           />
         </div>
       ),
-      time: moment(user.createdAt).format("DD/MM/YYYY, hh:mm A"),
+      time: moment(user.createdAt).format("DD/MM/YYYY, hh:mmA"),
       state: formatString.normalCase(user.state),
       gender: formatString.normalCase(user.gender),
       actions: (
@@ -104,6 +102,7 @@ export default function UsersTable({ filteredUsers }: UsersTableProps) {
     {
       title: "Registration Date",
       dataIndex: "time",
+			defaultSortOrder: "descend",
       key: "time",
       sorter: (a, b) => {
         const timeA = moment(a.time, "DD/MM/YYYY, hh:mm A").valueOf();

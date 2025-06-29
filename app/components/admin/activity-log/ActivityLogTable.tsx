@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
+import { useAppSelector } from "@/app/hooks/redux";
 import { AdminTableActivity } from "@/app/redux/admin-features/activityLogSlice";
 import { Button, Dropdown, Empty, Table, TableColumnsType } from "antd";
 import React, { useState } from "react";
@@ -44,6 +44,7 @@ function ActivityLogTable({ filteredActivities }: ActivityLogTableProps) {
     {
       title: "Time",
       dataIndex: "time",
+			defaultSortOrder: "descend",
       key: 4,
       sorter: (a: any, b: any) => {
         const timeA = moment(a.time, "DD/MM/YYYY, hh:mm A").valueOf();
@@ -77,7 +78,7 @@ function ActivityLogTable({ filteredActivities }: ActivityLogTableProps) {
         </div>
       ),
       action: activity.action,
-      time: moment(activity.timeCreated).format("DD/MM/YYYY, hh:mm A"),
+      time: moment(activity.timeCreated).format("DD/MM/YYYY, hh:mmA"),
       actions: (
         <div>
           <Dropdown

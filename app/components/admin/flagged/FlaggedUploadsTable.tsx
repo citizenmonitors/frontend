@@ -62,6 +62,7 @@ export default function FlaggedUploadsTable({
     {
       title: "Upload Date",
       dataIndex: "time",
+			defaultSortOrder: "descend",
       key: 5,
       sorter: (a: any, b: any) => {
         const timeA = moment(a.time, "DD/MM/YYYY, hh:mm A").valueOf();
@@ -98,7 +99,7 @@ export default function FlaggedUploadsTable({
       election: formatString.kebabToNormalCase(upload.election, true),
       state: formatString.normalCase(upload.state),
       pollingUnit: upload.pollingUnit.toUpperCase(),
-      time: moment(upload.createdAt).format("DD/MM/YYYY, hh:mm A"),
+      time: moment(upload.createdAt).format("DD/MM/YYYY, hh:mmA"),
       type: upload.resultUploaded,
       hidden: (
         <div className="flex justify-center">

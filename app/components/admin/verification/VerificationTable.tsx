@@ -48,7 +48,7 @@ export default function VerificationTable({ filteredUsers }: UsersTableProps) {
           />
         </div>
       ),
-      time: moment(user.createdAt).format("DD/MM/YYYY, hh:mm A"),
+      time: moment(user.createdAt).format("DD/MM/YYYY, hh:mmA"),
       state: formatString.normalCase(user.state),
       gender: formatString.normalCase(user.gender),
       actions: (
@@ -91,6 +91,7 @@ export default function VerificationTable({ filteredUsers }: UsersTableProps) {
     {
       title: "Registration Date",
       dataIndex: "time",
+			defaultSortOrder: "descend",
       key: "time",
       sorter: (a, b) => {
         const timeA = moment(a.time, "DD/MM/YYYY, hh:mm A").valueOf();

@@ -1,5 +1,5 @@
-import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
-import { AdminElectionUpload, UserRole } from "@/app/redux/types";
+import { useAppSelector } from "@/app/hooks/redux";
+import { AdminElectionUpload } from "@/app/redux/types";
 import formatString from "@/app/utils/formatString";
 import { Button, Dropdown, Empty, Table, TableColumnsType, Tooltip } from "antd";
 import { ArrowLeft, ArrowRight, Eye, Trash } from "iconsax-react";
@@ -19,7 +19,6 @@ type UploadsTableProps = {
 
 export default function UploadsTable({ filteredUploads }: UploadsTableProps) {
   const uploadState = useAppSelector((state) => state.adminUpload);
-  const dispatch = useAppDispatch();
   const [deleteUploadModalData, setDeleteUploadModalData] =
     useState<AdminElectionUpload | null>(null);
   const [viewUploadModalData, setViewUploadModalData] =
@@ -53,6 +52,7 @@ export default function UploadsTable({ filteredUploads }: UploadsTableProps) {
     {
       title: "Upload Date",
       dataIndex: "time",
+			defaultSortOrder: "descend",
       key: 5,
       sorter: (a: any, b: any) => {
         const timeA = moment(a.time, "DD/MM/YYYY, hh:mm A").valueOf();
@@ -88,7 +88,7 @@ export default function UploadsTable({ filteredUploads }: UploadsTableProps) {
       email: <TruncateTooltip length={24}>{upload.email}</TruncateTooltip>,
       election: formatString.kebabToNormalCase(upload.election, true),
       state: formatString.normalCase(upload.state),
-      time: moment(upload.createdAt).format("DD/MM/YYYY, hh:mm A"),
+      time: moment(upload.createdAt).format("DD/MM/YYYY, hh:mmA"),
       type: upload.resultUploaded,
       verification: (
         <div className="w-full flex justify-center">
