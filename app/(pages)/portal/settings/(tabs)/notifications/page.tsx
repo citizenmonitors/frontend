@@ -8,30 +8,27 @@ import React, { useMemo } from 'react'
 
 function Notifications() {
   const dispatch = useAppDispatch();
-  const dummyUserNotifications = {
-    emailNotifications: false,
-    inboxNotifications: false,
-    electionNotifications: false,
-    newsletterNotifications: false,
+  const initialUserNotifications = {
+    inboxNotifications: true,
+    electionNotifications: true,
+    newsletterNotifications: true,
   };
 
   const { formData, setFormData } = useFormHandler({
-    emailNotifications: dummyUserNotifications.emailNotifications,
-    inboxNotifications: dummyUserNotifications.inboxNotifications,
-    electionNotifications: dummyUserNotifications.electionNotifications,
-    newsletterNotifications: dummyUserNotifications.newsletterNotifications,
+    inboxNotifications: initialUserNotifications.inboxNotifications,
+    electionNotifications: initialUserNotifications.electionNotifications,
+    newsletterNotifications: initialUserNotifications.newsletterNotifications,
   });
 
   const isChangesMade = useMemo(() => {
-    const currentNotiSettings = {
-      emailNotifications: dummyUserNotifications.emailNotifications,
-      inboxNotifications: dummyUserNotifications.inboxNotifications,
-      electionNotifications: dummyUserNotifications.electionNotifications,
-      newsletterNotifications: dummyUserNotifications.newsletterNotifications,
+    const existingUserNotifications = {
+      inboxNotifications: initialUserNotifications.inboxNotifications,
+      electionNotifications: initialUserNotifications.electionNotifications,
+      newsletterNotifications: initialUserNotifications.newsletterNotifications,
     };
 
-    return JSON.stringify(currentNotiSettings) !== JSON.stringify(formData);
-  }, [formData, dummyUserNotifications]);
+    return JSON.stringify(existingUserNotifications) !== JSON.stringify(formData);
+  }, [formData, initialUserNotifications]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -63,30 +60,14 @@ function Notifications() {
         <p className="text-gray-500 text-sm text-center mb-8 max-w-screen-xs mx-auto">
           Manage your notification preferences to stay updated on important events and activities.
         </p>
+
+				<div className='flex justify-between items-center'>
+					<span className="text-brand-500 font-medium text-sm mb-3">
+						Email Notifications
+					</span>
+				</div>
         <form className="grid grid-cols-2 gap-4" action="" onSubmit={handleSubmit}>
-          <div className="grid gap-[6px] col-span-2 md:col-span-1 place-content-center">
-            <label
-              htmlFor="notification-emails"
-              className="text-sm font-medium w-[220px]"
-            >
-              Emails{" "}
-              <span className="text-error-600">*</span>
-            </label>
-            <Checkbox
-              id="notification-emails"
-              checked={formData.emailNotifications}
-              onChange={(e) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  emailNotifications: e.target.checked,
-                }));
-              }}
-            >
-              <span className="text-gray-500">
-                Receive Email Notifications</span>
-            </Checkbox>
-          </div>
-          <div className="grid gap-[6px] col-span-2 md:col-span-1 place-content-center">
+          <div className="grid gap-[6px] col-span-2 md:col-span-1 place-content-center md:place-content-start">
             <label
               htmlFor="notification-inbox"
               className="text-sm font-medium w-[220px]"
@@ -108,7 +89,7 @@ function Notifications() {
                 Receive Inbox Messages</span>
             </Checkbox>
           </div>
-          <div className="grid gap-[6px] col-span-2 md:col-span-1 place-content-center">
+          <div className="grid gap-[6px] col-span-2 md:col-span-1 place-content-center md:place-content-start">
             <label
               htmlFor="notification-elections"
               className="text-sm font-medium w-[220px]"
@@ -127,10 +108,10 @@ function Notifications() {
               }}
             >
               <span className="text-gray-500">
-                Receive Election Notifications</span>
+                Receive Live Election Updates</span>
             </Checkbox>
           </div>
-          <div className="grid gap-[6px] col-span-2 md:col-span-1 place-content-center">
+          <div className="grid gap-[6px] col-span-2 md:col-span-1 place-content-center md:place-content-start">
             <label
               htmlFor="notification-newsletter"
               className="text-sm font-medium w-[220px]"
