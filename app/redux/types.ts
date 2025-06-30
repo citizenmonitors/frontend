@@ -41,6 +41,14 @@ export type ObserverVerificationDetails = {
   bankAccountName: string;
 }
 
+export type NotificationSettings = {
+	email: {
+		inbox: boolean;
+		elections: boolean;
+		newsletter: boolean;
+	}
+}
+
 export type User = DBObject & {
   email: string;
   role: UserRole;
@@ -60,6 +68,7 @@ export type User = DBObject & {
   observerVerificationDetails: ObserverVerificationDetails;
   isObserverInPollingUnit: boolean;
   pendingObserverVerification: boolean;
+	notifications: NotificationSettings;
 } & ObserverVerificationDetails;
 
 export type FetchedElection = DBObject & Election & {
