@@ -6,8 +6,6 @@ import React, { act, useMemo } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import CustomRechartsTooltip from "../../../shared/charts/CustomRechartsTooltip";
 
-// rewrite to array of objects like { name: "verifiedObserverSubmissions", count: 4051149 }
-
 export default function ActivityBoardData() {
   const activityState = useAppSelector((state) => state.activity);
   const activityBoard = activityState.activityBoard;
@@ -15,9 +13,8 @@ export default function ActivityBoardData() {
     "Observer Submissions": activityBoard.observerSubmissions,
     "Volunteer Submissions": activityBoard.volunteerSubmissions,
     "Approved Submissions": activityBoard.approvedObserverSubmissions,
-    "Pending Approvals": activityBoard.pendingApprovals,
   };
-  const colors = ["#05A39C", "#6EEDE7", "#CCFFFF", "#026B63"];
+  const colors = ["#05A39C", "#6EEDE7", "#026B63"];
   const data = useMemo(() => {
     const slices = Object.entries(pieChartData).map(([name, count]) => ({ name, count }));
     return {
@@ -38,9 +35,7 @@ export default function ActivityBoardData() {
       <div className="grid grid-cols-2">
         <div className="relative col-span-2 xl:col-span-1">
           <div
-            className={`absolute flex flex-col justify-center -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 transition-all ${
-              !data.total ? "opacity-0" : "opacity-100"
-            }`}
+            className={`absolute flex flex-col justify-center -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 transition-all`}
           >
             <h3 className="font-bold text-center text-gray-700 text-display-sm leading-[1.1]">
               {formatNumber.commas(data.total)}

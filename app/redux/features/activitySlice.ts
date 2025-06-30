@@ -13,7 +13,6 @@ type InitialActivityState = {
     observerSubmissions: number,
     volunteerSubmissions: number,
     approvedObserverSubmissions: number,
-    pendingApprovals: number,
   },
   activityNotifications: Array<ActivityNotification>,
   activityLiveResult: null | ActivityLiveElection,
@@ -29,7 +28,6 @@ const initialState: InitialActivityState = {
     observerSubmissions: 0,
     volunteerSubmissions: 0,
     approvedObserverSubmissions: 0,
-    pendingApprovals: 0,
   },
   activityNotifications: [],
   activityLiveResult: null,
@@ -49,7 +47,6 @@ const activitySlice = createSlice({
         observerSubmissions: 0,
         volunteerSubmissions: 0,
         approvedObserverSubmissions: 0,
-        pendingApprovals: 0,
       }
       state.activityNotifications = []
       state.status.fetchActivityData = 'not started'
@@ -71,7 +68,6 @@ const activitySlice = createSlice({
         observerSubmissions: board["all the total result submitted by observer"],
         volunteerSubmissions: board["all the total result submitted by volunteer"],
         approvedObserverSubmissions: board["all the total approved result"],
-        pendingApprovals: board["all the total pending approved result"]
       }
       state.activityNotifications = action.payload.notifications;
       state.status.fetchActivityData = 'fulfilled';
@@ -124,7 +120,6 @@ export const getActivityData = createAsyncThunk<{
     "all the total result submitted by observer": number;
     "all the total result submitted by volunteer": number;
     "all the total approved result": number;
-    "all the total pending approved result": number
   },
   notifications: Array<ActivityNotification>
 }, void>(
