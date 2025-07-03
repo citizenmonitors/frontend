@@ -3,7 +3,7 @@ import SettingsHeader from "@/app/components/portal/settings/SettingsHeader";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import useFormHandler from "@/app/hooks/useFormHandler";
 import { showAlert } from "@/app/redux/features/alertSlice";
-import { updateAccount } from "@/app/redux/features/userSlice";
+import { clearUserStatus, updateAccount } from "@/app/redux/features/userSlice";
 import { Button, Checkbox } from "antd";
 import React, { useEffect, useMemo } from "react";
 
@@ -75,6 +75,7 @@ function Notifications() {
           type: "success",
         })
       );
+      dispatch(clearUserStatus(["updateAccount"]));
     }
   }, [userState.status.updateAccount]);
 
