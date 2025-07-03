@@ -45,7 +45,7 @@ function Notifications() {
     const updatedNotifications = {
       email: {
         inbox: formData.inboxNotifications,
-        elections: formData.electionNotifications,
+        election: formData.electionNotifications,
         newsletter: formData.newsletterNotifications,
       },
     };
