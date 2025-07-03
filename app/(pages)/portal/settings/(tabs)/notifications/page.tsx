@@ -5,7 +5,7 @@ import useFormHandler from "@/app/hooks/useFormHandler";
 import { showAlert } from "@/app/redux/features/alertSlice";
 import { clearUserStatus, updateAccount } from "@/app/redux/features/userSlice";
 import { User } from "@/app/redux/types";
-import { Button, Checkbox, notification } from "antd";
+import { Button, Checkbox } from "antd";
 import React, { useEffect, useMemo } from "react";
 
 function Notifications() {
