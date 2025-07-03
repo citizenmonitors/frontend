@@ -89,7 +89,7 @@ function Notifications() {
           Notification Preferences
         </h3>
         <p className="text-gray-500 text-sm text-center mb-8 max-w-screen-xs mx-auto">
-          Manage your preferences to stay updated on important
+          Manage your notification preferences to stay updated on important
           events and activities.
         </p>
 
