@@ -44,7 +44,7 @@ export type ObserverVerificationDetails = {
 export type NotificationSettings = {
 	email: {
 		inbox: boolean;
-		elections: boolean;
+		election: boolean;
 		newsletter: boolean;
 	}
 }

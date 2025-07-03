@@ -14,14 +14,14 @@ function Notifications() {
 
   const { formData, setFormData } = useFormHandler({
     inboxNotifications: userDetails.notifications.email.inbox,
-    electionNotifications: userDetails.notifications.email.elections,
+    electionNotifications: userDetails.notifications.email.election,
     newsletterNotifications: userDetails.notifications.email.newsletter,
   });
 
   const isChangesMade = useMemo(() => {
     const existingUserNotifications = {
       inboxNotifications: userDetails.notifications.email.inbox,
-      electionNotifications: userDetails.notifications.email.elections,
+      electionNotifications: userDetails.notifications.email.election,
       newsletterNotifications: userDetails.notifications.email.newsletter,
     };
 
