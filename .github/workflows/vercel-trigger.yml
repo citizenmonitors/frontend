@@ -1,0 +1,32 @@
+name: Auto Vercel Trigger
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger-vercel:
+    if: github.actor != 'citizenmonitors'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "citizenmonitors"
+          git config --global user.email "info.citizenmonitors@gmail.com"
+
+      - name: Make dummy commit
+        run: |
+          git pull origin main
+          git commit --allow-empty -m "chore: trigger vercel deployment"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+      - name: Push commit
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
+          git push
