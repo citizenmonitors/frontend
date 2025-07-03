@@ -4,7 +4,8 @@ import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import useFormHandler from "@/app/hooks/useFormHandler";
 import { showAlert } from "@/app/redux/features/alertSlice";
 import { clearUserStatus, updateAccount } from "@/app/redux/features/userSlice";
-import { Button, Checkbox } from "antd";
+import { User } from "@/app/redux/types";
+import { Button, Checkbox, notification } from "antd";
 import React, { useEffect, useMemo } from "react";
 
 function Notifications() {
@@ -42,20 +43,18 @@ function Notifications() {
       return;
     }
 
-    const updatedNotifications = {
-      email: {
-        inbox: formData.inboxNotifications,
-        election: formData.electionNotifications,
-        newsletter: formData.newsletterNotifications,
+    const updatedNotifications: Partial<User> = {
+      notifications: {
+        email: {
+          inbox: formData.inboxNotifications,
+          election: formData.electionNotifications,
+          newsletter: formData.newsletterNotifications,
+        },
       },
     };
 
     // Dispatch action to update user account with new notification settings
-    dispatch(
-      updateAccount({
-        notifications: updatedNotifications,
-      })
-    );
+    dispatch(updateAccount(updatedNotifications));
   }
 
   useEffect(() => {
@@ -172,7 +171,7 @@ function Notifications() {
             size="large"
             className="group/coverage-update-stage-three-submit font-medium flex gap-[1ch] items-center justify-center col-span-2 mt-6"
             htmlType="submit"
-						loading={userState.status.updateAccount === "pending"}
+            loading={userState.status.updateAccount === "pending"}
           >
             Update
           </Button>
