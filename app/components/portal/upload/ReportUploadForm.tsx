@@ -38,7 +38,6 @@ type ReportUploadFormProps = {
 export default function ReportUploadForm({ prefilledFormData }: ReportUploadFormProps) {
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
-  const userState = useAppSelector((state) => state.user.details!);
   const userDetails = useAppSelector((state) => state.user.details!);
   const electionState = useAppSelector((state) => state.election);
   const election = electionState.electionData.election!;

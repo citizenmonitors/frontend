@@ -9,7 +9,6 @@ import {
   InputNumber,
   Modal,
   Select,
-  TimePicker,
   Upload,
   UploadFile,
   UploadProps,
@@ -41,7 +40,6 @@ import acceptedFileTypes from "../../../data/acceptedFileTypes";
 import getElectionName from "@/app/utils/getElectionName";
 import formatNumber from "@/app/utils/formatNumber";
 import Image from "next/image";
-import partyInfo from "@/app/data/partyInfo";
 import ElectionTimePicker from "../elections/ElectionTimePicker";
 import Link from "next/link";
 

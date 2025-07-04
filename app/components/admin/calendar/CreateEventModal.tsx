@@ -146,7 +146,7 @@ export default function CreateEventModal({
               <AppSelect
                 id="event-type"
                 value={formData.electionType}
-                options={electionTypes.map((type, index) => ({
+                options={electionTypes.map((type) => ({
                   value: type.electionType,
                   label: `${type.electionName}`,
                 }))}

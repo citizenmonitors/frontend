@@ -1,13 +1,10 @@
-import TimeScrollPicker from "@/app/components/shared/time-scroll-picker/TimeScrollPicker";
-import Logo from "@/app/components/shared/svg/Logo";
 import LogoFlat from "@/app/components/shared/svg/LogoFlat";
-import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
+import { useAppDispatch } from "@/app/hooks/redux";
 import useFormHandler from "@/app/hooks/useFormHandler";
 import { showAlert } from "@/app/redux/features/alertSlice";
 import { Election } from "@/app/redux/types";
 import getElectionName from "@/app/utils/getElectionName";
-import { Button, Modal, Radio, TimePicker, TimePickerProps } from "antd";
-import dayjs from "dayjs";
+import { Button, Modal, Radio } from "antd";
 import moment from "moment";
 import { useRouter } from "next/navigation";
 import React from "react";

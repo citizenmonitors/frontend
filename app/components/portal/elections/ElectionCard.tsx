@@ -4,10 +4,7 @@ import ElectionPollingUnitModal from "./ElectionPollingUnitModal";
 import BaseElectionCard from "../shared/BaseElectionCard";
 import pluralize from "@/app/utils/pluralize";
 import { useAppDispatch } from "@/app/hooks/redux";
-import {
-  clearElectionUploadData,
-  getElectionById,
-} from "@/app/redux/features/electionSlice";
+import { getElectionById } from "@/app/redux/features/electionSlice";
 import { useRouter } from "next/navigation";
 
 type ElectionCardProps = {
@@ -15,10 +12,14 @@ type ElectionCardProps = {
   mode?: "previous" | "ongoing";
 };
 
-export default function ElectionCard({ election, mode = "ongoing" }: ElectionCardProps) {
+export default function ElectionCard({
+  election,
+  mode = "ongoing",
+}: ElectionCardProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const [confirmPollingUnitModal, setConfirmPollingUnitModal] = React.useState(false);
+  const [confirmPollingUnitModal, setConfirmPollingUnitModal] =
+    React.useState(false);
 
   function handleElectionCardClick() {
     if (election.results.length > 0) {

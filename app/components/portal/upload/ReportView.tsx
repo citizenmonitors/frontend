@@ -10,7 +10,6 @@ import { ratingSelectOptions } from "@/app/data/form";
 import {
   clearElectionUploadData,
   deleteElectionReport,
-  getElectionById,
 } from "@/app/redux/features/electionSlice";
 import formatNumber from "@/app/utils/formatNumber";
 import { showAlert } from "@/app/redux/features/alertSlice";
@@ -25,7 +24,6 @@ export default function ReportView({ setMode }: ReportViewProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { id }: { id: string } = useParams();
-  const userState = useAppSelector((state) => state.user.details!);
   const electionState = useAppSelector((state) => state.election);
   const election = electionState.electionData.election!;
   const electionReport = electionState.electionData.report!;

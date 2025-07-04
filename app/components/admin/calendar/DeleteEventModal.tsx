@@ -1,18 +1,7 @@
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import { Button, Modal } from "antd";
-import { Profile } from "iconsax-react";
-import {
-  AdminTableUser,
-  clearUser,
-  deleteUser,
-} from "@/app/redux/admin-features/userSlice";
 import { useEffect } from "react";
 import { showAlert } from "@/app/redux/features/alertSlice";
-import {
-  AdminCardAdmin,
-  getAdmins,
-  suspendAdmin,
-} from "@/app/redux/admin-features/adminSlice";
 import { deleteElection, getElections } from "@/app/redux/features/electionSlice";
 import { Election } from "@/app/redux/types";
 import { CalendarEvent } from "@/app/hooks/useCalendarEvents";

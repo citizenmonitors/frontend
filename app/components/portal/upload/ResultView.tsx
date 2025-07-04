@@ -28,7 +28,6 @@ export default function ResultView({ setMode }: ResultViewProps) {
   const dispatch = useAppDispatch();
   const { id }: { id: string } = useParams();
   const electionState = useAppSelector((state) => state.election);
-  const userState = useAppSelector((state) => state.user.details!);
   const election = electionState.electionData.election!;
   const electionResult = electionState.electionData.result!;
   const electionYear = moment(election.startDate).format("YYYY");

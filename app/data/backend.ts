@@ -1,5 +1,3 @@
-import { notification } from "antd";
-
 const backendURL = process.env.NEXT_PUBLIC_BACKEND_API_URL!;
 export const backendDomain = backendURL.replace("/api", "");
 

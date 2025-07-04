@@ -22,7 +22,6 @@ export default function ElectionLayout({
 }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const userState = useAppSelector((state) => state.user.details!);
   const electionState = useAppSelector((state) => state.adminElection!);
 
   useEffect(() => {
