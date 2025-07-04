@@ -1,7 +1,6 @@
-import { Button, DatePicker, Input, Modal, Spin } from "antd";
+import { Button, Checkbox, DatePicker, Input, Modal, Spin } from "antd";
 import { CloseSquare } from "iconsax-react";
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import UserProfileCard from "../../shared/UserProfileCard";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import useFormHandler from "@/app/hooks/useFormHandler";
@@ -19,7 +18,10 @@ type CreateEventModalProps = {
   setOpen: (open: boolean) => void;
 };
 
-export default function CreateEventModal({ open, setOpen }: CreateEventModalProps) {
+export default function CreateEventModal({
+  open,
+  setOpen,
+}: CreateEventModalProps) {
   const userState = useAppSelector((state) => state.user);
   const userDetails = userState.details!;
   const electionState = useAppSelector((state) => state.election);
@@ -32,6 +34,7 @@ export default function CreateEventModal({ open, setOpen }: CreateEventModalProp
     electionType: undefined as string | undefined,
     startDate: undefined as string | undefined,
     endDate: undefined as string | undefined,
+    mockElection: false,
 
     location: {
       federal: null,
@@ -82,6 +85,7 @@ export default function CreateEventModal({ open, setOpen }: CreateEventModalProp
       electionLocation,
       startDate: formData.startDate,
       endDate: formData.endDate,
+      mockElection: formData.mockElection,
     };
     dispatch(createElection(newElection));
   }
@@ -253,6 +257,23 @@ export default function CreateEventModal({ open, setOpen }: CreateEventModalProp
                 value={formData.endDate}
                 onChange={handleFormInputChange("endDate", "static")}
               />
+            </div>
+
+            <div className="grid gap-[6px] col-span-2 md:col-span-1 place-content-center md:place-content-start">
+              <Checkbox
+                id="mockelection"
+                checked={formData.mockElection}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    mockElection: e.target.checked,
+                  }));
+                }}
+              >
+                <span className="text-gray-500">
+									Set as Mock Election
+                </span>
+              </Checkbox>
             </div>
 
             <Button

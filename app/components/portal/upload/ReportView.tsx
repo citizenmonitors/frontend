@@ -127,7 +127,7 @@ export default function ReportView({ setMode }: ReportViewProps) {
       <header className="flex gap-4 md:items-center">
         <ElectionIcon electionType={election.electionType} />{" "}
         <h2 className="font-league text-display-xs text-gray-700 font-semibold leading-[1.1] lg:text-display-sm">
-        {electionYear} {getElectionName(election, "detailed", userState)} Elections Incident
+        {electionYear} {getElectionName(election, "detailed")} Elections Incident
           Report
         </h2>
         <div className="hidden ml-auto md:block">{actionButtons}</div>

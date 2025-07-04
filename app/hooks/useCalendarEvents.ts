@@ -31,7 +31,7 @@ export default function useCalendarEvents() {
   }).forEach((election, index) => {
     if (user && election.startDate <= now && now <= election.endDate) {
       events.elections.push({
-        name: getElectionName(election, "detailed", user),
+        name: getElectionName(election, "detailed"),
         color: eventColors[index % eventColors.length],
         startDate: election.startDate,
         endDate: election.endDate,

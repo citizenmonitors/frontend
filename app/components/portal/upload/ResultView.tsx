@@ -127,7 +127,7 @@ export default function ResultView({ setMode }: ResultViewProps) {
       <header className="flex gap-4 md:items-center">
         <ElectionIcon electionType={election.electionType} />{" "}
         <h2 className="font-league text-display-xs text-gray-700 font-semibold leading-[1.1] lg:text-display-sm">
-          {electionYear} {getElectionName(election, "detailed", userState)} Elections
+          {electionYear} {getElectionName(election, "detailed")} Elections
         </h2>
         <div className="ml-auto hidden md:block">{actionButtons}</div>
       </header>

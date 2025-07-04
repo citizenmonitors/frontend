@@ -11,7 +11,7 @@ import copyObject from "@/app/utils/copyObject";
 export const PARTY_COLOR_LIST = colors;
 
 export const emptyLiveElection: LiveElection = {
-  electionDetails: { electionType: '', electionName: '', startDate: '', endDate: '', },
+  electionDetails: { electionType: '', electionName: '', startDate: '', endDate: '', mockElection: false, electionLocation: '' },
   result: null,
   incidentReport: null,
   sentimentAnalysis: null,
@@ -55,6 +55,7 @@ const liveElectionSlice = createSlice({
     });
     builder.addCase(getLiveElectionById.fulfilled, (state, action) => {
       const { electionDetails, result, incidentReport, sentimentAnalysis } = action.payload;
+			console.log(emptyLiveElection, action.payload);
       let newLiveElection: LiveElection = Object.assign(copyObject(emptyLiveElection), { electionDetails });
 
       if (result) {

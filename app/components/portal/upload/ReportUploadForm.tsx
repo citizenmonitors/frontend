@@ -388,7 +388,7 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
         <ElectionIcon electionType={election.electionType} />{" "}
         <h2 className="font-league text-display-xs text-gray-700 font-semibold leading-[1.1] lg:text-display-sm">
           {isEditMode && "Edit "}
-          {electionYear} {getElectionName(election, "detailed", userState)} Elections
+          {electionYear} {getElectionName(election, "detailed")} Elections
           Incident Report
         </h2>
       </header>

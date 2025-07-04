@@ -81,12 +81,17 @@ export type ElectionType = DBObject & {
   electionName: string;
 }
 
-export type Election = DBObject & {
+// Active Elections
+export type ActiveElection = {
+	electionLocation: string | null;
+	startDate: string;
+	endDate: string;
+	mockElection: boolean;
+}
+
+export type Election = DBObject & ActiveElection & {
   electionType: string;
   electionName: string;
-  electionLocation: string | null;
-  startDate: string;
-  endDate: string;
   politicalParties: Array<ElectionParty>;
   resultsCount: number;
   results: Array<string>;
@@ -181,13 +186,7 @@ export type LiveOverallSentimentAnalysis = {
 // ===============================================================
 
 export type LiveElection = {
-  electionDetails: {
-    electionType: string;
-    electionName: string;
-
-    startDate: string;
-    endDate: string;
-  };
+  electionDetails: Pick<Election, 'mockElection' | 'electionLocation' | 'electionType' | 'electionName' | 'startDate' | 'endDate'>;
 
   result: BaseLiveElectionResult | GroupedLiveElectionResult | null;
   incidentReport: BaseLiveElectionIncident | null;

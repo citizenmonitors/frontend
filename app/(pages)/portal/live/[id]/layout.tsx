@@ -8,7 +8,6 @@ import {
 } from "@/app/redux/features/liveElectionSlice";
 import getElectionName from "@/app/utils/getElectionName";
 import { Button, Spin } from "antd";
-import { useRowStyle } from "antd/es/grid/style";
 import { ArrowLeft2 } from "iconsax-react";
 import moment from "moment";
 import { useRouter } from "next/navigation";
@@ -23,7 +22,6 @@ export default function LiveSubmissionLayout({
 }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const userState = useAppSelector((state) => state.user.details!);
   const liveElectionState = useAppSelector((state) => state.liveElection);
 
   useEffect(() => {
@@ -75,7 +73,7 @@ export default function LiveSubmissionLayout({
       <header className="flex gap-4 md:items-center mb-7">
         <ElectionIcon electionType={liveElection.electionType} />{" "}
         <h2 className="font-league text-display-xs text-gray-700 font-semibold leading-[1.1] lg:text-display-sm">
-          {liveElectionYear} {getElectionName(liveElection, "detailed", userState)}{" "}
+          {liveElectionYear} {getElectionName(liveElection, "detailed")}{" "}
           Elections
         </h2>
       </header>

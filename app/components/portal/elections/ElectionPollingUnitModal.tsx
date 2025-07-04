@@ -23,7 +23,6 @@ export default function ElectionPollingUnitModal({
   open,
   setOpen,
 }: ElectionPollingUnitModalProps) {
-  const userState = useAppSelector((state) => state.user.details!);
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -72,7 +71,7 @@ export default function ElectionPollingUnitModal({
         <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-6 w-full">
           <div className="flex flex-col">
             <span className="text-center text-gray-500">
-              {getElectionName(election, "detailed", userState)} Elections (
+              {getElectionName(election, "detailed")} Elections (
               {moment(election.startDate).format("YYYY")})
             </span>
             <label

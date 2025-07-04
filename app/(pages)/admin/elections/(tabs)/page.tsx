@@ -1,11 +1,11 @@
 "use client";
+import React from "react";
 import ElectionCard from "@/app/components/admin/elections/ElectionCard";
 import ElectionsTabs from "@/app/components/admin/elections/ElectionsTabs";
 import EmptyElectionsPage from "@/app/components/portal/elections/EmptyElectionsPage";
 import { useAppSelector } from "@/app/hooks/redux";
 import sortByElectionType from "@/app/utils/sortByElectionType";
 import moment from "moment";
-import React from "react";
 
 export default function Elections() {
   const { elections } = useAppSelector((state) => state.adminElection);

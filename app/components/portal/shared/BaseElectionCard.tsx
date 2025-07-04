@@ -6,6 +6,7 @@ import React from "react";
 
 type BaseElectionCardProps = {
   election: Election;
+	detailed?: boolean;
   onClick?: () => void;
   tag?: React.ReactElement | string;
   style?: React.CSSProperties;
@@ -16,6 +17,7 @@ export default function BaseElectionCard({
   onClick,
   tag,
   style,
+	detailed = false,
 }: BaseElectionCardProps) {
   return (
     <article
@@ -35,7 +37,7 @@ export default function BaseElectionCard({
         <ElectionCardBg />
       </div>
       <h2 className="font-league font-semibold text-lg md:text-display-xs xl:text-display-sm leading-[1.1] text-gray-700 group-hover/election-card:text-white transition-all duration-300">
-        {getElectionName(election, "short")}
+        {getElectionName(election, detailed ? "detailed" : "short")}
       </h2>
     </article>
   );

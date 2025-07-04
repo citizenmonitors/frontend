@@ -1,4 +1,4 @@
-import { Election, User } from "../redux/types";
+import { Election } from "../redux/types";
 import formatString from "./formatString";
 
 // export default function getElectionName(
@@ -6,26 +6,24 @@ import formatString from "./formatString";
 //   return `${type !== "short" && election.electionLocation ? election.electionLocation : ""} ${election.electionName}`;
 // }
 
-const electionTypeLocationMap: Record<string, string | null> = {
-  "national": null,
-  "senatorial": null,
-  "house-of-representatives": null,
-  "gubernatorial": "state",
-  "house-of-assembly": "state",
-  "lga": "lga",
-}
+// const electionTypeLocationMap: Record<string, string | null> = {
+//   "national": null,
+//   "senatorial": null,
+//   "house-of-representatives": null,
+//   "gubernatorial": "state",
+//   "house-of-assembly": "state",
+//   "lga": "lga",
+// }
 
 export default function getElectionName(
-  election: Pick<Election, "electionName" | "electionType">,
+  election: Pick<Election, "electionName" | "electionLocation" | "mockElection">,
   type?: "short" | "detailed",
-  user: typeof type extends "detailed" ? User : Partial<User> = {},
 ) {
-  const { electionName, electionType } = election;
+  const { electionName, electionLocation, mockElection } = election;
+	const nameParts = [electionName];
 
-  if (type === "short" || type === undefined) {
-    return electionName;
-  } else {
-    const location = user[electionTypeLocationMap[electionType] as 'state'] || "";
-    return `${formatString.normalCase(location)} ${electionName}`;
-  }
+  if (type === "detailed") nameParts.unshift(formatString.normalCase(electionLocation || ""));
+	nameParts.unshift(mockElection ? "Mock" : "");
+
+	return nameParts.filter(Boolean).join(" ");
 }

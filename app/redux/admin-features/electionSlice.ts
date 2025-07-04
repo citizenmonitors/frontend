@@ -65,6 +65,7 @@ const adminElectionSlice = createSlice({
     });
     builder.addCase(getElectionById.fulfilled, (state, action) => {
       const { electionDetails, result, incidentReport, sentimentAnalysis } = action.payload;
+			console.log(emptyLiveElection, action.payload);
       let newLiveElection: LiveElection = Object.assign(copyObject(emptyLiveElection), { electionDetails });
 
       if (result) {

@@ -18,7 +18,7 @@ export default function ElectionCard({ election }: ElectionCardProps) {
 
   return (
     <Link href={`/admin/elections/${election._id}`}>
-      <BaseElectionCard election={election} tag={LiveResultsTag} />
+      <BaseElectionCard detailed election={election} tag={LiveResultsTag} />
     </Link>
   );
 }

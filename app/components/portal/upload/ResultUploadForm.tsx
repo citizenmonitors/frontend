@@ -545,7 +545,7 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
         <ElectionIcon electionType={election.electionType} />{" "}
         <h2 className="font-league text-display-xs text-gray-700 font-semibold leading-[1.1] lg:text-display-sm">
           {isEditMode && "Edit"} {electionYear}{" "}
-          {getElectionName(election, "detailed", userDetails)} Elections Upload
+          {getElectionName(election, "detailed")} Elections Upload
         </h2>
       </header>
 
