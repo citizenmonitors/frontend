@@ -1,17 +1,12 @@
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import {
-  AdminElectionUpload,
   AdminFlaggedUpload,
   DetailedIncident,
   DetailedResult,
 } from "@/app/redux/types";
 import {
   Button,
-  Image as AntImage,
-  Input,
-  InputNumber,
   Modal,
-  Select,
   Spin,
   Tooltip,
 } from "antd";
@@ -21,12 +16,10 @@ import {
   CloseSquare,
   Dislike,
   Flag,
-  Like,
   Like1,
 } from "iconsax-react";
 import moment from "moment";
-import React, { SetStateAction, useEffect, useMemo, useState } from "react";
-import { clearUpload, getUpload } from "@/app/redux/admin-features/uploadSlice";
+import React, { SetStateAction, useEffect, useState } from "react";
 import ElectionIcon from "../../shared/ElectionIcon";
 import getElectionName from "@/app/utils/getElectionName";
 import ResultDetails from "../../shared/ResultDetails";

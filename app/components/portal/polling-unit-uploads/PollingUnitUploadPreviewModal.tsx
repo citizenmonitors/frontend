@@ -6,7 +6,7 @@ import { PollingUnitReport, PollingUnitResult } from "@/app/redux/types";
 import pluralize from "@/app/utils/pluralize";
 import { Button, Image as AntImage, Input, InputNumber, Modal, Select } from "antd";
 import Dragger from "antd/es/upload/Dragger";
-import { CloseSquare, Dislike, Flag, Like1 } from "iconsax-react";
+import { CloseSquare, Flag, Like1 } from "iconsax-react";
 import moment from "moment";
 import React, { SetStateAction, useState } from "react";
 import acceptedFileTypes from "../../../data/acceptedFileTypes";

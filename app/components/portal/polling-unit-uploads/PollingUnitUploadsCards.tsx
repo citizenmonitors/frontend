@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import { getPollingUnitResults } from "@/app/redux/features/electionSlice";
 import { PollingUnitReport, PollingUnitResult } from "@/app/redux/types";
 import { Button, Pagination, Spin } from "antd";
-import { ArrowLeft, ArrowRight, Dislike, Flag, Like1, Notepad } from "iconsax-react";
+import { ArrowLeft, ArrowRight, Flag, Like1, Notepad } from "iconsax-react";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { v4 } from "uuid";

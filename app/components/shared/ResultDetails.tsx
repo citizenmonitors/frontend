@@ -1,5 +1,5 @@
 import acceptedFileTypes from "@/app/data/acceptedFileTypes";
-import { DetailedResult, ElectionResult } from "@/app/redux/types";
+import { DetailedResult } from "@/app/redux/types";
 import Dragger from "antd/es/upload/Dragger";
 import moment from "moment";
 import React, { useState } from "react";

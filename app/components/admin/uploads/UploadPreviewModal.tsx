@@ -1,9 +1,9 @@
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import { AdminElectionUpload } from "@/app/redux/types";
-import { Button, Image as AntImage, Input, InputNumber, Modal, Select, Spin } from "antd";
+import { Modal, Spin } from "antd";
 import { CloseSquare } from "iconsax-react";
 import moment from "moment";
-import React, { SetStateAction, useEffect, useState } from "react";
+import React, { SetStateAction, useEffect } from "react";
 import { clearUpload, getUpload } from "@/app/redux/admin-features/uploadSlice";
 import ElectionIcon from "../../shared/ElectionIcon";
 import getElectionName from "@/app/utils/getElectionName";
@@ -27,7 +27,6 @@ export default function UploadPreviewModal({
 		const electionDetails = (uploadDetails?.result || uploadDetails?.incident)
 			?.electionDetails;
 
-  const [previewImageVisible, setPreviewImageVisible] = useState(false);
   const electionYear = moment(upload?.createdAt).format("YYYY");
 
   function closeModal() {
