@@ -14,7 +14,6 @@ import getElectionName from "@/app/utils/getElectionName";
 import formatNumber from "@/app/utils/formatNumber";
 import partyInfo from "@/app/data/partyInfo";
 import Image from "next/image";
-import ReportDetails from "../../shared/ReportDetails";
 
 type PollingUnitUploadPreviewModalProps = {
   togglePollingUnitUploadFlagModal: (

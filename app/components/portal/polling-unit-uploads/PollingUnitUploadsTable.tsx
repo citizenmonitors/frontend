@@ -22,7 +22,6 @@ export default function PollingUnitUploadsTable({
 }) {
   const dispatch = useAppDispatch();
   const electionState = useAppSelector((state) => state.election);
-  const userDetails = useAppSelector((state) => state.user.details!);
 
   type ColumnType = {
     key: React.Key;
@@ -82,7 +81,7 @@ export default function PollingUnitUploadsTable({
 
     return {
       key: v4(),
-      election: upload.electionName,
+      election: getElectionName(upload.election),
       pollingUnit: formatString.normalCase(upload.pollingUnit).toUpperCase(),
       electionYear: upload.electionYear,
       time: moment(upload.uploadedAt || Date.now()).format("YYYY/MM/DD hh:mmA"),

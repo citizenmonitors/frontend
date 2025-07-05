@@ -107,8 +107,8 @@ export default function UploadsTable() {
     },
   ];
 
-  const dataSource = filteredUploads.map((upload, index) => ({
-    key: upload.election._id,
+  const dataSource = filteredUploads.map((upload) => ({
+    key: upload._id,
     election: getElectionName(upload.election),
     time: moment(upload.updatedAt || Date.now()).format("DD/MM/YYYY hh:mmA"),
     type: (upload as any).partiesVotes ? "Election Result" : "Incident Report",

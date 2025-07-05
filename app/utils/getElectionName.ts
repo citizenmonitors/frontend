@@ -17,7 +17,7 @@ import formatString from "./formatString";
 
 export default function getElectionName(
   election: Pick<Election, "electionName" | "electionLocation" | "mockElection">,
-  type?: "short" | "detailed",
+	type: "short" | "detailed" = "short",
 ) {
   const { electionName, electionLocation, mockElection } = election;
 	const nameParts = [electionName];

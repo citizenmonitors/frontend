@@ -98,6 +98,8 @@ export type Election = DBObject & ActiveElection & {
   incidentReports: Array<string>;
 }
 
+type PopulatedElection = Pick<Election, 'mockElection' | 'electionLocation' | 'electionType' | 'electionName' | 'startDate' | 'endDate'>
+
 export type ElectionParty = {
   name: string;
   code: string;
@@ -122,7 +124,7 @@ export type ElectionResult = DBObject & {
   lga: string,
   ward: string,
   pollingUnit: string,
-  election: Pick<Election, '_id' | 'electionType' | 'startDate' | 'endDate' | 'electionName' | 'electionLocation'>;
+  election: PopulatedElection & DBObject;
   // Survey
   voteBuying: BinaryOption;
   voterIntimidation: BinaryOption;
@@ -139,7 +141,7 @@ export type ElectionReport = DBObject & {
   lga: string,
   ward: string,
   pollingUnit: string,
-  election: Pick<Election, '_id' | 'electionType' | 'startDate' | 'endDate' | 'electionName' | 'electionLocation'>;
+  election: PopulatedElection & DBObject;
   // Survey
   electionRating: RatingOption;
 }
@@ -186,7 +188,7 @@ export type LiveOverallSentimentAnalysis = {
 // ===============================================================
 
 export type LiveElection = {
-  electionDetails: Pick<Election, 'mockElection' | 'electionLocation' | 'electionType' | 'electionName' | 'startDate' | 'endDate'>;
+  electionDetails: PopulatedElection;
 
   result: BaseLiveElectionResult | GroupedLiveElectionResult | null;
   incidentReport: BaseLiveElectionIncident | null;
@@ -286,7 +288,7 @@ export type AdminFlaggedUpload = {
 }
 
 export type DetailedResult = DBObject & {
-  electionDetails: Pick<Election, 'electionType' | 'electionName' | 'startDate' | 'endDate'>,
+  electionDetails: PopulatedElection,
   election: string,
   user: string,
   userRole: string,
@@ -309,7 +311,7 @@ export type DetailedResult = DBObject & {
 }
 
 export type DetailedIncident = DBObject & {
-  electionDetails: Pick<Election, 'electionType' | 'electionName' | 'startDate' | 'endDate'>,
+  electionDetails: PopulatedElection,
   election: string,
   user: string,
   userRole: UserRole,

@@ -62,7 +62,9 @@ type ResultUploadFormProps = {
   };
 };
 
-export default function ResultUploadForm({ prefilledFormData }: ResultUploadFormProps) {
+export default function ResultUploadForm({
+  prefilledFormData,
+}: ResultUploadFormProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
@@ -85,7 +87,9 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
     voteBuying: undefined as BinaryOption | undefined,
     voteRating: undefined as RatingOption | undefined,
   });
-  const [resultPicture, setResultPicture] = React.useState<UploadFile | null>(null);
+  const [resultPicture, setResultPicture] = React.useState<UploadFile | null>(
+    null
+  );
   const [resultVideo, setResultVideo] = React.useState<UploadFile | null>(null);
   const [politicalPartyResults, setPoliticalPartyResults] = React.useState<
     Array<ElectionPartyResult>
@@ -103,7 +107,9 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
   ]);
 
   function getPartyLogo(code: string) {
-    return election.politicalParties.find((party) => party.code === code)?.logo || "";
+    return (
+      election.politicalParties.find((party) => party.code === code)?.logo || ""
+    );
   }
 
   function fillFormData() {
@@ -192,12 +198,14 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
     },
   };
 
-  const [addPoliticalPartyModal, setAddPoliticalPartyModal] = React.useState(false);
-  const { formData: partyFormData, setFormData: setPartyFormData } = useFormHandler<{
-    partyName?: string;
-  }>({
-    partyName: "",
-  });
+  const [addPoliticalPartyModal, setAddPoliticalPartyModal] =
+    React.useState(false);
+  const { formData: partyFormData, setFormData: setPartyFormData } =
+    useFormHandler<{
+      partyName?: string;
+    }>({
+      partyName: "",
+    });
   function handleAddPoliticalParty() {
     if (!partyFormData.partyName) {
       dispatch(
@@ -211,7 +219,9 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
 
     // Check if party already exists
     if (
-      politicalPartyResults.some((result) => result.party === partyFormData.partyName)
+      politicalPartyResults.some(
+        (result) => result.party === partyFormData.partyName
+      )
     ) {
       dispatch(
         showAlert({
@@ -319,7 +329,8 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
       if (isNaN(resultVotes) || resultVotes < 0) {
         dispatch(
           showAlert({
-            message: "Please enter a valid vote count for all political parties.",
+            message:
+              "Please enter a valid vote count for all political parties.",
             type: "error",
           })
         );
@@ -344,7 +355,9 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
     }
 
     if (
-      formData.spoiledBallotPapers! + formData.rejectedPapers! + manualPartyVotes !==
+      formData.spoiledBallotPapers! +
+        formData.rejectedPapers! +
+        manualPartyVotes !==
       formData.usedBallotPapers!
     ) {
       dispatch(
@@ -357,7 +370,10 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
       return;
     }
 
-    if (formData.rejectedPapers! + manualPartyVotes > formData.accreditedVoters!) {
+    if (
+      formData.rejectedPapers! + manualPartyVotes >
+      formData.accreditedVoters!
+    ) {
       dispatch(
         showAlert({
           message:
@@ -455,10 +471,15 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
       voteRating: formData.voteRating,
     };
     if (resultPicture!.uid !== prefilledFormData?.resultPicture._id) {
-      updatedResult.resultPicture = resultPicture!.originFileObj! as unknown as FileInfo;
+      updatedResult.resultPicture = resultPicture!
+        .originFileObj! as unknown as FileInfo;
     }
-    if (resultVideo && resultVideo!.uid !== prefilledFormData?.resultVideo._id) {
-      updatedResult.resultVideo = resultVideo!.originFileObj! as unknown as FileInfo;
+    if (
+      resultVideo &&
+      resultVideo!.uid !== prefilledFormData?.resultVideo._id
+    ) {
+      updatedResult.resultVideo = resultVideo!
+        .originFileObj! as unknown as FileInfo;
     }
 
     dispatch(
@@ -500,14 +521,15 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
               type: "success",
             })
           );
+          router.replace("/portal/uploads");
         } else if (searchParams.get("flag")) {
           dispatch(
             showAlert({
-              message: "Conflicting Result Uploaded and Result Flagged successfully.",
+              message:
+                "Conflicting Result Uploaded and Result Flagged successfully.",
               type: "success",
             })
           );
-          dispatch(clearElectionUploadData());
           router.push(`/portal/polling-unit-uploads`);
         } else {
           dispatch(
@@ -516,9 +538,9 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
               type: "success",
             })
           );
-          dispatch(clearElectionUploadData());
-          router.push(`/portal/dashboard`);
+          router.replace("/portal/uploads");
         }
+        dispatch(clearElectionUploadData());
       } else if (electionState.status.uploadElectionResult === "rejected") {
         dispatch(
           showAlert({
@@ -556,7 +578,8 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
             Time Election Began <span className="text-error-600">*</span>
           </label>
           <p>
-            Kindly select the time the election began in your polling unit (hh:mm AM/PM).
+            Kindly select the time the election began in your polling unit
+            (hh:mm AM/PM).
           </p>
           <ElectionTimePicker
             onChange={(time) => {
@@ -570,12 +593,16 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
       )}
 
       <div className="flex flex-col gap-1 text-sm text-gray-500">
-        <label className="text-sm font-medium text-gray-700" htmlFor="accredited-voters">
-          Total Number of Accredited Voters <span className="text-error-600">*</span>
+        <label
+          className="text-sm font-medium text-gray-700"
+          htmlFor="accredited-voters"
+        >
+          Total Number of Accredited Voters{" "}
+          <span className="text-error-600">*</span>
         </label>
         <p>
-          Kindly manually input the total number of accredited voters from the uploaded
-          evidence.
+          Kindly manually input the total number of accredited voters from the
+          uploaded evidence.
         </p>
         <InputNumber
           id="accredited-voters"
@@ -589,12 +616,16 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
       </div>
 
       <div className="flex flex-col gap-1 text-sm text-gray-500">
-        <label className="text-sm font-medium text-gray-700" htmlFor="spoiled-ballots">
-          Total Number of Spoiled Ballot Papers <span className="text-error-600">*</span>
+        <label
+          className="text-sm font-medium text-gray-700"
+          htmlFor="spoiled-ballots"
+        >
+          Total Number of Spoiled Ballot Papers{" "}
+          <span className="text-error-600">*</span>
         </label>
         <p>
-          Kindly manually input the total number of spoiled ballot papers from the
-          uploaded evidence.
+          Kindly manually input the total number of spoiled ballot papers from
+          the uploaded evidence.
         </p>
         <InputNumber
           id="spoiled-ballots"
@@ -608,12 +639,16 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
       </div>
 
       <div className="flex flex-col gap-1 text-sm text-gray-500">
-        <label className="text-sm font-medium text-gray-700" htmlFor="rejected-ballots">
-          Total Number of Rejected Ballots <span className="text-error-600">*</span>
+        <label
+          className="text-sm font-medium text-gray-700"
+          htmlFor="rejected-ballots"
+        >
+          Total Number of Rejected Ballots{" "}
+          <span className="text-error-600">*</span>
         </label>
         <p>
-          Kindly manually input the total number of rejected ballots from the uploaded
-          evidence.
+          Kindly manually input the total number of rejected ballots from the
+          uploaded evidence.
         </p>
         <InputNumber
           id="rejected-ballots"
@@ -631,11 +666,12 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
           className="text-sm font-medium text-gray-700"
           htmlFor="used-ballot-ballots"
         >
-          Total Number of Used Ballot Papers <span className="text-error-600">*</span>
+          Total Number of Used Ballot Papers{" "}
+          <span className="text-error-600">*</span>
         </label>
         <p>
-          Kindly manually input the total number of used ballot papers from the uploaded
-          evidence.
+          Kindly manually input the total number of used ballot papers from the
+          uploaded evidence.
         </p>
         <InputNumber
           id="used-ballot-ballots"
@@ -686,10 +722,14 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
             ) : (
               <div>
                 <p className="text-gray-600">
-                  <span className="font-semibold text-brand-600">Click to upload</span> or
-                  drag and drop
+                  <span className="font-semibold text-brand-600">
+                    Click to upload
+                  </span>{" "}
+                  or drag and drop
                 </p>
-                <p className="mb-4 text-xs text-gray-400">PNG or JPG • Max. 5MB</p>
+                <p className="mb-4 text-xs text-gray-400">
+                  PNG or JPG • Max. 5MB
+                </p>
 
                 <div className="flex items-center gap-2 my-4">
                   <hr className="flex-1 border-gray-100" />
@@ -697,15 +737,19 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
                   <hr className="flex-1 border-gray-100" />
                 </div>
 
-                <Button className="text-sm font-semibold" size="large" type="primary">
+                <Button
+                  className="text-sm font-semibold"
+                  size="large"
+                  type="primary"
+                >
                   Browse Files
                 </Button>
               </div>
             )}
           </Dragger>
           <p className="text-xs font-light text-error-600">
-            The picture uploaded must be a signed result sheet for the election of your
-            polling unit.
+            The picture uploaded must be a signed result sheet for the election
+            of your polling unit.
           </p>
         </div>
 
@@ -739,8 +783,10 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
             ) : (
               <div>
                 <p className="text-gray-600">
-                  <span className="font-semibold text-brand-600">Click to upload</span> or
-                  drag and drop
+                  <span className="font-semibold text-brand-600">
+                    Click to upload
+                  </span>{" "}
+                  or drag and drop
                 </p>
                 <p className="mb-4 text-xs text-gray-400">MP4 • Max. 100MB</p>
 
@@ -750,15 +796,19 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
                   <hr className="flex-1 border-gray-100" />
                 </div>
 
-                <Button className="text-sm font-semibold" size="large" type="primary">
+                <Button
+                  className="text-sm font-semibold"
+                  size="large"
+                  type="primary"
+                >
                   Browse Files
                 </Button>
               </div>
             )}
           </Dragger>
           <p className="text-xs font-light text-error-600">
-            Video must contain vocal proof of date, time and place to validate the video
-            as authentic and verifiable
+            Video must contain vocal proof of date, time and place to validate
+            the video as authentic and verifiable
             {!userDetails.isObserverInPollingUnit && " (Optional Upload)"}.
           </p>
         </div>
@@ -786,7 +836,10 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
                       width={20}
                       height={20}
                       alt={`${result.party} Logo`}
-                      src={getPartyLogo(result.party) || "/assets/party/default.png"}
+                      src={
+                        getPartyLogo(result.party) ||
+                        "/assets/party/default.png"
+                      }
                       className="rounded"
                     />{" "}
                     <span>{result.party}</span>
@@ -818,7 +871,9 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
             ))}
           </div>
         ) : (
-          <p className="py-4 text-sm text-center text-gray-500">No Parties Added</p>
+          <p className="py-4 text-sm text-center text-gray-500">
+            No Parties Added
+          </p>
         )}
 
         <Button
@@ -829,8 +884,8 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
           <span className="font-semibold text-brand-600">Add more Parties</span>
         </Button>
         <p className="text-error-400 text-xs text-center">
-          It is compulsory that you manually enter the vote count for each party as shown
-          in the result sheet for your polling unit.
+          It is compulsory that you manually enter the vote count for each party
+          as shown in the result sheet for your polling unit.
         </p>
         <Modal
           title="Add Political Party"
@@ -846,7 +901,9 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
               e.preventDefault();
             }}
           >
-            <p className="text-gray-500">Please manually enter a political party</p>
+            <p className="text-gray-500">
+              Please manually enter a political party
+            </p>
             <div className="grid gap-2">
               <label htmlFor="party-name" className="text-sm font-medium">
                 Party Name <span className="text-error-600">*</span>
@@ -856,7 +913,9 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
                 options={election.politicalParties
                   .filter(
                     (party) =>
-                      !politicalPartyResults.some((result) => result.party === party.code)
+                      !politicalPartyResults.some(
+                        (result) => result.party === party.code
+                      )
                   )
                   .map((party) => ({
                     value: party.code,
@@ -882,8 +941,8 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
               className="text-sm font-medium text-gray-700"
               htmlFor="sentiment-analysis-voter-intimidation"
             >
-              Were there instances of voter intimidation in your polling unit today?{" "}
-              <span className="text-error-600">*</span>
+              Were there instances of voter intimidation in your polling unit
+              today? <span className="text-error-600">*</span>
             </label>
             <Select
               id="sentiment-analysis-voter-intimidation"
@@ -900,8 +959,8 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
               className="text-sm font-medium text-gray-700"
               htmlFor="sentiment-analysis-vote-buying"
             >
-              Did you observe instances of vote buying in your polling unit today?{" "}
-              <span className="text-error-600">*</span>
+              Did you observe instances of vote buying in your polling unit
+              today? <span className="text-error-600">*</span>
             </label>
             <Select
               id="sentiment-analysis-vote-buying"
@@ -939,14 +998,17 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
             <Checkbox
               checked={formData.isInfoAccurate}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, isInfoAccurate: e.target.checked }))
+                setFormData((prev) => ({
+                  ...prev,
+                  isInfoAccurate: e.target.checked,
+                }))
               }
             />
           </div>
           <p className="text-sm text-gray-700">
-            I hereby affirm that the information submitted is accurate, peer-reviewed and
-            can be used to fact-check the information submitted by the observer in my
-            polling unit.
+            I hereby affirm that the information submitted is accurate,
+            peer-reviewed and can be used to fact-check the information
+            submitted by the observer in my polling unit.
           </p>
         </div>
         <div className="flex gap-2 md:items-center">
@@ -954,7 +1016,10 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
             <Checkbox
               checked={formData.isAgreedToTerms}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, isAgreedToTerms: e.target.checked }))
+                setFormData((prev) => ({
+                  ...prev,
+                  isAgreedToTerms: e.target.checked,
+                }))
               }
             />
           </div>
@@ -986,8 +1051,8 @@ export default function ResultUploadForm({ prefilledFormData }: ResultUploadForm
         {isEditMode
           ? "Update Results"
           : searchParams.get("flag")
-          ? "Submit Results and Flag"
-          : "Submit Results"}
+            ? "Submit Results and Flag"
+            : "Submit Results"}
       </Button>
 
       <SentimentAnalysisModal

@@ -24,8 +24,8 @@ export default function UploadPreviewModal({
   const dispatch = useAppDispatch();
   const uploadState = useAppSelector((state) => state.adminUpload);
   const uploadDetails = uploadState.upload;
-  const electionDetails = (uploadDetails?.result || uploadDetails?.incident)
-    ?.electionDetails;
+		const electionDetails = (uploadDetails?.result || uploadDetails?.incident)
+			?.electionDetails;
 
   const [previewImageVisible, setPreviewImageVisible] = useState(false);
   const electionYear = moment(upload?.createdAt).format("YYYY");

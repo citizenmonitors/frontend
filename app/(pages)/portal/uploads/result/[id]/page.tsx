@@ -65,7 +65,6 @@ export default function ResultUploadPage() {
           type: "warning",
         })
       );
-
       router.replace(`/portal/elections`);
       return;
     }

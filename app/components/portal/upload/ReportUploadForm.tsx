@@ -3,7 +3,15 @@ import UploadIcon from "@/app/components/shared/UploadIcon";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import useFormHandler from "@/app/hooks/useFormHandler";
 import { showAlert } from "@/app/redux/features/alertSlice";
-import { Button, Checkbox, Input, Select, Upload, UploadFile, UploadProps } from "antd";
+import {
+  Button,
+  Checkbox,
+  Input,
+  Select,
+  Upload,
+  UploadFile,
+  UploadProps,
+} from "antd";
 import Dragger from "antd/es/upload/Dragger";
 import moment from "moment";
 import React, { useEffect } from "react";
@@ -35,7 +43,9 @@ type ReportUploadFormProps = {
   };
 };
 
-export default function ReportUploadForm({ prefilledFormData }: ReportUploadFormProps) {
+export default function ReportUploadForm({
+  prefilledFormData,
+}: ReportUploadFormProps) {
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
   const userDetails = useAppSelector((state) => state.user.details!);
@@ -56,7 +66,9 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
     voteBuying: undefined,
     voteRating: undefined,
   });
-  const [incidentPictures, setIncidentPictures] = React.useState<UploadFile[]>([]);
+  const [incidentPictures, setIncidentPictures] = React.useState<UploadFile[]>(
+    []
+  );
   const [incidentVideos, setIncidentVideos] = React.useState<UploadFile[]>([]);
 
   function fillFormData() {
@@ -166,7 +178,10 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
   };
 
   function handleFormSubmit() {
-    if (formData.selectIncident === undefined || !formData.incidentNote.trim()) {
+    if (
+      formData.selectIncident === undefined ||
+      !formData.incidentNote.trim()
+    ) {
       dispatch(
         showAlert({
           message: "Please fill all required fields.",
@@ -241,8 +256,12 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
     };
 
     // get ids of previous files (from db)
-    let previousPicturesIds = prefilledFormData!.incidentPictures.map((pic) => pic._id);
-    let previousVideosIds = prefilledFormData!.incidentVideos.map((vid) => vid._id);
+    let previousPicturesIds = prefilledFormData!.incidentPictures.map(
+      (pic) => pic._id
+    );
+    let previousVideosIds = prefilledFormData!.incidentVideos.map(
+      (vid) => vid._id
+    );
 
     // get ids of previous files (remaining)
     previousPicturesIds = previousPicturesIds.filter(
@@ -263,8 +282,12 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
     // store new files in a DataTransfer object
     const newIncidentPicturesDT = new DataTransfer();
     const newIncidentVideosDT = new DataTransfer();
-    newIncidentPictures.forEach((pic) => newIncidentPicturesDT.items.add(pic as any));
-    newIncidentVideos.forEach((vid) => newIncidentVideosDT.items.add(vid as any));
+    newIncidentPictures.forEach((pic) =>
+      newIncidentPicturesDT.items.add(pic as any)
+    );
+    newIncidentVideos.forEach((vid) =>
+      newIncidentVideosDT.items.add(vid as any)
+    );
 
     (updatedReport as any).previousIncidentPictures = previousPicturesIds;
     (updatedReport as any).previousIncidentVideos = previousVideosIds;
@@ -273,15 +296,20 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
         newIncidentPicturesDT.files as unknown as FileInfo[];
     }
     if (newIncidentVideos.length > 0) {
-      updatedReport.incidentVideos = newIncidentVideosDT.files as unknown as FileInfo[];
+      updatedReport.incidentVideos =
+        newIncidentVideosDT.files as unknown as FileInfo[];
     }
 
-    dispatch(updateElectionReport({ electionId: election._id, report: updatedReport }));
+    dispatch(
+      updateElectionReport({ electionId: election._id, report: updatedReport })
+    );
   }
 
   async function uploadReport() {
     const incidentPicturesDT = new DataTransfer();
-    incidentPictures.forEach((f) => incidentPicturesDT.items.add(f.originFileObj!));
+    incidentPictures.forEach((f) =>
+      incidentPicturesDT.items.add(f.originFileObj!)
+    );
     const incidentVideosDT = new DataTransfer();
     incidentVideos.forEach((f) => incidentVideosDT.items.add(f.originFileObj!));
 
@@ -343,6 +371,7 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
               type: "success",
             })
           );
+          router.replace("/portal/uploads");
         } else if (searchParams.get("flag")) {
           dispatch(
             showAlert({
@@ -351,7 +380,6 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
               type: "success",
             })
           );
-          dispatch(clearElectionUploadData());
           router.push(`/portal/polling-unit-uploads`);
         } else {
           dispatch(
@@ -360,9 +388,9 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
               type: "success",
             })
           );
-          dispatch(clearElectionUploadData());
-          router.push(`/portal/dashboard`);
+          router.replace("/portal/uploads");
         }
+        dispatch(clearElectionUploadData());
       } else if (electionState.status.uploadElectionReport === "rejected") {
         dispatch(
           showAlert({
@@ -393,9 +421,10 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
       </header>
 
       <p className="text-sm text-error-600">
-        Please ensure that you use the "GPSMapCamera" app to capture the incident reports.
-        This app can be downloaded from the PlayStore or AppStore. Incident report
-        submissions will only be valid if they adhere to this requirement.
+        Please ensure that you use the "GPSMapCamera" app to capture the
+        incident reports. This app can be downloaded from the PlayStore or
+        AppStore. Incident report submissions will only be valid if they adhere
+        to this requirement.
       </p>
 
       <div className="flex flex-col gap-1 text-sm text-gray-500">
@@ -403,8 +432,9 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
           Upload Incident Report <span className="text-error-600">*</span>
         </label>
         <p>
-          Your documentation will help us have independent data and evidence that can help
-          us collectively advocate for a just and transparent electoral process.
+          Your documentation will help us have independent data and evidence
+          that can help us collectively advocate for a just and transparent
+          electoral process.
         </p>
       </div>
 
@@ -470,8 +500,10 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
             ) : (
               <div>
                 <p className="text-gray-600">
-                  <span className="font-semibold text-brand-600">Click to upload</span> or
-                  drag and drop
+                  <span className="font-semibold text-brand-600">
+                    Click to upload
+                  </span>{" "}
+                  or drag and drop
                 </p>
                 <p className="mb-4 text-xs text-gray-400">
                   PNG or JPG • Max. 5MB (3 pictures max)
@@ -483,14 +515,19 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
                   <hr className="flex-1 border-gray-100" />
                 </div>
 
-                <Button className="text-sm font-semibold" size="large" type="primary">
+                <Button
+                  className="text-sm font-semibold"
+                  size="large"
+                  type="primary"
+                >
                   Browse Files
                 </Button>
               </div>
             )}
           </Dragger>
           <p className="text-xs font-light text-error-600">
-            Pictures must capture describable proof of the incident in your polling unit.
+            Pictures must capture describable proof of the incident in your
+            polling unit.
           </p>
         </div>
 
@@ -521,8 +558,10 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
             ) : (
               <div>
                 <p className="text-gray-600">
-                  <span className="font-semibold text-brand-600">Click to upload</span> or
-                  drag and drop
+                  <span className="font-semibold text-brand-600">
+                    Click to upload
+                  </span>{" "}
+                  or drag and drop
                 </p>
                 <p className="mb-4 text-xs text-gray-400">
                   MP4 • Max. 100MB (3 videos max)
@@ -534,15 +573,19 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
                   <hr className="flex-1 border-gray-100" />
                 </div>
 
-                <Button className="text-sm font-semibold" size="large" type="primary">
+                <Button
+                  className="text-sm font-semibold"
+                  size="large"
+                  type="primary"
+                >
                   Browse Files
                 </Button>
               </div>
             )}
           </Dragger>
           <p className="text-xs font-light text-error-600">
-            Videos must contain vocal proof of date, time and place to validate the live
-            video capture of the reported incidents.
+            Videos must contain vocal proof of date, time and place to validate
+            the live video capture of the reported incidents.
           </p>
         </div>
       </div>
@@ -575,14 +618,17 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
             <Checkbox
               checked={formData.isInfoAccurate}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, isInfoAccurate: e.target.checked }))
+                setFormData((prev) => ({
+                  ...prev,
+                  isInfoAccurate: e.target.checked,
+                }))
               }
             />
           </div>
           <p className="text-sm text-gray-700">
-            I hereby affirm that the information submitted is accurate, peer-reviewed and
-            can be used to fact-check the information submitted by the observer in my
-            polling unit.
+            I hereby affirm that the information submitted is accurate,
+            peer-reviewed and can be used to fact-check the information
+            submitted by the observer in my polling unit.
           </p>
         </div>
         <div className="flex gap-2 md:items-center">
@@ -590,7 +636,10 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
             <Checkbox
               checked={formData.isAgreedToTerms}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, isAgreedToTerms: e.target.checked }))
+                setFormData((prev) => ({
+                  ...prev,
+                  isAgreedToTerms: e.target.checked,
+                }))
               }
             />
           </div>
@@ -622,8 +671,8 @@ export default function ReportUploadForm({ prefilledFormData }: ReportUploadForm
         {isEditMode
           ? "Update Report"
           : searchParams.get("flag")
-          ? "Submit Report and Flag"
-          : "Submit Report"}
+            ? "Submit Report and Flag"
+            : "Submit Report"}
       </Button>
 
       <SentimentAnalysisModal
