@@ -152,7 +152,7 @@ export default function FlaggedUploadPreviewModal({
             <header className="flex gap-4 md:items-center">
               <ElectionIcon electionType={electionDetails.electionType} />{" "}
               <h2 className="font-league text-xl text-gray-700 font-semibold leading-[1.1] lg:text-display-xs mr-4">
-                {electionYear} {getElectionName(electionDetails)}{" "}
+                {electionYear} {getElectionName(electionDetails, "detailed")}{" "}
                 {upload.resultUploaded === "Incident Report" && upload.resultUploaded}
               </h2>
             </header>
@@ -214,7 +214,7 @@ export default function FlaggedUploadPreviewModal({
 
           <div className="flex gap-4 justify-center mb-4">
             <Button
-              className="!p-0 !rounded-full !w-[40px]"
+              className="!p-0 !rounded-full !w-[40px] grid place-items-center"
               size="large"
               type="primary"
               onClick={() => setCurrentSlide((prev) => prev - 1)}
@@ -223,7 +223,7 @@ export default function FlaggedUploadPreviewModal({
               <ArrowLeft size={24} />
             </Button>
             <Button
-              className="!p-0 !rounded-full !w-[40px]"
+              className="!p-0 !rounded-full !w-[40px] grid place-items-center"
               size="large"
               type="primary"
               onClick={() => setCurrentSlide((prev) => prev + 1)}

@@ -294,7 +294,13 @@ const electionSlice = createSlice({
     });
     builder.addCase(getPollingUnitResults.fulfilled, (state, action) => {
       state.status.fetchPollingUnitResults = "fulfilled";
-      state.pollingUnitResults.results = action.payload.results.results || [];
+      state.pollingUnitResults.results = action.payload.results.results.map((result) => ({
+				...result,
+				election: {
+					...result.election,
+					electionName: result.electionName,
+				}
+			})) || [];
       state.pollingUnitResults.reports =
         action.payload.results.incidentReports || [];
     });

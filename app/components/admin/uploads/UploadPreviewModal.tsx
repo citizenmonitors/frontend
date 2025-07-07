@@ -68,7 +68,7 @@ export default function UploadPreviewModal({
             <header className="flex gap-4 md:items-center mb-9">
               <ElectionIcon electionType={electionDetails.electionType} />{" "}
               <h2 className="font-league text-xl text-gray-700 font-semibold leading-[1.1] lg:text-display-xs mr-4">
-                {electionYear} {getElectionName(electionDetails)}{" "}
+                {electionYear} {getElectionName(electionDetails, "detailed")}{" "}
                 {upload.resultUploaded === "Incident Report" && upload.resultUploaded}
               </h2>
             </header>

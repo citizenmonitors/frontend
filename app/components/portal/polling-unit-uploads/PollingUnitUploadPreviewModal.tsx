@@ -53,7 +53,7 @@ export default function PollingUnitUploadPreviewModal({
       <header className="flex gap-4 md:items-center mb-9">
         <ElectionIcon electionType={upload.electionType} />{" "}
         <h2 className="font-league text-xl text-gray-700 font-semibold leading-[1.1] lg:text-display-xs mr-4">
-          {upload.electionYear} {getElectionName(upload.election)}{" "}
+          {upload.electionYear} {getElectionName(upload.election, "detailed")}{" "}
           {dataType === "report" && "Incident Report"}
         </h2>
       </header>
