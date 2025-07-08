@@ -19,7 +19,7 @@ const press: Press = {
       heading: "",
       content: (
         <article className="grid gap-5 text-gray-700">
-          <div className="w-full h-[346px]">
+          <div className="w-full max-h-[346px]">
             <Image
               src="/assets/press/articles/rivers-01.png"
               className="h-full w-full object-contain object-top rounded-xl"
