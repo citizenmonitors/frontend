@@ -9,7 +9,7 @@ type ElectionCardProps = {
 
 export default function ElectionCard({ election }: ElectionCardProps) {
   const LiveResultsTag = (
-    <div className="flex gap-1 items-center">
+    <div className="flex gap-1 items-center text-sm font-medium text-error-600">
       <div className="w-2 h-2 rounded-full bg-error-500"></div>
       <span className="md:hidden">Live</span>
       <span className="hidden md:inline-block">Happening Live</span>
@@ -18,7 +18,7 @@ export default function ElectionCard({ election }: ElectionCardProps) {
 
   return (
     <Link href={`/admin/elections/${election._id}`}>
-      <BaseElectionCard detailed election={election} tag={LiveResultsTag} />
+      <BaseElectionCard election={election} tag={LiveResultsTag} />
     </Link>
   );
 }

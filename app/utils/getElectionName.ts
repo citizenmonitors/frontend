@@ -18,12 +18,13 @@ import formatString from "./formatString";
 export default function getElectionName(
   election: Pick<Election, "electionName" | "electionLocation" | "mockElection">,
 	type: "short" | "detailed" = "short",
+	options: { showMock: boolean } = { showMock: true }
 ) {
   const { electionName, electionLocation, mockElection } = election;
 	const nameParts = [electionName];
 
   if (type === "detailed") nameParts.unshift(formatString.normalCase(electionLocation || ""));
-	nameParts.unshift(mockElection ? "Mock" : "");
+	if (options.showMock) nameParts.unshift(mockElection ? "Mock" : "");
 
 	return nameParts.filter(Boolean).join(" ");
 }

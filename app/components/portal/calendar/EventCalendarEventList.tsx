@@ -6,6 +6,7 @@ import { Trash } from "iconsax-react";
 import React, { useState } from "react";
 import DeleteEventModal from "../../admin/calendar/DeleteEventModal";
 import { Election } from "@/app/redux/types";
+import MockTag from "../../shared/MockTag";
 
 type EventCalendarEventListProps = {
   events: Record<string, Array<CalendarEvent>>;
@@ -53,6 +54,7 @@ export default function EventCalendarEventList({ events }: EventCalendarEventLis
                   </div>
                   <header className="flex gap-2 items-center">
                     {event.icon}
+										{event.data.mockElection && <MockTag />}
                     <h4 className="text-gray-700 text-sm">{event.name}</h4>
                   </header>
                 </div>
