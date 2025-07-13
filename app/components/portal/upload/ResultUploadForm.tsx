@@ -105,6 +105,9 @@ export default function ResultUploadForm({
     { party: "PRP", count: 0 },
     { party: "AA", count: 0 },
   ]);
+  function getValidPartyResults() {
+    return politicalPartyResults.filter((result) => result.count > 0);
+  }
 
   function getPartyLogo(code: string) {
     return (
@@ -436,7 +439,7 @@ export default function ResultUploadForm({
           rejectedPapers: formData.rejectedPapers!,
           spoiledBallotPapers: formData.spoiledBallotPapers!,
           usedBallotPapers: formData.usedBallotPapers!,
-          partiesVotes: politicalPartyResults,
+          partiesVotes: getValidPartyResults(),
           voteRating: formData.voteRating!,
           voteBuying: formData.voteBuying!,
           voterIntimidation: formData.voterIntimidation!,
@@ -465,7 +468,7 @@ export default function ResultUploadForm({
     const updatedResult: Partial<ElectionResult> = {
       accreditedVoters: formData.accreditedVoters!,
 
-      partiesVotes: politicalPartyResults,
+      partiesVotes: getValidPartyResults(),
       voteBuying: formData.voteBuying,
       voterIntimidation: formData.voterIntimidation,
       voteRating: formData.voteRating,
