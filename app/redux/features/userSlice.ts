@@ -1,4 +1,3 @@
-import { email } from '@/app/data/links';
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { FetchState, SupportTicket, User } from "../types";
 import axios from "axios";

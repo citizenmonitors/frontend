@@ -29,7 +29,7 @@ export default function BaseElectionCard({
 			onClick={onClick}
 		>
 			{/* Tags */}
-			{tag && <div className="absolute top-3 left-3 z-10">{tag}</div>}
+			{tag && <span><div className="absolute top-3 left-3 z-10">{tag}</div></span>}
 
 			<div className="absolute flex flex-col justify-center items-center gap-2 top-2 right-2">
 				<ElectionIcon electionType={election.electionType} />
