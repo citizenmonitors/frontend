@@ -1,6 +1,6 @@
 import { Press } from "@/app/data/press/types";
 import dayjs from "dayjs";
-import { Book1, Calendar, Calendar1 } from "iconsax-react";
+import { Book1, Calendar } from "iconsax-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -13,7 +13,7 @@ type PressCardProps = {
 export default function PressCard({ article, horizontal }: PressCardProps) {
   return (
     <article className={"flex flex-col gap-3" + (horizontal ? " md:flex-row lg:items-center" : "")}>
-      <div className={`h-[150px] bg-gray-200 rounded-xl overflow-hidden ${horizontal ? 'min-w-[220px] w-full md:w-auto' : 'w-full'}`}>
+      <div className={`h-[150px] bg-gray-200 rounded-xl overflow-hidden ${horizontal ? 'min-w-[220px] md:max-w-[250px] w-full' : 'w-full'}`}>
         <Image
           className="object-cover w-full h-full"
           src={article.featuredImage}
