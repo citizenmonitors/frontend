@@ -3,7 +3,7 @@ import PressCard from "@/app/components/landing/press/PressCard";
 import PressDonateCTA from "@/app/components/landing/press/PressDonateCTA";
 import PressHighlight from "@/app/components/landing/press/PressHighlight";
 import PressSocialCTA from "@/app/components/landing/press/PressSocialCTA";
-import pressData from "@/app/data/press";
+import { currentPress as press } from "@/app/data/press";
 import { Press as PressType } from "@/app/data/press/types";
 import React, { useEffect, useState } from "react";
 
@@ -22,7 +22,7 @@ export default function Press() {
 
   // This isn't strictly necessary since we initialize the state with  the data,
   useEffect(() => {
-    const currentPressData = pressData.filter(
+    const currentPressData = press.filter(
       (p) => new Date(p.date) <= new Date()
     );
 

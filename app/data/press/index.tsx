@@ -8,8 +8,8 @@ import { Press } from "./types";
 
 const press: Array<Press> = [Press5, Press4, Press3, Press2, Press1];
 
-const currentPress = press.filter(
+export const currentPress = press.filter(
   (p) => new Date(p.date).getUTCDate() <= new Date().getUTCDate()
 );
 
-export default currentPress;
+export default press;

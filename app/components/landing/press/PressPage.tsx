@@ -1,8 +1,8 @@
 "use client";
 import { Press } from "@/app/data/press/types";
 import React from "react";
-import { Button, Select } from "antd";
-import { ArrowRight, ArrowRight2, Book1, Calendar, Share } from "iconsax-react";
+import { Button } from "antd";
+import { ArrowRight2, Book1, Calendar, Share } from "iconsax-react";
 import Link from "next/link";
 import dayjs from "dayjs";
 import { useAppDispatch } from "@/app/hooks/redux";
@@ -10,11 +10,11 @@ import { showAlert } from "@/app/redux/features/alertSlice";
 import PressDonateCTA from "./PressDonateCTA";
 import PressSocialCTA from "./PressSocialCTA";
 import PressCard from "./PressCard";
-import press from "@/app/data/press";
+import { currentPress } from "@/app/data/press";
 
 export default function PressPage({ article }: { article: Press }) {
   const dispatch = useAppDispatch();
-  const otherArticles = press.filter((item) => item.id !== article.id);
+  const otherArticles = currentPress.filter((item) => item.id !== article.id);
 
   function handleShareClick() {
     const shareData = {
@@ -27,17 +27,24 @@ export default function PressPage({ article }: { article: Press }) {
       navigator
         .share(shareData)
         .then(() => {
-          dispatch(showAlert({ message: "Shared successfully.", type: "success" }));
+          dispatch(
+            showAlert({ message: "Shared successfully.", type: "success" })
+          );
         })
         .catch((error) => console.error("Error sharing:", error));
     } else if (navigator.clipboard) {
       // Copy to clipboard as a fallback
       navigator.clipboard.writeText(shareData.url).then(() => {
-        dispatch(showAlert({ message: "Link copied to clipboard.", type: "success" }));
+        dispatch(
+          showAlert({ message: "Link copied to clipboard.", type: "success" })
+        );
       });
     } else {
       dispatch(
-        showAlert({ message: "Sharing not supported on this browser.", type: "error" })
+        showAlert({
+          message: "Sharing not supported on this browser.",
+          type: "error",
+        })
       );
     }
   }
