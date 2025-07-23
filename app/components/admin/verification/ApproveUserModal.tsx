@@ -23,8 +23,8 @@ export default function ApproveUserModal({ user, open, setOpen }: ApproveUserMod
   }
 
   function closeModal() {
+    dispatch(clearVerificationUser());
     setOpen(null);
-    clearVerificationUser();
   }
 
   useEffect(() => {
