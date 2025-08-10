@@ -14,7 +14,8 @@ import { currentPress } from "@/app/data/press";
 
 export default function PressPage({ article }: { article: Press }) {
   const dispatch = useAppDispatch();
-  const otherArticles = currentPress.filter((item) => item.id !== article.id);
+	const OTHER_ARTICLES_LIMIT = 4;
+  const otherArticles = currentPress.filter((item) => item.id !== article.id).slice(0, OTHER_ARTICLES_LIMIT);
 
   function handleShareClick() {
     const shareData = {

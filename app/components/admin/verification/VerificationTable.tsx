@@ -1,14 +1,11 @@
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
-import { User } from "@/app/redux/types";
 import React, { useEffect, useState } from "react";
 import RoleTag from "../../shared/RoleTag";
 import moment from "moment";
 import formatString from "@/app/utils/formatString";
-import { ArrowLeft, ArrowRight, Eye, Trash } from "iconsax-react";
-import { Button, Dropdown, Empty, Table, TableColumnsType, Tooltip } from "antd";
-import DotsVertical from "@/public/assets/dots-vertical.svg";
+import { ArrowLeft, ArrowRight, Eye } from "iconsax-react";
+import { Button, Empty, Table, TableColumnsType, Tooltip } from "antd";
 import TruncateTooltip from "../../shared/TruncateTooltip";
-import Image from "next/image";
 import { AdminTableUser, clearUser } from "@/app/redux/admin-features/userSlice";
 import UserPreviewModal from "../users/UserPreviewModal";
 import DeleteUserModal from "../users/DeleteUserModal";
