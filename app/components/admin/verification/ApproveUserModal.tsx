@@ -6,6 +6,7 @@ import { AdminTableUser } from "@/app/redux/admin-features/userSlice";
 import {
   approveUser,
   clearVerificationUser,
+  unverifyUser,
 } from "@/app/redux/admin-features/verificationSlice";
 import { showAlert } from "@/app/redux/features/alertSlice";
 
@@ -22,6 +23,10 @@ export default function ApproveUserModal({ user, open, setOpen }: ApproveUserMod
     dispatch(approveUser(user?._id as string));
   }
 
+  function handleUnverifyUser() {
+    dispatch(unverifyUser(user?._id as string));
+  }
+
   function closeModal() {
     dispatch(clearVerificationUser());
     setOpen(null);
@@ -29,6 +34,7 @@ export default function ApproveUserModal({ user, open, setOpen }: ApproveUserMod
 
   useEffect(() => {
     if (user) {
+      // Handle "Approve User" status
       if (verificationState.status.approveUser === "fulfilled") {
         dispatch(
           showAlert({
@@ -48,8 +54,33 @@ export default function ApproveUserModal({ user, open, setOpen }: ApproveUserMod
           })
         );
       }
+  
+      // Handle "Unverify User" status
+      if (verificationState.status.unverifyUser === "fulfilled") {
+        dispatch(
+          showAlert({
+            message: "Account Unverified Successfully.",
+            type: "success",
+          })
+        );
+        closeModal();
+      }
+      if (verificationState.status.unverifyUser === "rejected") {
+        dispatch(
+          showAlert({
+            message:
+              verificationState.error.message ||
+              "Failed to unverify account. Please try again later.",
+            type: "error",
+          })
+        );
+      }
     }
-  }, [verificationState.status.approveUser, user]);
+  }, [
+    verificationState.status.approveUser,
+    verificationState.status.unverifyUser,
+    user,
+  ]);
 
   return (
     <Modal
@@ -67,6 +98,17 @@ export default function ApproveUserModal({ user, open, setOpen }: ApproveUserMod
         >
           Cancel
         </Button>,
+         <Button
+         key={"unverify"}
+         type="primary"
+         danger
+         className="text-sm"
+         size="large"
+         onClick={handleUnverifyUser}
+         loading={verificationState.status.unverifyUser === "pending"}
+       >
+         Unverify
+       </Button>,
         <Button
           key={"confirm"}
           type="primary"

@@ -84,6 +84,7 @@ export const backendRoutes = {
       get: 'admin/observers',
       approve: (id: string) => `admin/approve-observer/${id}`,
       downgrade: (id: string) => `admin/downgrade-observer/${id}`,
+      unverify: (id: string) => `admin/unapprove-observer/${id}`,
     },
     activityLog: {
       get: 'admin/access-control'

@@ -28,6 +28,7 @@ type InitialVerificationState = {
   status: {
     fetchUsers: FetchState;
     approveUser: FetchState;
+    unverifyUser: FetchState;
     downgradeUser: FetchState;
   };
   error: {
@@ -42,6 +43,7 @@ const initialState: InitialVerificationState = {
   status: {
     fetchUsers: "not started",
     approveUser: "not started",
+    unverifyUser: "not started",
     downgradeUser: "not started",
   },
   error: {
@@ -56,6 +58,7 @@ const adminVerificationSlice = createSlice({
     clearVerificationUser(state) {
       state.user = null;
       state.status.approveUser = "not started";
+      state.status.unverifyUser = "not started";
       state.status.downgradeUser = "not started";
       state.error.message = null;
     },
@@ -95,6 +98,21 @@ const adminVerificationSlice = createSlice({
       handleStateError(state, action);
     });
 
+    // Unverify user
+    builder.addCase(unverifyUser.pending, (state) => {
+      state.status.unverifyUser = "pending"; 
+    });
+    builder.addCase(unverifyUser.fulfilled, (state, action) => {
+      state.status.unverifyUser = "fulfilled";
+      state.verifiedUsers = action.payload.observers.filter((u) => !u.pendingObserverVerification);
+      state.pendingVerificationUsers = action.payload.observers.filter((u) => u.pendingObserverVerification);
+    });
+    builder.addCase(unverifyUser.rejected, (state, action: any) => {
+      state.status.unverifyUser = "rejected";
+      handleStateError(state, action);
+    });
+
+
     // Downgrade user
     builder.addCase(downgradeUser.pending, (state) => {
       state.status.downgradeUser = "pending";
@@ -127,6 +145,16 @@ export const approveUser = createAsyncThunk<{ observers: Array<AdminTableVerific
   async (userId, { rejectWithValue }) => {
     return await fetchInThunk({
       asyncCallback: () => axios.patch(backendRoutes.admin.verification.approve(userId), { userId }, backendAxiosConfig()),
+      rejectWithValue,
+    });
+  }
+);
+
+export const unverifyUser = createAsyncThunk<{ observers: Array<AdminTableVerificationUser> }, string>(
+  "admin-verification/unverifyUser",
+  async (userId, { rejectWithValue }) => {
+    return await fetchInThunk({
+      asyncCallback: () => axios.patch(backendRoutes.admin.verification.unverify(userId), { userId }, backendAxiosConfig()),
       rejectWithValue,
     });
   }
