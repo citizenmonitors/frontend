@@ -152,6 +152,7 @@ export default function VerificationTable({ filteredUsers }: UsersTableProps) {
                 type="primary"
                 className="text-sm"
                 size="large"
+                style={{ width: '100%' }}
                 onClick={() => {
                   setApproveUserModalData(viewUserModalData);
                   setViewUserModalData(null);
@@ -175,7 +176,7 @@ export default function VerificationTable({ filteredUsers }: UsersTableProps) {
                 Downgrade Account
               </Button>
             )}
-            <Button
+            {/* <Button
               key={"confirm"}
               type="text"
               className="ring-1 ring-error-500 !text-error-500 bg-error-50 hover:!bg-error-500 hover:!text-white text-sm transition-all"
@@ -187,7 +188,7 @@ export default function VerificationTable({ filteredUsers }: UsersTableProps) {
               }}
             >
               Delete Account
-            </Button>
+            </Button> */}
           </React.Fragment>
         }
       />
