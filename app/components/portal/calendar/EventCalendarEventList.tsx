@@ -19,6 +19,11 @@ export default function EventCalendarEventList({ events }: EventCalendarEventLis
   const [deleteElectionModalOpen, setDeleteElectionModalOpen] = useState<Election | null>(null);
   const [deleteEvent, setDeleteEvent] = useState<CalendarEvent | null>(null);
 
+//   console.log("Election events:", events["elections"]);
+// console.log("Election fetch status:", electionState.status.fetchElections);
+// console.log("events", events);
+// console.log("events.elections", events?.elections);
+
   return (
     <React.Fragment>
       <DeleteEventModal
