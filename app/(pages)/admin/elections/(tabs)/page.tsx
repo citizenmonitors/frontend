@@ -9,11 +9,25 @@ import moment from "moment";
 
 export default function Elections() {
   const { elections } = useAppSelector((state) => state.adminElection);
-  const today = moment(new Date()).format("YYYY-MM-DD");
-  const onGoingElections = elections.filter(
-    (election) => election.startDate <= today && election.endDate >= today
-  );
+  // const today = moment(new Date()).format("YYYY-MM-DD");
+  // const onGoingElections = elections.filter(
+  //   (election) => election.startDate <= today && election.endDate >= today
+  // );
 
+
+  const today = moment.utc(); 
+
+
+  const onGoingElections = elections.filter((election) => {
+    const start = moment.utc(election.startDate);
+    const end = moment.utc(election.endDate);
+
+    const isOngoing = today.isBetween(start, end, "day", "[]");
+
+
+    return isOngoing;
+  });
+  
   return (
     <React.Fragment>
       <ElectionsTabs />
