@@ -3,7 +3,7 @@ import { Press } from "../types";
 import { v4 } from "uuid";
 
 const press: Press = {
-  id: "nigeria-2027-budget",
+  id: "nigeria-2027-election-budget",
   shortTitle: "₦1.01 Trillion Budget for 2027 Elections",
   title:
     "Citizen Monitors Queries ₦1.01 Trillion Budget for Nigeria’s 2027 Elections",
