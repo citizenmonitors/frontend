@@ -6,10 +6,11 @@ import Press5 from "./articles/inec-01";
 import Press6 from "./articles/debt-01";
 import Press7 from "./articles/tax-01";
 import Press8 from "./articles/nigeria-2027-election-budget";
+import Press9 from "./articles/tax-forged-01";
 
 import { Press } from "./types";
 
-const press: Array<Press> = [Press8, Press7, Press6, Press5, Press4, Press3, Press2, Press1];
+const press: Array<Press> = [Press9, Press8, Press7, Press6, Press5, Press4, Press3, Press2, Press1];
 
 const now = new Date();
 export const currentPress = press.filter((article) => {
