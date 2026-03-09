@@ -156,3 +156,33 @@
   }
 }
 
+/* Admin schedule table: fit content and proper spacing */
+.schedule-table-wrapper {
+  @apply border border-gray-200 rounded-lg;
+}
+
+.schedule-table-wrapper .schedule-table .ant-table {
+  @apply text-sm;
+}
+
+.schedule-table-wrapper .schedule-table .ant-table-thead > tr > th,
+.schedule-table-wrapper .schedule-table .ant-table-tbody > tr > td {
+  @apply !py-4 !px-4 !align-middle;
+}
+
+.schedule-table-wrapper .schedule-table .ant-table-thead > tr > th {
+  @apply !bg-gray-50 !font-medium !text-gray-700 !whitespace-nowrap;
+}
+
+.schedule-table-wrapper .schedule-table .ant-table-tbody > tr > td {
+  @apply !text-gray-800;
+}
+
+.schedule-table-wrapper .schedule-table .ant-table-tbody > tr > td.schedule-table-cell-speakers {
+  @apply !max-w-[220px];
+}
+
+.schedule-table-wrapper .schedule-table .ant-table-tbody > tr:hover > td {
+  @apply !bg-gray-50/80;
+}
+

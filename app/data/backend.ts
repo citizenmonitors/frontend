@@ -1,4 +1,4 @@
-const backendURL = process.env.NEXT_PUBLIC_BACKEND_API_URL!;
+const backendURL = (process.env.NEXT_PUBLIC_BACKEND_API_URL ?? "").trim();
 export const backendDomain = backendURL.replace("/api", "");
 
 export const backendRoutes = {
@@ -108,12 +108,42 @@ export const backendRoutes = {
       markRead: (id: string) => `admin/notification/mark-read/${id}`,
       delete: (id: string) => `admin/notification/delete/${id}`,
     },
+    schedule: {
+      get: 'admin/schedule',
+      export: 'admin/schedule/export',
+    },
+    bookings: {
+      update: (id: string) => `admin/bookings/${id}`,
+    },
+    speakerSlots: {
+      events: 'admin/speaker-slots/events',
+      createEvent: 'admin/speaker-slots/events',
+      eventSchedule: (eventId: string) => `admin/speaker-slots/events/${eventId}/schedule`,
+      eventExport: (eventId: string) => `admin/speaker-slots/events/${eventId}/export`,
+      eventSlots: (eventId: string) => `admin/speaker-slots/events/${eventId}/slots`,
+      slotDelete: (slotId: string) => `admin/speaker-slots/slots/${slotId}`,
+      eventInvites: (eventId: string) => `admin/speaker-slots/events/${eventId}/invites`,
+      eventBookings: (eventId: string) => `admin/speaker-slots/events/${eventId}/bookings`,
+      bookingUpdate: (bookingId: string) => `admin/speaker-slots/bookings/${bookingId}`,
+      bookingDelete: (bookingId: string) => `admin/speaker-slots/bookings/${bookingId}`,
+    },
   },
   locations: {
     states: 'locations/states',
     localGovernments: (state: string) => `locations/states/${state}/local_governments`,
     wards: (state: string, lga: string) => `locations/states/${state}/local_governments/${lga}/wards`,
     pollingUnits: (state: string, lga: string, ward: string) => `locations/states/${state}/local_governments/${lga}/wards/${ward}/polling_units`,
+  },
+  speakerInvite: {
+    get: (token: string) => `speaker-invite/${token}`,
+    book: (token: string) => `speaker-invite/${token}/book`,
+  },
+  speakerSlots: {
+    invite: (token: string) => `speaker-slots/invite/${token}`,
+    book: "speaker-slots/book",
+    confirm: (bookingId: string) => `speaker-slots/booking/confirm/${bookingId}`,
+    ics: (bookingId: string) => `speaker-slots/booking/${bookingId}/ics`,
+    seedData: "speaker-slots/seed-data",
   },
   data: {
     banks: 'banks',
