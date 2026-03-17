@@ -3,11 +3,14 @@ export type SpeakerInviteDay = {
   name: string;
   theme: string;
   date: string; // YYYY-MM-DD
+  description?: string;
 };
 
 export type SpeakerInviteSlot = {
   id: string;
   dayId: string;
+  /** Day date (YYYY-MM-DD). Some backends also include it on slot. */
+  date?: string;
   start: string; // ISO or "HH:mm"
   end: string;
   theme: string;

@@ -34,10 +34,8 @@ export default function SlotCard({ slot, day, status, timeLabel, onSelect }: Pro
     >
       <div className="flex-1 min-w-0">
         <p className="font-medium text-gray-800">{timeLabel}</p>
-        <p className="text-sm text-gray-600">{day.theme}</p>
-        <p className="text-xs text-gray-500 mt-1">
-          {slot.capacity === 1 ? "1 speaker (keynote)" : `Panel · ${slot.capacity} spots`}
-        </p>
+        <p className="text-base font-medium text-brand-500">Theme: {day.theme}</p>
+        <p className="text-sm text-gray-500 mt-1">Pick your slot</p>
         <span className={`inline-block mt-2 text-xs font-medium px-2 py-0.5 rounded ${className}`}>
           {label}
         </span>

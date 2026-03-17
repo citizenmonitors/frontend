@@ -15,10 +15,12 @@ type Props = {
 };
 
 function formatTimeWAT(dayDate: string, start: string, end: string): string {
+  if (!dayDate) return `${start}–${end} WAT`;
   return `${start}–${end} WAT`;
 }
 
 function formatTimeLocal(dayDate: string, start: string, end: string): string {
+  if (!dayDate) return `${start}–${end} (local)`;
   const startDate = new Date(`${dayDate}T${start}:00+01:00`);
   const endDate = new Date(`${dayDate}T${end}:00+01:00`);
   const fmt = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" });
@@ -35,6 +37,31 @@ function getStatus(
   return "available";
 }
 
+function themeMeta(theme: string): { dayLabel: string; description: string } | null {
+  switch ((theme ?? "").trim()) {
+    case "People Focus":
+      return {
+        dayLabel: "Day 1",
+        description:
+          "People Focus: The theme for day 1 focuses on the people and what 2023 did to trust, lived experiences, and the polling unit as the real battleground.",
+      };
+    case "People Power":
+      return {
+        dayLabel: "Day 2",
+        description:
+          "People Power: The theme for day 2 focuses on the sleeping power of the people, how organization beats outrage, and what structures must exist to protect the vote.",
+      };
+    case "People Protest":
+      return {
+        dayLabel: "Day 3",
+        description:
+          "People Protest: The theme for day 3 focuses on people protest, disciplined evidence driven pressure, and the red lines Nigerians must refuse to tolerate again.",
+      };
+    default:
+      return null;
+  }
+}
+
 export default function ScheduleView({
   days,
   slots,
@@ -46,7 +73,7 @@ export default function ScheduleView({
   const slotsByDay = days.map((day) => ({
     day,
     slots: slots.filter((s) => s.dayId === day.id),
-  }));
+  })).filter(({ slots }) => slots.length > 0);
 
   return (
     <div className="space-y-6">
@@ -60,10 +87,22 @@ export default function ScheduleView({
 
       {slotsByDay.map(({ day, slots: daySlots }) => (
         <div key={day.id} className="space-y-3">
+          {(() => {
+            const meta = themeMeta(day.theme);
+            const headerDay = meta?.dayLabel ?? day.name;
+            const description = meta?.description ?? "";
+            return (
+              <>
           <h3 className="text-brand-600 font-medium">
-            {day.name}: {day.theme}
+            {headerDay}: {day.theme}
           </h3>
-          <p className="text-sm text-gray-500">{day.date}</p>
+          <p className="text-base font-semibold text-gray-600">{day.date}</p>
+          {!!description && (
+            <p className="text-md text-gray-600 max-w-2xl">{description}</p>
+          )}
+              </>
+            );
+          })()}
           <div className="grid gap-3">
             {daySlots.map((slot) => {
               const timeLabel = useLocalTime

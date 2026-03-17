@@ -117,8 +117,11 @@ export const backendRoutes = {
     },
     speakerSlots: {
       events: 'admin/speaker-slots/events',
+      seed: 'admin/speaker-slots/seed',
       createEvent: 'admin/speaker-slots/events',
       eventSchedule: (eventId: string) => `admin/speaker-slots/events/${eventId}/schedule`,
+      eventDays: (eventId: string) => `admin/speaker-slots/events/${eventId}/days`,
+      eventDayUpdate: (eventId: string, dayId: string) => `admin/speaker-slots/events/${eventId}/days/${dayId}`,
       eventExport: (eventId: string) => `admin/speaker-slots/events/${eventId}/export`,
       eventSlots: (eventId: string) => `admin/speaker-slots/events/${eventId}/slots`,
       slotDelete: (slotId: string) => `admin/speaker-slots/slots/${slotId}`,

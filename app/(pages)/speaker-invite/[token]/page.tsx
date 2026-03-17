@@ -22,7 +22,8 @@ function normalizeSlot(raw: RawSlot, index: number): SpeakerInviteSlot {
   const sessionType = (raw.sessionType as "keynote" | "panel") ?? "panel";
   const timezone = (raw.timezone as string) ?? "Africa/Lagos";
   const theme = (raw.theme as string) ?? "";
-  return { id, dayId: raw.dayId, start, end, theme, capacity, bookedCount, sessionType, timezone };
+  const date = (raw.date as string) ?? "";
+  return { id, dayId: raw.dayId, date, start, end, theme, capacity, bookedCount, sessionType, timezone };
 }
 
 function normalizeInviteResponse(raw: Record<string, unknown>): InviteResponse {
@@ -33,18 +34,35 @@ function normalizeInviteResponse(raw: Record<string, unknown>): InviteResponse {
   const rawSlots = (raw.slots as RawSlot[] | undefined) ?? [];
   const slots: SpeakerInviteSlot[] = rawSlots.map((s, i) => normalizeSlot(s, i));
 
+  // Ensure days exist for all slot dayIds, and derive date from slot.date when needed.
   if (slots.length > 0) {
     const dayIdsInSlots = Array.from(new Set(slots.map((s) => s.dayId)));
-    const dayIdsWeHave = new Set(days.map((d) => d.id));
-    const missingDayIds = dayIdsInSlots.filter((id) => !dayIdsWeHave.has(id));
-    if (missingDayIds.length > 0) {
-      const derivedDays: SpeakerInviteDay[] = missingDayIds.map((dayId, i) => {
-        const firstSlot = slots.find((s) => s.dayId === dayId)!;
-        const date = `2025-04-${String(10 + i).padStart(2, "0")}`;
-        return { id: dayId, name: dayId, theme: firstSlot.theme || dayId, date };
-      });
-      days = [...days, ...derivedDays].sort((a, b) => a.date.localeCompare(b.date));
+    const daysById = new Map(days.map((d) => [d.id, { ...d }]));
+
+    for (const dayId of dayIdsInSlots) {
+      const firstSlotForDay = slots.find((s) => s.dayId === dayId);
+      const slotDate = firstSlotForDay?.date ?? "";
+      const slotTheme = firstSlotForDay?.theme ?? "";
+
+      const existing = daysById.get(dayId);
+      if (!existing) {
+        daysById.set(dayId, {
+          id: dayId,
+          name: dayId,
+          theme: slotTheme || dayId,
+          date: slotDate || "",
+        });
+      } else {
+        if (!existing.date && slotDate) existing.date = slotDate;
+        if (!existing.theme && slotTheme) existing.theme = slotTheme;
+      }
     }
+
+    const sorted = Array.from(daysById.values()).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+    days = sorted.map((d, idx) => ({
+      ...d,
+      name: d.name?.startsWith("Day ") ? d.name : `Day ${idx + 1}`,
+    }));
   }
 
   const eventName = eventFromRaw?.name ?? (raw.eventName as string) ?? "72-Hour X Space";

@@ -6,8 +6,6 @@ import type { SpeakerInviteSlot, BookResponse } from "@/app/types/speaker-invite
 import type { SpeakerInviteDay } from "@/app/types/speaker-invite";
 import { speakerSlotsBookUrl } from "@/app/data/speaker-slots-api";
 
-const { TextArea } = Input;
-
 type Props = {
   slot: SpeakerInviteSlot;
   day: SpeakerInviteDay;
@@ -22,8 +20,6 @@ export default function SpeakerBookingForm({ slot, day, token, onSuccess, onCanc
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [xHandle, setXHandle] = useState("");
-  const [bioLink, setBioLink] = useState("");
-  const [topicAngle, setTopicAngle] = useState("");
   const [phone, setPhone] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
@@ -40,8 +36,6 @@ export default function SpeakerBookingForm({ slot, day, token, onSuccess, onCanc
           fullName: name,
           email,
           xHandle,
-          bioLink: bioLink || undefined,
-          topicAngle: topicAngle || undefined,
           phone: phone || undefined,
         }),
       });
@@ -98,23 +92,6 @@ export default function SpeakerBookingForm({ slot, day, token, onSuccess, onCanc
           onChange={(e) => setXHandle(e.target.value)}
           required
           placeholder="@username"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Short bio or link</label>
-        <Input
-          value={bioLink}
-          onChange={(e) => setBioLink(e.target.value)}
-          placeholder="Link to your bio or short bio"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Topic / angle (one sentence)</label>
-        <TextArea
-          value={topicAngle}
-          onChange={(e) => setTopicAngle(e.target.value)}
-          rows={2}
-          placeholder="What you plan to contribute"
         />
       </div>
       <div>

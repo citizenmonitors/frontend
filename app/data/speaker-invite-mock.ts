@@ -1,19 +1,27 @@
 import type { SpeakerInviteDay, SpeakerInviteSlot, SpeakerBooking } from "@/app/types/speaker-invite";
 
 const defaultDays: SpeakerInviteDay[] = [
-  { id: "day1", name: "Day 1", theme: "People Focus", date: "2025-04-10" },
-  { id: "day2", name: "Day 2", theme: "People Power", date: "2025-04-11" },
-  { id: "day3", name: "Day 3", theme: "People Protest", date: "2025-04-12" },
+  { id: "day1", name: "Day 1", theme: "People Focus", date: "2026-05-01" },
+  { id: "day2", name: "Day 2", theme: "People Power", date: "2026-05-02" },
+  { id: "day3", name: "Day 3", theme: "People Protest", date: "2026-05-03" },
 ];
 
 const defaultSlots: SpeakerInviteSlot[] = [
-  { id: "s1", dayId: "day1", start: "09:00", end: "10:00", theme: "People Focus", capacity: 1, bookedCount: 0, sessionType: "keynote", timezone: "Africa/Lagos" },
-  { id: "s2", dayId: "day1", start: "11:00", end: "12:00", theme: "People Focus", capacity: 3, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
-  { id: "s3", dayId: "day1", start: "14:00", end: "15:00", theme: "People Focus", capacity: 1, bookedCount: 0, sessionType: "keynote", timezone: "Africa/Lagos" },
-  { id: "s4", dayId: "day2", start: "09:00", end: "10:00", theme: "People Power", capacity: 1, bookedCount: 0, sessionType: "keynote", timezone: "Africa/Lagos" },
-  { id: "s5", dayId: "day2", start: "12:00", end: "13:00", theme: "People Power", capacity: 2, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
-  { id: "s6", dayId: "day3", start: "10:00", end: "11:00", theme: "People Protest", capacity: 1, bookedCount: 0, sessionType: "keynote", timezone: "Africa/Lagos" },
-  { id: "s7", dayId: "day3", start: "15:00", end: "16:00", theme: "People Protest", capacity: 3, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
+  // Day 1: 09:00–18:00 in 2-hour panels
+  { id: "s1", dayId: "day1", start: "09:00", end: "11:00", theme: "People Focus", capacity: 6, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
+  { id: "s2", dayId: "day1", start: "11:00", end: "13:00", theme: "People Focus", capacity: 6, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
+  { id: "s3", dayId: "day1", start: "13:00", end: "15:00", theme: "People Focus", capacity: 6, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
+  { id: "s4", dayId: "day1", start: "15:00", end: "17:00", theme: "People Focus", capacity: 6, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
+  // Day 2: 09:00–18:00 in 2-hour panels
+  { id: "s5", dayId: "day2", start: "09:00", end: "11:00", theme: "People Power", capacity: 6, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
+  { id: "s6", dayId: "day2", start: "11:00", end: "13:00", theme: "People Power", capacity: 6, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
+  { id: "s7", dayId: "day2", start: "13:00", end: "15:00", theme: "People Power", capacity: 6, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
+  { id: "s8", dayId: "day2", start: "15:00", end: "17:00", theme: "People Power", capacity: 6, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
+  // Day 3: 09:00–18:00 in 2-hour panels
+  { id: "s9", dayId: "day3", start: "09:00", end: "11:00", theme: "People Protest", capacity: 6, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
+  { id: "s10", dayId: "day3", start: "11:00", end: "13:00", theme: "People Protest", capacity: 6, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
+  { id: "s11", dayId: "day3", start: "13:00", end: "15:00", theme: "People Protest", capacity: 6, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
+  { id: "s12", dayId: "day3", start: "15:00", end: "17:00", theme: "People Protest", capacity: 6, bookedCount: 0, sessionType: "panel", timezone: "Africa/Lagos" },
 ];
 
 // Mutable event config (admin can create/edit)

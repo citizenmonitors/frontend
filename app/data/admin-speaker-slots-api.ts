@@ -23,6 +23,12 @@ export async function createEvent(body: CreateEventBody): Promise<SpeakerSlotEve
   return res.data;
 }
 
+/** POST /api/admin/speaker-slots/seed – create event, days, and slots (admin). Body can be seed payload or empty. */
+export async function seedSpeakerSlots(body?: Record<string, unknown>): Promise<unknown> {
+  const res = await api().post(backendRoutes.admin.speakerSlots.seed, body ?? {});
+  return res.data;
+}
+
 export type ScheduleDay = { id: string; name?: string; label?: string; theme?: string; date?: string };
 export type ScheduleSlot = {
   id: string;
@@ -52,6 +58,48 @@ export type ScheduleResponse = {
 
 export async function getEventSchedule(eventId: string): Promise<ScheduleResponse> {
   const res = await api().get<ScheduleResponse>(backendRoutes.admin.speakerSlots.eventSchedule(eventId));
+  return res.data;
+}
+
+/** GET /api/admin/speaker-slots/events/:eventId/days */
+export type EventDay = {
+  id: string;
+  label?: string;
+  name?: string;
+  date?: string;
+  theme?: string;
+  description?: string;
+  sortOrder?: number;
+};
+
+export async function getEventDays(eventId: string): Promise<EventDay[]> {
+  const res = await api().get<EventDay[]>(backendRoutes.admin.speakerSlots.eventDays(eventId));
+  return Array.isArray(res.data) ? res.data : [];
+}
+
+/** POST /api/admin/speaker-slots/events/:eventId/days – body: array of days */
+export type CreateDayBody = {
+  id?: string;
+  label?: string;
+  name?: string;
+  date?: string;
+  theme?: string;
+  description?: string;
+  sortOrder?: number;
+};
+
+export async function createEventDays(eventId: string, days: CreateDayBody[]): Promise<unknown> {
+  const res = await api().post(backendRoutes.admin.speakerSlots.eventDays(eventId), days);
+  return res.data;
+}
+
+/** PATCH /api/admin/speaker-slots/events/:eventId/days/:dayId */
+export async function updateEventDay(
+  eventId: string,
+  dayId: string,
+  body: Partial<CreateDayBody>
+): Promise<unknown> {
+  const res = await api().patch(backendRoutes.admin.speakerSlots.eventDayUpdate(eventId, dayId), body);
   return res.data;
 }
 
@@ -120,10 +168,14 @@ export async function deleteSlot(slotId: string): Promise<unknown> {
 }
 
 export type CreateSlotBody = {
-  dayId: string;
+  /** Required when not sending dayId. Any date format; backend normalizes to YYYY-MM-DD. */
+  date?: string;
+  /** Required when not sending dayId. Day label, e.g. "Day 1". */
+  label?: string;
+  dayId?: string;
   startTime: string;
   endTime: string;
-  theme: string;
+  theme?: string;
   capacity?: number;
   sessionType?: string;
 };

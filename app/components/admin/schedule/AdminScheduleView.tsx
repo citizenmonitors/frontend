@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Button, Table, Select, Popconfirm } from "antd";
+import { Button, Table, Select, Popconfirm, Modal, Input, InputNumber, DatePicker } from "antd";
+import dayjs from "dayjs";
 import type { SpeakerBooking } from "@/app/types/speaker-invite";
 import MoveBookingModal from "./MoveBookingModal";
 import CreateInvitesModal from "./CreateInvitesModal";
@@ -11,6 +12,8 @@ import {
   getEventSchedule,
   exportEventCsv,
   deleteBooking,
+  deleteSlot,
+  createSlots,
   type SpeakerSlotEvent,
   type ScheduleResponse,
   type ScheduleDayGroup,
@@ -19,6 +22,7 @@ import {
 
 type ScheduleRow = {
   id: string;
+  dayId: string;
   date: string;
   dayTheme: string;
   timeWAT: string;
@@ -57,6 +61,7 @@ function scheduleResponseToRows(data: ScheduleResponse): ScheduleRow[] {
         const bookedCount = typeof slot.bookedCount === "number" ? slot.bookedCount : bookings.length;
         rows.push({
           id: slot.id ?? `slot-${slot.dayId}-${start}-${end}`,
+          dayId: slot.dayId ?? "",
           date,
           dayTheme,
           timeWAT: `${start}–${end}`,
@@ -91,6 +96,7 @@ function scheduleResponseToRows(data: ScheduleResponse): ScheduleRow[] {
       const bookedCount = typeof slot.bookedCount === "number" ? slot.bookedCount : bookings.length;
       rows.push({
         id: slot.id ?? `slot-${slot.dayId}-${start}-${end}`,
+        dayId: slot.dayId ?? "",
         date,
         dayTheme: (day?.theme ?? slot.theme) ?? "",
         timeWAT: `${start}–${end}`,
@@ -118,6 +124,22 @@ export default function AdminScheduleView() {
   const [moveModal, setMoveModal] = useState<{ booking: SpeakerBooking; slotIds: string[] } | null>(null);
   const [viewSpeaker, setViewSpeaker] = useState<SpeakerBooking | null>(null);
   const [createInvitesOpen, setCreateInvitesOpen] = useState(false);
+  const [createSlotOpen, setCreateSlotOpen] = useState(false);
+  const [createSlotLoading, setCreateSlotLoading] = useState(false);
+  const [newSlot, setNewSlot] = useState({
+    selectedDate: "",
+    label: "",
+    startTime: "09:00",
+    endTime: "11:00",
+    theme: "",
+    capacity: 1,
+    sessionType: "",
+  });
+  const THEME_OPTIONS = [
+    { value: "People Focus", label: "People Focus" },
+    { value: "People Power", label: "People Power" },
+    { value: "People Protest", label: "People Protest" },
+  ];
 
   useEffect(() => {
     listEvents()
@@ -173,7 +195,17 @@ export default function AdminScheduleView() {
     { title: "Date", dataIndex: "date", key: "date", width: 100, ellipsis: true, className: "schedule-table-cell" },
     { title: "Theme", dataIndex: "dayTheme", key: "dayTheme", width: 120, ellipsis: true, className: "schedule-table-cell" },
     { title: "Time (WAT)", dataIndex: "timeWAT", key: "timeWAT", width: 95, ellipsis: true, className: "schedule-table-cell" },
-    { title: "Type", dataIndex: "sessionType", key: "sessionType", width: 82, ellipsis: true, className: "schedule-table-cell" },
+    {
+      title: "Type",
+      dataIndex: "sessionType",
+      key: "sessionType",
+      width: 110,
+      ellipsis: true,
+      className: "schedule-table-cell",
+      render: (_: unknown, r: ScheduleRow) => (
+        <span>{r.sessionType === "panel" ? "Multiple speakers" : r.sessionType || ""}</span>
+      ),
+    },
     {
       title: "Slots",
       key: "slots",
@@ -205,15 +237,13 @@ export default function AdminScheduleView() {
     {
       title: "Actions",
       key: "actions",
-      width: 220,
+      width: 260,
       className: "schedule-table-cell",
       render: (_: unknown, r: ScheduleRow) => (
-        <div className="space-y-2 min-w-0">
-          {r.bookings.length === 0 ? (
-            <span className="text-gray-400">—</span>
-          ) : (
+        <div className="flex flex-wrap items-center gap-2 min-w-0 text-sm">
+          {r.bookings.length === 0 ? null : (
             r.bookings.map((b) => (
-              <div key={b.id} className="flex flex-wrap items-center gap-2 text-sm">
+              <React.Fragment key={b.id}>
                 <Button type="default" size="small" className="border border-gray-300" onClick={() => setViewSpeaker(b)}>
                   View
                 </Button>
@@ -239,9 +269,28 @@ export default function AdminScheduleView() {
                     Cancel booking
                   </Button>
                 </Popconfirm>
-              </div>
+              </React.Fragment>
             ))
           )}
+          <Popconfirm
+            title="Delete slot?"
+            description="This slot will be removed. Any speakers in it will lose their booking."
+            onConfirm={async () => {
+              try {
+                await deleteSlot(r.id);
+                refreshSchedule();
+              } catch {
+                alert("Failed to delete slot.");
+              }
+            }}
+            okText="Delete slot"
+            okButtonProps={{ danger: true }}
+            cancelText="Cancel"
+          >
+            <Button type="default" size="small" danger className="border border-red-300">
+              Delete slot
+            </Button>
+          </Popconfirm>
         </div>
       ),
     },
@@ -250,6 +299,47 @@ export default function AdminScheduleView() {
   const handleMoveSuccess = () => {
     setMoveModal(null);
     refreshSchedule();
+  };
+
+  const handleCreateSlot = async () => {
+    if (!selectedEventId || !newSlot.selectedDate || !newSlot.label.trim()) {
+      alert("Please pick a date and enter a day label (e.g. Day 1).");
+      return;
+    }
+    if (!newSlot.theme.trim()) {
+      alert("Please choose a theme.");
+      return;
+    }
+    setCreateSlotLoading(true);
+    try {
+      await createSlots(selectedEventId, [
+        {
+          date: newSlot.selectedDate,
+          label: newSlot.label.trim(),
+          startTime: newSlot.startTime,
+          endTime: newSlot.endTime,
+          theme: newSlot.theme.trim(),
+          capacity: newSlot.capacity,
+          sessionType: newSlot.sessionType.trim() || "panel",
+        },
+      ]);
+      setCreateSlotOpen(false);
+      setNewSlot({
+        selectedDate: "",
+        label: "",
+        startTime: "09:00",
+        endTime: "11:00",
+        theme: "",
+        capacity: 1,
+        sessionType: "",
+      });
+      refreshSchedule();
+    } catch (e) {
+      const msg = e && typeof e === "object" && "response" in e ? (e as { response?: { data?: { message?: string } } }).response?.data?.message : null;
+      alert(msg ?? "Failed to create slot.");
+    } finally {
+      setCreateSlotLoading(false);
+    }
   };
 
   return (
@@ -270,6 +360,9 @@ export default function AdminScheduleView() {
           />
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Button onClick={() => setCreateSlotOpen(true)} disabled={!selectedEventId}>
+            Create slot
+          </Button>
           <Button onClick={() => setCreateInvitesOpen(true)} disabled={!selectedEventId}>
             Create invites
           </Button>
@@ -286,7 +379,7 @@ export default function AdminScheduleView() {
           rowKey="id"
           pagination={false}
           size="small"
-          scroll={{ x: 820 }}
+          scroll={{ x: 860 }}
           className="schedule-table"
         />
       </div>
@@ -309,6 +402,86 @@ export default function AdminScheduleView() {
           onSuccess={() => setCreateInvitesOpen(false)}
         />
       )}
+      <Modal
+        title="Create slot"
+        open={createSlotOpen}
+        onCancel={() => setCreateSlotOpen(false)}
+        onOk={handleCreateSlot}
+        confirmLoading={createSlotLoading}
+        okText="Create"
+        destroyOnClose
+      >
+        <div className="space-y-4 pt-2">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+              <DatePicker
+                className="w-full"
+                value={newSlot.selectedDate ? dayjs(newSlot.selectedDate) : null}
+                onChange={(_, dateStr) => {
+                  const str = (typeof dateStr === "string" ? dateStr : "") || "";
+                  setNewSlot((s) => ({ ...s, selectedDate: str }));
+                }}
+                format="YYYY-MM-DD"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Day label</label>
+              <Input
+                value={newSlot.label}
+                onChange={(e) => setNewSlot((s) => ({ ...s, label: e.target.value }))}
+                placeholder="e.g. Day 1"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Start time</label>
+              <Input
+                value={newSlot.startTime}
+                onChange={(e) => setNewSlot((s) => ({ ...s, startTime: e.target.value }))}
+                placeholder="09:00"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">End time</label>
+              <Input
+                value={newSlot.endTime}
+                onChange={(e) => setNewSlot((s) => ({ ...s, endTime: e.target.value }))}
+                placeholder="11:00"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Theme</label>
+            <Select
+              placeholder="Select theme"
+              allowClear
+              options={THEME_OPTIONS}
+              value={newSlot.theme || undefined}
+              onChange={(v) => setNewSlot((s) => ({ ...s, theme: v ?? "" }))}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
+            <InputNumber
+              min={1}
+              value={newSlot.capacity}
+              onChange={(v) => setNewSlot((s) => ({ ...s, capacity: v ?? 6 }))}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Session type</label>
+            <Input
+              value={newSlot.sessionType}
+              onChange={(e) => setNewSlot((s) => ({ ...s, sessionType: e.target.value }))}
+              placeholder="e.g. Multiple speakers"
+            />
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }
