@@ -1,4 +1,4 @@
-import { Calendar, DocumentText1, DocumentUpload, Edit2, HomeHashtag, Icon, Notepad2, Setting, SliderVertical1 } from "iconsax-react";
+import { Calendar, DocumentText1, DocumentUpload, Edit2, HomeHashtag, Icon, Note, Notepad2, Setting, SliderVertical1 } from "iconsax-react";
 
 export type Route = {
   title: string,
@@ -50,6 +50,11 @@ const dashboardRoutes: Array<Route> = [
     title: "Live",
     icon: SliderVertical1,
     href: "/portal/live",
+  },
+  {
+    title: "Press room",
+    icon: Note,
+    href: "/portal/press/create",
   },
   {
     title: "Polls & Surveys",
