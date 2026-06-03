@@ -8,10 +8,12 @@ import Press7 from "./articles/tax-01";
 import Press8 from "./articles/nigeria-2027-election-budget";
 import Press9 from "./articles/tax-forged-01";
 import Press10 from "./articles/pat-utomi-x-space-01";
+import Press11 from "./articles/x-space-success-01";
 
 import { Press } from "./types";
 
 const staticPressArticles: Array<Press> = [
+  Press11,
   Press10,
   Press9,
   Press8,
