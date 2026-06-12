@@ -10,7 +10,7 @@ export default function PvcIssuesPage() {
         </h2>
         <p className="mt-2 text-sm text-gray-500 lg:text-base">
           Review public PVC issue submissions, filter by location and issue type, and
-          export records for legal and communications use.
+          export records for legal and communications use
         </p>
       </header>
 
