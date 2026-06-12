@@ -18,6 +18,7 @@ const fileTypes = {
   incidentReportVideo: [file.mp4, file.mov],
   resultPicture: [file.png, file.jpg],
   resultVideo: [file.mp4, file.mov],
+  pvcEvidence: [file.png, file.jpg, file.gif, file.pdf],
 } as const;
 
 // Convert the fileTypes values to a string

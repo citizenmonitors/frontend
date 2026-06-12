@@ -1,4 +1,4 @@
-import { Calendar, CalendarEdit, DocumentUpload, Flag, HomeHashtag, Icon, Messages1, Notepad2, Profile2User, Setting, Task, UserOctagon, Verify } from "iconsax-react";
+import { Calendar, CalendarEdit, DocumentUpload, Flag, HomeHashtag, Icon, Messages1, Notepad2, Profile2User, Setting, Task, UserOctagon, Verify, Warning2 } from "iconsax-react";
 
 export type Route = {
   title: string,
@@ -32,6 +32,11 @@ const adminRoutes: Array<Route> = [
     title: "Users",
     icon: Profile2User,
     href: "/admin/users",
+  },
+  {
+    title: "PVC Issues",
+    icon: Warning2,
+    href: "/admin/pvc-issues",
   },
   {
     title: "Verification",

@@ -115,6 +115,10 @@ export const backendRoutes = {
     bookings: {
       update: (id: string) => `admin/bookings/${id}`,
     },
+    pvcIssues: {
+      get: 'admin/pvc-issues',
+      getById: (id: string) => `admin/pvc-issues/${id}`,
+    },
     speakerSlots: {
       events: 'admin/speaker-slots/events',
       seed: 'admin/speaker-slots/seed',
@@ -136,6 +140,9 @@ export const backendRoutes = {
     localGovernments: (state: string) => `locations/states/${state}/local_governments`,
     wards: (state: string, lga: string) => `locations/states/${state}/local_governments/${lga}/wards`,
     pollingUnits: (state: string, lga: string, ward: string) => `locations/states/${state}/local_governments/${lga}/wards/${ward}/polling_units`,
+  },
+  pvcIssues: {
+    submit: 'pvc-issues',
   },
   speakerInvite: {
     get: (token: string) => `speaker-invite/${token}`,

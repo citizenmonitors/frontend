@@ -4,6 +4,7 @@ export type BinaryOption = 'yes' | 'no';
 export type RatingOption = 'good' | 'okay' | 'poor';
 export type IncidentTypes = "Thuggery and Violence" | "Lack of electoral materials" | "Fraudulent electoral officers" | "Late commencement" | "Over voting" | "Other";
 export type CurrencyCode = "ngn" | "usd" | "gbp";
+import type { RcFile } from "antd/es/upload";
 
 export type FileInfo = {
   _id: string;
@@ -23,6 +24,37 @@ export type SupportTicket = {
   message: string,
 };
 
+export type PvcIssueReport = {
+  fullName: string;
+  phoneNumber: string;
+  email?: string;
+  state: string;
+  lga: string;
+  pollingUnit: string;
+  issueType: string;
+  otherIssueDetail?: string;
+  description: string;
+  consent: boolean;
+  consentText: string;
+  evidence: RcFile[];
+};
+
+export type PvcIssueReportRecord = DBObject & {
+  fullName: string;
+  phoneNumber: string;
+  email?: string;
+  state: string;
+  lga: string;
+  pollingUnit: string;
+  issueType: string;
+  otherIssueDetail?: string;
+  description: string;
+  consentGiven: boolean;
+  consentText: string;
+  consentedAt: string;
+  evidence: FileInfo[];
+};
+
 export type DBObject = {
   _id: string;
   createdAt?: string;
@@ -31,7 +63,7 @@ export type DBObject = {
 
 // App
 export type FetchState = 'not started' | 'pending' | 'fulfilled' | 'rejected';
-export type UserRole = 'observer' | 'volunteer' | 'super-admin' | 'admin';
+export type UserRole = 'observer' | 'volunteer' | 'public-viewer' | 'super-admin' | 'admin';
 
 export type ObserverVerificationDetails = {
   observerId: Array<FileInfo>;
@@ -56,6 +88,7 @@ export type User = DBObject & {
   lastName: string;
   profileImage: FileInfo | null;
   gender: string;
+  nationality?: string;
   dateOfBirth: string;
   state: string;
   lga: string;

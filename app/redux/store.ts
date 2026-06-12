@@ -16,6 +16,8 @@ import adminActivityLogSlice from "./admin-features/activityLogSlice";
 import adminAdminSlice from "./admin-features/adminSlice";
 import outboxSlice from "./admin-features/outboxSlice";
 import notificationSlice from "./admin-features/notificationSlice";
+import pvcIssuesSlice from "./features/pvcIssuesSlice";
+import adminPvcIssuesSlice from "./admin-features/pvcIssuesSlice";
 
 const store = configureStore({
   reducer: {
@@ -36,6 +38,8 @@ const store = configureStore({
     adminAdmin: adminAdminSlice,
     adminOutbox: outboxSlice,
     adminNotification: notificationSlice,
+    pvcIssues: pvcIssuesSlice,
+    adminPvcIssues: adminPvcIssuesSlice,
   }
 });
 

@@ -9,6 +9,9 @@ const withPWA = withPWAConfigurer({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withPWA({
+  env: {
+    INHOUSE_API_ACCESS_TOKEN: process.env.INHOUSE_API_ACCESS_TOKEN ?? "",
+  },
   swcMinify: true, // Enable SWC minification for improved performance
   compiler: {
     removeConsole: process.env.NODE_ENV !== "development", // Remove console.log in production

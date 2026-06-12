@@ -159,4 +159,27 @@ export const forgotPasswordMetadata = {
   },
 };
 
+export const pvcReportMetadata = {
+  title: "Report PVC Issues - Citizen Monitors",
+  description:
+    "Report PVC and voter registration problems including unknown voters roll status, uncollected PVCs, and other INEC-related issues.",
+  keywords: [
+    "pvc issues",
+    "voters roll",
+    "inec",
+    "voter registration",
+    "citizen monitors",
+    "nigeria elections",
+  ],
+  openGraph: {
+    title: "Report PVC Issues - Citizen Monitors",
+    description:
+      "Share your PVC or voter registration issue to support Citizen Monitors' advocacy and INEC engagement.",
+    url: `${process.env.METADATA_BASEURL!}/pvc-report`,
+    siteName: "Citizen Monitors",
+    type: "website",
+    locale: "en_GB",
+  },
+};
+
 export default primaryMetadata;
