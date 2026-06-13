@@ -158,7 +158,7 @@ export default function CoverageDetails() {
             <AppSelect
               id="coverage-update-state"
               value={locationData.states.current}
-              options={locationData.states.data.map((state, index) => ({
+              options={locationData.states.data.map((state: string, index: number) => ({
                 value: state,
                 label: `${formatNumber.prependZeroes(index + 1)} – ${formatString.kebabToNormalCase(
                   state
@@ -178,7 +178,7 @@ export default function CoverageDetails() {
             <AppSelect
               id="coverage-update-lga"
               value={locationData.lgas.current}
-              options={locationData.lgas.data.map((lga, index) => ({
+              options={locationData.lgas.data.map((lga: string, index: number) => ({
                 value: lga,
                 label: `${formatNumber.prependZeroes(index + 1)} – ${formatString.kebabToNormalCase(
                   lga
@@ -198,7 +198,7 @@ export default function CoverageDetails() {
             <AppSelect
               id="coverage-update-ward"
               value={locationData.wards.current}
-              options={locationData.wards.data.map((ward, index) => ({
+              options={locationData.wards.data.map((ward: string, index: number) => ({
                 value: ward,
                 label: `${formatNumber.prependZeroes(index + 1)} – ${formatString.kebabToNormalCase(
                   ward
@@ -218,7 +218,7 @@ export default function CoverageDetails() {
             <AppSelect
               id="coverage-update-polling-unit"
               value={locationData.pollingUnits.current}
-              options={locationData.pollingUnits.data.map((pollingUnit, index) => ({
+              options={locationData.pollingUnits.data.map((pollingUnit: string, index: number) => ({
                 value: pollingUnit,
                 label: `${formatNumber.prependZeroes(index + 1)} – ${formatString.kebabToNormalCase(
                   pollingUnit
