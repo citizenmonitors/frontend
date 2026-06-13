@@ -297,7 +297,7 @@ export default function PvcIssuesForm() {
           <AppSelect
             id="pvc-state"
             placeholder="Select state"
-            options={locationData.states.data.map((state) => ({
+            options={locationData.states.data.map((state: string) => ({
               value: state,
               label: formatString.normalCase(state),
             }))}
@@ -314,7 +314,7 @@ export default function PvcIssuesForm() {
           <AppSelect
             id="pvc-lga"
             placeholder="Select LGA"
-            options={locationData.lgas.data.map((lga) => ({
+            options={locationData.lgas.data.map((lga: string) => ({
               value: lga,
               label: formatString.normalCase(lga),
             }))}
