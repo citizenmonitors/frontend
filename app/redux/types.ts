@@ -63,7 +63,7 @@ export type DBObject = {
 
 // App
 export type FetchState = 'not started' | 'pending' | 'fulfilled' | 'rejected';
-export type UserRole = 'observer' | 'volunteer' | 'public-viewer' | 'super-admin' | 'admin';
+export type UserRole = 'observer' | 'volunteer' | 'super-admin' | 'admin';
 
 export type ObserverVerificationDetails = {
   observerId: Array<FileInfo>;
