@@ -4,33 +4,47 @@ import { backendRoutes } from "../data/backend";
 import backendAxiosConfig from "../data/axiosConfig";
 import { FetchState } from "../redux/types";
 
-function useLocationData(data?: typeof initialLocationData) {
-  const initialLocationData = {
-    states: {
-      data: [],
-      current: undefined as string | undefined,
-      status: 'not started' as FetchState,
-    },
-    lgas: {
-      data: [],
-      current: undefined as string | undefined,
-      status: 'not started' as FetchState,
-    },
-    wards: {
-      data: [],
-      current: undefined as string | undefined,
-      status: 'not started' as FetchState,
-    },
-    pollingUnits: {
-      data: [],
-      current: undefined as string | undefined,
-      status: 'not started' as FetchState,
-    }
-  };
+type LocationFieldData = {
+  data: string[];
+  current: string | undefined;
+  status: FetchState;
+};
+
+export type LocationData = {
+  states: LocationFieldData;
+  lgas: LocationFieldData;
+  wards: LocationFieldData;
+  pollingUnits: LocationFieldData;
+};
+
+const initialLocationData: LocationData = {
+  states: {
+    data: [],
+    current: undefined,
+    status: "not started",
+  },
+  lgas: {
+    data: [],
+    current: undefined,
+    status: "not started",
+  },
+  wards: {
+    data: [],
+    current: undefined,
+    status: "not started",
+  },
+  pollingUnits: {
+    data: [],
+    current: undefined,
+    status: "not started",
+  },
+};
+
+function useLocationData(data?: LocationData) {
   const [locationData, setLocationData] = useState(data || initialLocationData);
   const [initialLoad, setInitialLoad] = useState(false);
 
-  function updateField(field: keyof typeof locationData, value: string | undefined) {
+  function updateField(field: keyof LocationData, value: string | undefined) {
     setLocationData((prev) => ({
       ...prev,
       [field]: {
@@ -38,8 +52,9 @@ function useLocationData(data?: typeof initialLocationData) {
         current: value,
       },
     }));
-  };
-  function updateFieldData(field: keyof typeof locationData, data: Array<string>) {
+  }
+
+  function updateFieldData(field: keyof LocationData, data: string[]) {
     setLocationData((prev) => ({
       ...prev,
       [field]: {
@@ -49,7 +64,7 @@ function useLocationData(data?: typeof initialLocationData) {
     }));
   }
 
-  function updateFieldStatus(field: keyof typeof locationData, status: FetchState) {
+  function updateFieldStatus(field: keyof LocationData, status: FetchState) {
     setLocationData((prev) => ({
       ...prev,
       [field]: {
@@ -60,56 +75,76 @@ function useLocationData(data?: typeof initialLocationData) {
   }
 
   async function fetchStates() {
-    updateFieldStatus('states', 'pending');
+    updateFieldStatus("states", "pending");
     const { data } = await axios.get(backendRoutes.locations.states, backendAxiosConfig());
-    const states: Array<string> = data.map((state: any) => state.name);
-    updateFieldData('states', states);
-    updateFieldStatus('states', 'fulfilled');
+    const states: string[] = data.map((state: { name: string }) => state.name);
+    updateFieldData("states", states);
+    updateFieldStatus("states", "fulfilled");
   }
 
   async function fetchLGAs(state: string) {
-    updateFieldStatus('lgas', 'pending');
+    updateFieldStatus("lgas", "pending");
     const { data } = await axios.get(
-      backendRoutes.locations.localGovernments(state), backendAxiosConfig());
-    const lgas: Array<string> = data.map((lga: any) => lga.name);
-    updateFieldData('lgas', lgas);
-    updateFieldStatus('lgas', 'fulfilled');
+      backendRoutes.locations.localGovernments(state),
+      backendAxiosConfig()
+    );
+    const lgas: string[] = data.map((lga: { name: string }) => lga.name);
+    updateFieldData("lgas", lgas);
+    updateFieldStatus("lgas", "fulfilled");
   }
 
   async function fetchWards(state: string, lga: string) {
-    updateFieldStatus('wards', 'pending');
-    const { data } = await axios.get(backendRoutes.locations.wards(state, lga), backendAxiosConfig());
-    const wards: Array<string> = data.map((ward: any) => ward.name);
-    updateFieldData('wards', wards);
-    updateFieldStatus('wards', 'fulfilled');
+    updateFieldStatus("wards", "pending");
+    const { data } = await axios.get(
+      backendRoutes.locations.wards(state, lga),
+      backendAxiosConfig()
+    );
+    const wards: string[] = data.map((ward: { name: string }) => ward.name);
+    updateFieldData("wards", wards);
+    updateFieldStatus("wards", "fulfilled");
   }
 
   async function fetchPollingUnits(state: string, lga: string, ward: string) {
-    updateFieldStatus('pollingUnits', 'pending');
+    updateFieldStatus("pollingUnits", "pending");
     const { data } = await axios.get(
-      backendRoutes.locations.pollingUnits(state, lga, ward), backendAxiosConfig());
-    const pollingUnits: Array<string> = data.map((unit: any) => unit.name);
-    updateFieldData('pollingUnits', pollingUnits);
-    updateFieldStatus('pollingUnits', 'fulfilled');
+      backendRoutes.locations.pollingUnits(state, lga, ward),
+      backendAxiosConfig()
+    );
+    const pollingUnits: string[] = data.map((unit: { name: string }) => unit.name);
+    updateFieldData("pollingUnits", pollingUnits);
+    updateFieldStatus("pollingUnits", "fulfilled");
   }
 
-  async function fetchAll(data: typeof initialLocationData) {
-    updateFieldStatus('states', 'pending');
-    updateFieldStatus('lgas', 'pending');
-    updateFieldStatus('wards', 'pending');
-    updateFieldStatus('pollingUnits', 'pending');
+  async function fetchAll(data: LocationData) {
+    updateFieldStatus("states", "pending");
+    updateFieldStatus("lgas", "pending");
+    updateFieldStatus("wards", "pending");
+    updateFieldStatus("pollingUnits", "pending");
     const { data: s } = await axios.get(backendRoutes.locations.states, backendAxiosConfig());
-    const { data: l } = await axios.get(backendRoutes.locations.localGovernments(data.states.current!), backendAxiosConfig());
-    const { data: w } = await axios.get(backendRoutes.locations.wards(data.states.current!, data.lgas.current!), backendAxiosConfig());
-    const { data: p } = await axios.get(backendRoutes.locations.pollingUnits(data.states.current!, data.lgas.current!, data.wards.current!), backendAxiosConfig());
-    updateFieldData('states', s.map((x: any) => x.name));
-    updateFieldData('lgas', l.map((x: any) => x.name));
-    updateFieldData('wards', w.map((x: any) => x.name));
-    updateFieldData('pollingUnits', p.map((x: any) => x.name));
-    updateFieldStatus('states', 'fulfilled');
-    updateFieldStatus('lgas', 'fulfilled');
-    updateFieldStatus('wards', 'fulfilled');
-    updateFieldStatus('pollingUnits', 'fulfilled');
+    const { data: l } = await axios.get(
+      backendRoutes.locations.localGovernments(data.states.current!),
+      backendAxiosConfig()
+    );
+    const { data: w } = await axios.get(
+      backendRoutes.locations.wards(data.states.current!, data.lgas.current!),
+      backendAxiosConfig()
+    );
+    const { data: p } = await axios.get(
+      backendRoutes.locations.pollingUnits(
+        data.states.current!,
+        data.lgas.current!,
+        data.wards.current!
+      ),
+      backendAxiosConfig()
+    );
+    updateFieldData("states", s.map((x: { name: string }) => x.name));
+    updateFieldData("lgas", l.map((x: { name: string }) => x.name));
+    updateFieldData("wards", w.map((x: { name: string }) => x.name));
+    updateFieldData("pollingUnits", p.map((x: { name: string }) => x.name));
+    updateFieldStatus("states", "fulfilled");
+    updateFieldStatus("lgas", "fulfilled");
+    updateFieldStatus("wards", "fulfilled");
+    updateFieldStatus("pollingUnits", "fulfilled");
     setInitialLoad(true);
   }
 
@@ -124,8 +159,8 @@ function useLocationData(data?: typeof initialLocationData) {
 
   useEffect(() => {
     if (initialLoad) {
-      updateField('lgas', undefined);
-      updateFieldData('lgas', []);
+      updateField("lgas", undefined);
+      updateFieldData("lgas", []);
       if (locationData.states.current) {
         fetchLGAs(locationData.states.current);
       }
@@ -134,8 +169,8 @@ function useLocationData(data?: typeof initialLocationData) {
 
   useEffect(() => {
     if (initialLoad) {
-      updateField('wards', undefined);
-      updateFieldData('wards', []);
+      updateField("wards", undefined);
+      updateFieldData("wards", []);
       if (locationData.lgas.current) {
         fetchWards(locationData.states.current!, locationData.lgas.current);
       }
@@ -144,8 +179,8 @@ function useLocationData(data?: typeof initialLocationData) {
 
   useEffect(() => {
     if (initialLoad) {
-      updateField('pollingUnits', undefined);
-      updateFieldData('pollingUnits', []);
+      updateField("pollingUnits", undefined);
+      updateFieldData("pollingUnits", []);
       if (locationData.wards.current) {
         fetchPollingUnits(
           locationData.states.current!,
@@ -160,6 +195,6 @@ function useLocationData(data?: typeof initialLocationData) {
     locationData,
     updateLocationField: updateField,
   };
-};
+}
 
 export default useLocationData;
