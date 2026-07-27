@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import ObserverIllustration from "@/app/components/shared/svg/ObseverIllustration";
+import PublicViewerIllustration from "@/app/components/shared/svg/PublicViewerIllustration";
 import VolunteerIllustration from "@/app/components/shared/svg/VolunteerIllustration";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import useFormHandler from "@/app/hooks/useFormHandler";
@@ -18,7 +19,7 @@ export default function RoleSelectForm() {
   const { currentUser, updateCurrentUser } = useContext(SignupUserContext);
 
   const initialFormState = {
-    role: null as "observer" | "volunteer" | null,
+    role: null as "observer" | "volunteer" | "public-viewer" | null,
   };
   const { formData, handleFormInputChange } =
     useFormHandler<typeof initialFormState>(initialFormState);
@@ -69,7 +70,7 @@ export default function RoleSelectForm() {
     }
 
     if (status === "fulfilled") {
-      if (formData.role === "volunteer") {
+      if (formData.role === "volunteer" || formData.role === "public-viewer") {
         dispatch(
           showAlert({
             message: "Account created sucessfully.",
@@ -97,7 +98,7 @@ export default function RoleSelectForm() {
   return (
     <React.Fragment>
       <p className="max-w-[480px] text-center text-sm text-gray-500 mb-4">
-        There are two important roles available, Observers and Volunteers.
+        There are three roles available: Observers, Volunteers, and Public Viewers.
       </p>
       <form action="" className="flex flex-col mb-3" onSubmit={(e) => e.preventDefault()}>
         <label htmlFor="signup-select-role" className="text-sm font-medium mb-5">
@@ -105,7 +106,7 @@ export default function RoleSelectForm() {
         </label>
         <Radio.Group
           name="signup-select-role"
-          className="flex flex-col items-center md:flex-row gap-7 mb-2 md:mb-4"
+          className="flex flex-col items-center md:flex-row md:flex-wrap md:justify-center gap-7 mb-2 md:mb-4"
           onChange={handleFormInputChange("role")}
         >
           <div
@@ -159,9 +160,31 @@ export default function RoleSelectForm() {
               reviews and appraisals.
             </p>
           </div>
+          <div
+            className={`role-card p-5 ring-1 rounded-lg flex flex-col items-center w-full max-w-[300px] md:max-w-[252px] transition-colors ${
+              formData.role === "public-viewer"
+                ? "ring-brand-500 bg-brand-25/25"
+                : "ring-gray-300"
+            }`}
+          >
+            <PublicViewerIllustration active={formData.role === "public-viewer"} />
+            <Radio
+              value={"public-viewer"}
+              rootClassName="mt-2 mb-1"
+              disabled={signupState.status.roleSelection === "pending"}
+            >
+              Public Viewer
+            </Radio>
+            <p className="text-xs text-gray-500 font-light text-center">
+              Public viewers follow elections on the platform without uploading
+              results or incident reports. This role is ideal if you want to stay
+              informed and closely monitor election activity in your local area.
+              You can view live updates, explore election discussions.
+            </p>
+          </div>
         </Radio.Group>
 
-        <p className="text-xs md:text-sm text-error-500 text-center mt-1 mb-6 max-w-[484px]">
+        <p className="text-xs md:text-sm text-error-500 text-center mx-auto mt-1 mb-6 max-w-[484px]">
           {signupState.isObserverAllowed === false
             ? `Anyone can be an accredited observer but only one observer is accredited per polling unit, An observer has been approved for your polling unit.`
             : signupState.isObserverAllowed === true

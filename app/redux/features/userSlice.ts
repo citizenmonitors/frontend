@@ -11,13 +11,20 @@ import { cookieData } from '@/app/data/cookieData';
 type InitialUserState = {
   details: User | null,
   isAdmin: boolean | null,
+  anonymousUsernamePreview: {
+    anonymousUsername: string;
+  } | null,
   status: {
     validateSession: FetchState,
     loginUser: FetchState,
     forgotPassword: FetchState,
     resetPassword: FetchState,
+    setPassword: FetchState,
     upgradeAccount: FetchState,
+    upgradeToVolunteer: FetchState,
     updateAccount: FetchState,
+    generateAnonymousUsername: FetchState,
+    updateAnonymousIdentity: FetchState,
     deleteAccount: FetchState,
     updateEmail: FetchState,
     resendEmailUpdateToken: FetchState,
@@ -32,13 +39,18 @@ type InitialUserState = {
 const initialState: InitialUserState = {
   details: null,
   isAdmin: null,
+  anonymousUsernamePreview: null,
   status: {
     validateSession: 'not started',
     loginUser: 'not started',
     forgotPassword: 'not started',
     resetPassword: 'not started',
+    setPassword: 'not started',
     upgradeAccount: 'not started',
+    upgradeToVolunteer: 'not started',
     updateAccount: 'not started',
+    generateAnonymousUsername: 'not started',
+    updateAnonymousIdentity: 'not started',
     deleteAccount: 'not started',
     updateEmail: 'not started',
     resendEmailUpdateToken: 'not started',
@@ -56,6 +68,7 @@ const userSlice = createSlice({
   reducers: {
     logoutUser(state) {
       state.details = initialState.details;
+      state.anonymousUsernamePreview = initialState.anonymousUsernamePreview;
       state.status = initialState.status;
       state.error = initialState.error;
       state.isAdmin = null;
@@ -65,6 +78,7 @@ const userSlice = createSlice({
     },
     refreshUser(state) {
       state.details = initialState.details;
+      state.anonymousUsernamePreview = initialState.anonymousUsernamePreview;
       state.status = initialState.status;
       state.error = initialState.error;
     },
@@ -146,6 +160,17 @@ const userSlice = createSlice({
       handleStateError(state, action);
     });
 
+    builder.addCase(setPassword.pending, (state) => {
+      state.status.setPassword = 'pending';
+    });
+    builder.addCase(setPassword.fulfilled, (state) => {
+      state.status.setPassword = 'fulfilled';
+    });
+    builder.addCase(setPassword.rejected, (state, action: any) => {
+      state.status.setPassword = 'rejected';
+      handleStateError(state, action);
+    });
+
     // Upgrade Account
     builder.addCase(upgradeAccount.pending, (state) => {
       state.status.upgradeAccount = 'pending';
@@ -159,6 +184,21 @@ const userSlice = createSlice({
       handleStateError(state, action);
     });
 
+    builder.addCase(upgradeToVolunteer.pending, (state) => {
+      state.status.upgradeToVolunteer = 'pending';
+    });
+    builder.addCase(upgradeToVolunteer.fulfilled, (state, action) => {
+      state.details = action.payload.user;
+      state.status.upgradeToVolunteer = 'fulfilled';
+      Cookies.set(cookieData.login.name, action.payload.token, {
+        expires: cookieData.login.expiration,
+      });
+    });
+    builder.addCase(upgradeToVolunteer.rejected, (state, action: any) => {
+      state.status.upgradeToVolunteer = 'rejected';
+      handleStateError(state, action);
+    });
+
     // Update Account
     builder.addCase(updateAccount.pending, (state) => {
       state.status.updateAccount = 'pending';
@@ -169,6 +209,34 @@ const userSlice = createSlice({
     });
     builder.addCase(updateAccount.rejected, (state, action: any) => {
       state.status.updateAccount = 'rejected';
+      handleStateError(state, action);
+    });
+
+    builder.addCase(generateAnonymousUsername.pending, (state) => {
+      state.status.generateAnonymousUsername = 'pending';
+    });
+    builder.addCase(generateAnonymousUsername.fulfilled, (state, action) => {
+      state.status.generateAnonymousUsername = 'fulfilled';
+      state.anonymousUsernamePreview = action.payload;
+    });
+    builder.addCase(generateAnonymousUsername.rejected, (state, action: any) => {
+      state.status.generateAnonymousUsername = 'rejected';
+      handleStateError(state, action);
+    });
+
+    builder.addCase(updateAnonymousIdentity.pending, (state) => {
+      state.status.updateAnonymousIdentity = 'pending';
+    });
+    builder.addCase(updateAnonymousIdentity.fulfilled, (state, action) => {
+      state.status.updateAnonymousIdentity = 'fulfilled';
+      if (state.details) {
+        state.details.useAnonymousIdentity = action.payload.useAnonymousIdentity;
+        state.details.anonymousUsername = action.payload.anonymousUsername;
+      }
+      state.anonymousUsernamePreview = null;
+    });
+    builder.addCase(updateAnonymousIdentity.rejected, (state, action: any) => {
+      state.status.updateAnonymousIdentity = 'rejected';
       handleStateError(state, action);
     });
 
@@ -281,6 +349,24 @@ export const resetPassword = createAsyncThunk<void, { password: string, token: s
   }
 );
 
+export const setPassword = createAsyncThunk<
+  void,
+  { password: string; confirmPassword: string }
+>(
+  'user/setPassword',
+  async (passwords, { rejectWithValue }) => {
+    return await fetchInThunk({
+      asyncCallback: () =>
+        axios.post(
+          backendRoutes.auth.setPassword,
+          passwords,
+          backendAxiosConfig()
+        ),
+      rejectWithValue,
+    });
+  }
+);
+
 type UpgradeAccountProps = User['observerVerificationDetails'];
 export const upgradeAccount = createAsyncThunk<
   { user: User },
@@ -299,6 +385,21 @@ export const upgradeAccount = createAsyncThunk<
   }
 );
 
+export const upgradeToVolunteer = createAsyncThunk<
+  { token: string; user: User },
+  void
+>("user/upgradeToVolunteer", async (_, { rejectWithValue }) => {
+  return await fetchInThunk({
+    asyncCallback: () =>
+      axios.put(
+        backendRoutes.dashboard.user.publicViewerToVolunteer,
+        {},
+        backendAxiosConfig()
+      ),
+    rejectWithValue,
+  });
+});
+
 export const updateAccount = createAsyncThunk<
   User,
   Partial<User>
@@ -315,6 +416,64 @@ export const updateAccount = createAsyncThunk<
     })
   }
 );
+
+type AnonymousUsernamePreview = {
+  anonymousUsername: string;
+};
+
+type AnonymousIdentityUpdate = {
+  useAnonymousIdentity: boolean;
+  anonymousUsername: string;
+};
+
+function normalizeAnonymousUsernamePreview(data: unknown): AnonymousUsernamePreview {
+  const record = (data && typeof data === "object" ? data : {}) as Record<string, unknown>;
+  return {
+    anonymousUsername: String(record.anonymousUsername ?? ""),
+  };
+}
+
+function normalizeAnonymousIdentityUpdate(data: unknown): AnonymousIdentityUpdate {
+  const record = (data && typeof data === "object" ? data : {}) as Record<string, unknown>;
+  return {
+    useAnonymousIdentity: Boolean(record.useAnonymousIdentity),
+    anonymousUsername: String(record.anonymousUsername ?? ""),
+  };
+}
+
+export const generateAnonymousUsername = createAsyncThunk<AnonymousUsernamePreview, void>(
+  "user/generateAnonymousUsername",
+  async (_, { rejectWithValue }) => {
+    return await fetchInThunk({
+      asyncCallback: async () => {
+        const { data } = await axios.post(
+          backendRoutes.anonymous.generateUsername,
+          {},
+          backendAxiosConfig()
+        );
+        return { data: normalizeAnonymousUsernamePreview(data) };
+      },
+      rejectWithValue,
+    });
+  }
+);
+
+export const updateAnonymousIdentity = createAsyncThunk<
+  AnonymousIdentityUpdate,
+  { enabled: boolean }
+>("user/updateAnonymousIdentity", async (props, { rejectWithValue }) => {
+  return await fetchInThunk({
+    asyncCallback: async () => {
+      const { data } = await axios.put(
+        backendRoutes.anonymous.identity,
+        props,
+        backendAxiosConfig()
+      );
+      return { data: normalizeAnonymousIdentityUpdate(data) };
+    },
+    rejectWithValue,
+  });
+});
 
 export const updateEmail = createAsyncThunk<
   void,

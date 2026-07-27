@@ -1,4 +1,5 @@
-import { Calendar, DocumentText1, DocumentUpload, Edit2, HomeHashtag, Icon, Note, Notepad2, Setting, SliderVertical1 } from "iconsax-react";
+import { Calendar, DocumentText1, DocumentUpload, Edit2, HomeHashtag, Icon, Microphone2, Notepad2, Setting, SliderVertical1 } from "iconsax-react";
+import { UserRole } from "../redux/types";
 
 export type Route = {
   title: string,
@@ -37,6 +38,11 @@ const dashboardRoutes: Array<Route> = [
     ]
   },
   {
+    title: "Pulse",
+    icon: Microphone2,
+    href: "/portal/pulse",
+  },
+  {
     title: "Calendar",
     icon: Calendar,
     href: "/portal/calendar",
@@ -50,11 +56,6 @@ const dashboardRoutes: Array<Route> = [
     title: "Live",
     icon: SliderVertical1,
     href: "/portal/live",
-  },
-  {
-    title: "Press room",
-    icon: Note,
-    href: "/portal/press/create",
   },
   {
     title: "Polls & Surveys",
@@ -80,7 +81,15 @@ const dashboardPaths = {
   settings: settingsPath
 }
 
-const settingsRoutes = [
+export type SettingsRouteItem = {
+  route: string;
+  name: string;
+  onlyRoles?: UserRole[];
+  excludeRoles?: UserRole[];
+  section?: "main" | "footer";
+};
+
+const settingsRoutes: SettingsRouteItem[] = [
   {
     route: `${settingsPath}/profile`,
     name: "Profile Details",
@@ -96,6 +105,12 @@ const settingsRoutes = [
   {
     route: `${settingsPath}/verify`,
     name: "Observer Verification",
+    excludeRoles: ["public-viewer"],
+  },
+  {
+    route: `${settingsPath}/upgrade-volunteer`,
+    name: "Upgrade to Volunteer",
+    onlyRoles: ["public-viewer"],
   },
   {
     route: `${settingsPath}/notifications`,
@@ -106,13 +121,53 @@ const settingsRoutes = [
     name: "Password",
   },
   {
+    route: `${settingsPath}/polling-unit-locator`,
+    name: "Polling Unit Locator",
+  },
+  {
+    route: `${settingsPath}/feedback`,
+    name: "Give Feedback",
+  },
+  {
+    route: `${settingsPath}/citizen-academy`,
+    name: "Citizen Academy",
+    section: "footer",
+  },
+  {
     route: "/privacy-policy",
     name: "Privacy Policy",
+    section: "footer",
   },
   {
     route: "/terms-of-use",
-    name: "Terms of Use"
-  }
+    name: "Terms of Use",
+    section: "footer",
+  },
 ];
 
-export { dashboardRoutes, dashboardPaths, settingsRoutes };
+function isSettingsRouteVisible(route: SettingsRouteItem, role: UserRole) {
+  if (route.onlyRoles && !route.onlyRoles.includes(role)) return false;
+  if (route.excludeRoles?.includes(role)) return false;
+  return true;
+}
+
+function getSettingsRoutes(role: UserRole) {
+  return settingsRoutes.filter((route) => isSettingsRouteVisible(route, role));
+}
+
+function getSettingsMainRoutes(role: UserRole) {
+  return getSettingsRoutes(role).filter((route) => route.section !== "footer");
+}
+
+function getSettingsFooterRoutes(role: UserRole) {
+  return getSettingsRoutes(role).filter((route) => route.section === "footer");
+}
+
+export {
+  dashboardRoutes,
+  dashboardPaths,
+  settingsRoutes,
+  getSettingsRoutes,
+  getSettingsMainRoutes,
+  getSettingsFooterRoutes,
+};

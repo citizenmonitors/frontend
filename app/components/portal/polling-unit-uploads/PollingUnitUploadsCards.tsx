@@ -8,6 +8,7 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { v4 } from "uuid";
 import getElectionName from "@/app/utils/getElectionName";
+import { getNoObserverUploadMessage } from "@/app/utils/userRoleAccess";
 
 export default function PollingUnitUploadsCards({
   togglePollingUnitUploadFlagModal,
@@ -21,6 +22,7 @@ export default function PollingUnitUploadsCards({
   togglePreviewModal: (modalInfo?: PollingUnitReport | PollingUnitResult) => void;
 }) {
   const electionState = useAppSelector((state) => state.election);
+  const userDetails = useAppSelector((state) => state.user.details!);
   const dispatch = useAppDispatch();
   const PAGE_SIZE = 5;
   const [currentPage, setCurrentPage] = useState(1);
@@ -163,9 +165,7 @@ export default function PollingUnitUploadsCards({
         Nothing Here.
       </h3>
       <p className="text-xs mx-auto max-w-sm text-center text-gray-500">
-        No data is available for your polling unit as there’s currently no accredited
-        observer for your polling unit. You can upgrade now to become the accredited
-        observer for your polling unit.
+        {getNoObserverUploadMessage(userDetails.role)}
       </p>
     </div>
   );

@@ -33,7 +33,8 @@ function PortalLayout({ children }: any) {
   if (isAdmin) router.replace("/admin/dashboard");
 
   const dashboardLinks = dashboardRoutes;
-  const mobileLinks = dashboardRoutes.filter((l) => l.title).slice(0, 5);
+  const mobileNavTitles = ["Home", "Elections", "Records", "Pulse", "Live"];
+  const mobileLinks = dashboardRoutes.filter((l) => mobileNavTitles.includes(l.title));
 
   return (
     <main
@@ -83,7 +84,7 @@ function PortalLayout({ children }: any) {
                 className={`
                     flex flex-col items-center gap-1
                     ${
-                      pathName === link.href
+                      pathName === link.href || pathName.startsWith(`${link.href}/`)
                         ? link.title === "Live"
                           ? "text-error-500"
                           : "text-brand-500"
@@ -93,7 +94,11 @@ function PortalLayout({ children }: any) {
               >
                 <link.icon
                   size={24}
-                  variant={pathName === link.href ? "Bold" : "Linear"}
+                  variant={
+                    pathName === link.href || pathName.startsWith(`${link.href}/`)
+                      ? "Bold"
+                      : "Linear"
+                  }
                 />
                 <span className="text-xs font-medium whitespace-nowrap">
                   {link.title}

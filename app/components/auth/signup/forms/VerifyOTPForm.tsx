@@ -7,6 +7,9 @@ import { useRouter } from "next/navigation";
 import OTPInput from "react-otp-input";
 import VerifyCounter from "../../../../(pages)/auth/signup/(step-1)/verify/components/VerifyCounter";
 import { SignupUserContext } from "../../../../(pages)/auth/signup/SignupUserProvider";
+import { saveSignupDraft, setSignupNextPath } from "@/app/data/signupDraft";
+import { cookieData } from "@/app/data/cookieData";
+import Cookies from "js-cookie";
 
 export default function VerifyOTPForm() {
   const router = useRouter();
@@ -15,8 +18,7 @@ export default function VerifyOTPForm() {
   const { currentUser } = useContext(SignupUserContext);
   const [OTP, setOTP] = useState("");
 
-  // handle form submission
-  function submitOTP() {
+  async function submitOTP() {
     if (OTP.length < 6) {
       dispatch(
         showAlert({
@@ -27,24 +29,44 @@ export default function VerifyOTPForm() {
       return;
     }
 
-    dispatch(verifyOTP({ email: currentUser.email!, verificationCode: OTP }));
+    try {
+      const result = await dispatch(
+        verifyOTP({ email: currentUser.email!, verificationCode: OTP })
+      ).unwrap();
+
+      if (result?.token) {
+        Cookies.set(cookieData.login.name, result.token, {
+          expires: cookieData.login.expiration,
+        });
+      }
+
+      saveSignupDraft({
+        email: currentUser.email,
+        emailVerified: true,
+      });
+      setSignupNextPath("/auth/signup/biodata");
+
+      dispatch(
+        showAlert({
+          message:
+            "Your email has been verified. Set a password to continue your signup.",
+          type: "success",
+        })
+      );
+      router.push("/auth/set-password");
+    } catch {
+      // rejected status handled by the effect below
+    }
   }
 
   useEffect(() => {
-    const status = signupState.status.emailVerification;
-
-    if (status === "rejected") {
+    if (signupState.status.emailVerification === "rejected") {
       dispatch(
         showAlert({
-          message: signupState.error.message!,
+          message: signupState.error.message || "Could not verify email.",
           type: "error",
         })
       );
-    }
-
-    if (status === "fulfilled") {
-      dispatch(showAlert({ message: "Email verified successfully.", type: "success" }));
-      router.push("/auth/signup/biodata");
     }
   }, [signupState.status.emailVerification]);
 

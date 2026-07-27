@@ -114,6 +114,20 @@
   }
 }
 
+.citizen-academy-tabs {
+  > .ant-tabs-nav::before {
+    @apply !border-gray-300;
+  }
+
+  > .ant-tabs-nav {
+    @apply overflow-hidden isolate;
+
+    > .ant-tabs-nav-operations {
+      @apply z-50;
+    }
+  }
+}
+
 #settings-profile-details {
   .ant-upload {
     @apply flex flex-col md:flex-row items-center gap-2 md:gap-4 justify-center;

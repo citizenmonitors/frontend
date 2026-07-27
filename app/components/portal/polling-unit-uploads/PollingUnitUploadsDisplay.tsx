@@ -13,6 +13,7 @@ import PollingUnitUploadsCards from "./PollingUnitUploadsCards";
 import PollingUnitUploadFlagConfirmModal from "./PollingUnitUploadFlagConfirmModal";
 import SuggestionPopup from "../../shared/SuggestionPopup";
 import { resourceVideos } from "../../landing/resources/data";
+import sortByCreatedAtAsc from "@/app/utils/sortByCreatedAtAsc";
 
 export default function PollingUnitUploadsDisplay() {
   const router = useRouter();
@@ -60,23 +61,25 @@ export default function PollingUnitUploadsDisplay() {
     const { reports, results } = pollingUnitUploads;
     const allUploads = [...reports, ...results];
 
-    return allUploads.filter((upload: any) => {
-      if (filterData.uploadType.selected === "reports" && upload.partiesVotes) {
-        return false;
-      }
-      if (filterData.uploadType.selected === "results" && !upload.partiesVotes) {
-        return false;
-      }
-      if (
-        filterData.electionYear.selected !== "all years" &&
-        upload.electionYear.toLowerCase() !==
-          filterData.electionYear.selected.toLowerCase()
-      ) {
-        return false;
-      }
+    return sortByCreatedAtAsc(
+      allUploads.filter((upload: any) => {
+        if (filterData.uploadType.selected === "reports" && upload.partiesVotes) {
+          return false;
+        }
+        if (filterData.uploadType.selected === "results" && !upload.partiesVotes) {
+          return false;
+        }
+        if (
+          filterData.electionYear.selected !== "all years" &&
+          upload.electionYear.toLowerCase() !==
+            filterData.electionYear.selected.toLowerCase()
+        ) {
+          return false;
+        }
 
-      return true;
-    });
+        return true;
+      })
+    );
   }, [pollingUnitUploads, filterData]);
 
   const [previewModalOpen, setPreviewModalOpen] = useState<boolean>(false);

@@ -56,10 +56,12 @@ const adminActivityLogSlice = createSlice({
     });
     builder.addCase(getActivities.fulfilled, (state, action) => {
       state.status.fetchActivities = "fulfilled";
-      state.activities = action.payload.sort((a, b) => {
-        return new Date(b.admin.timeCreated).getTime() - new Date(a.admin.timeCreated).getTime();
-      }
-      );
+      state.activities = [...action.payload].sort((a, b) => {
+        return (
+          new Date(a.admin.timeCreated).getTime() -
+          new Date(b.admin.timeCreated).getTime()
+        );
+      });
     });
     builder.addCase(getActivities.rejected, (state, action: any) => {
       state.status.fetchActivities = "rejected";

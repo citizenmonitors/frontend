@@ -11,6 +11,7 @@ import formatString from "@/app/utils/formatString";
 import AppFilter from "../../shared/AppFilter";
 import { useRouter, useSearchParams } from "next/navigation";
 import { showAlert } from "@/app/redux/features/alertSlice";
+import sortByCreatedAtAsc from "@/app/utils/sortByCreatedAtAsc";
 
 export default function ActivityLogDisplay() {
   const activityLogState = useAppSelector((state) => state.adminActivityLog);
@@ -66,7 +67,7 @@ export default function ActivityLogDisplay() {
       
       return true;
     });
-    return filtered;
+    return sortByCreatedAtAsc(filtered, (activity) => activity.timeCreated);
   }, [activities, filterData]);
 
   const exportHeaderKeyMap: Record<string, keyof AdminTableActivity["admin"]> = {

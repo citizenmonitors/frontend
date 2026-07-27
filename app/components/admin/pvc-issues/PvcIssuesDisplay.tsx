@@ -11,6 +11,7 @@ import AppExport from "../../shared/AppExport";
 import AppFilter from "../../shared/AppFilter";
 import { initialPvcIssuesFilterData } from "./data";
 import PvcIssuesTable from "./PvcIssuesTable";
+import sortByCreatedAtAsc from "@/app/utils/sortByCreatedAtAsc";
 
 export default function PvcIssuesDisplay() {
   const pvcIssuesState = useAppSelector((state) => state.adminPvcIssues);
@@ -44,36 +45,38 @@ export default function PvcIssuesDisplay() {
   }, [reports]);
 
   const filteredReports = useMemo(() => {
-    return reports.filter((report) => {
-      const state = formatString.normalCase(report.state) + " State";
-      const lga = formatString.normalCase(report.lga);
-      const issueType = getPvcIssueLabel(report.issueType);
-      const year = moment(report.createdAt).format("YYYY");
+    return sortByCreatedAtAsc(
+      reports.filter((report) => {
+        const state = formatString.normalCase(report.state) + " State";
+        const lga = formatString.normalCase(report.lga);
+        const issueType = getPvcIssueLabel(report.issueType);
+        const year = moment(report.createdAt).format("YYYY");
 
-      if (
-        filterData.state.selected !== "all states" &&
-        filterData.state.selected !== state
-      ) {
-        return false;
-      }
+        if (
+          filterData.state.selected !== "all states" &&
+          filterData.state.selected !== state
+        ) {
+          return false;
+        }
 
-      if (filterData.lga.selected !== "all lgas" && filterData.lga.selected !== lga) {
-        return false;
-      }
+        if (filterData.lga.selected !== "all lgas" && filterData.lga.selected !== lga) {
+          return false;
+        }
 
-      if (
-        filterData.issueType.selected !== "all issue types" &&
-        filterData.issueType.selected !== issueType
-      ) {
-        return false;
-      }
+        if (
+          filterData.issueType.selected !== "all issue types" &&
+          filterData.issueType.selected !== issueType
+        ) {
+          return false;
+        }
 
-      if (filterData.date.selected !== "all dates" && filterData.date.selected !== year) {
-        return false;
-      }
+        if (filterData.date.selected !== "all dates" && filterData.date.selected !== year) {
+          return false;
+        }
 
-      return true;
-    });
+        return true;
+      })
+    );
   }, [reports, filterData]);
 
   const exportHeaderKeyMap: Record<string, keyof AdminTablePvcIssue | "issueTypeLabel"> = {

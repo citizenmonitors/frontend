@@ -2,6 +2,7 @@ import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import { getPollingUnitResults } from "@/app/redux/features/electionSlice";
 import { PollingUnitReport, PollingUnitResult } from "@/app/redux/types";
 import getElectionName from "@/app/utils/getElectionName";
+import { getNoObserverUploadMessage } from "@/app/utils/userRoleAccess";
 import formatString from "@/app/utils/formatString";
 import { Button, Empty, Table, TableColumnsType, Tooltip } from "antd";
 import { ArrowLeft, ArrowRight, Flag, Like1 } from "iconsax-react";
@@ -22,6 +23,7 @@ export default function PollingUnitUploadsTable({
 }) {
   const dispatch = useAppDispatch();
   const electionState = useAppSelector((state) => state.election);
+  const userDetails = useAppSelector((state) => state.user.details!);
 
   type ColumnType = {
     key: React.Key;
@@ -146,7 +148,7 @@ export default function PollingUnitUploadsTable({
           <span className="flex justify-center max-w-sm mx-auto">
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No data is available for your polling unit as there’s currently no accredited observer for your polling unit. You can upgrade now to become the accredited observer for your polling unit."
+              description={getNoObserverUploadMessage(userDetails.role)}
             />
           </span>
         ),

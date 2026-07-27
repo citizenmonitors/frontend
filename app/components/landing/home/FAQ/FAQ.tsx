@@ -1,10 +1,9 @@
 import React from "react";
-import FAQCollapse from "./FAQCollapse";
+import FAQCollapse from "@/app/components/shared/FAQCollapse";
 import { SmsEdit } from "iconsax-react";
 import { email } from "@/app/data/links";
 import Link from "next/link";
 import "./FAQ.css";
-
 
 function FAQ() {
   return (

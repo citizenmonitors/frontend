@@ -14,11 +14,14 @@ export const backendRoutes = {
     // New Routes
     submitDetails: 'auth/submit-details',
     selectRole: 'auth/select-role',
-    submitRole: 'auth/submit-role'
+    submitRole: 'auth/submit-role',
+    google: 'mobile/auth/google',
+    setPassword: 'mobile/auth/set-password',
   },
   dashboard: {
     user: {
       upgradeAccount: 'volunteer-to-observer',
+      publicViewerToVolunteer: 'public-viewer-to-volunteer',
       updateAccount: 'user',
       deleteAccount: 'user',
       resendEmailVerificationToken: 'user/resend-token',
@@ -50,11 +53,24 @@ export const backendRoutes = {
       deleteResult: (id: string) => `elections/election/${id}/results`,
       deleteReport: (id: string) => `elections/election/${id}/report`,
       fetchUploads: () => `elections/user-election-data`,
+
+      getDiscussionPosts: (activeElectionId: string) =>
+        `elections/${activeElectionId}/discussion/posts`,
+      createDiscussionPost: (activeElectionId: string) =>
+        `elections/${activeElectionId}/discussion/posts`,
+      likeDiscussionPost: (activeElectionId: string, postId: string) =>
+        `elections/${activeElectionId}/discussion/posts/${postId}/like`,
+      getDiscussionComments: (activeElectionId: string, postId: string) =>
+        `elections/${activeElectionId}/discussion/posts/${postId}/comments`,
+      createDiscussionComment: (activeElectionId: string, postId: string) =>
+        `elections/${activeElectionId}/discussion/posts/${postId}/comments`,
+      likeDiscussionComment: (activeElectionId: string, postId: string, commentId: string) =>
+        `elections/${activeElectionId}/discussion/posts/${postId}/comments/${commentId}/like`,
     },
     inbox: {
       get: 'podcasts/inbox',
       markRead: (id: string) => `podcast/mark-read/${id}`,
-    }
+    },
   },
   admin: {
     dashboard: {
@@ -143,6 +159,24 @@ export const backendRoutes = {
   },
   pvcIssues: {
     submit: 'pvc-issues',
+  },
+  anonymous: {
+    generateUsername: 'anonymous/username/generate',
+    identity: 'anonymous/identity',
+  },
+  faq: 'faq',
+  academy: {
+    list: 'academy',
+    article: (slug: string) => `academy/${slug}`,
+  },
+  pulse: {
+    getPosts: 'pulse/posts',
+    createPost: 'pulse/posts',
+    likePost: (postId: string) => `pulse/posts/${postId}/like`,
+    getComments: (postId: string) => `pulse/posts/${postId}/comments`,
+    createComment: (postId: string) => `pulse/posts/${postId}/comments`,
+    likeComment: (postId: string, commentId: string) =>
+      `pulse/posts/${postId}/comments/${commentId}/like`,
   },
   speakerInvite: {
     get: (token: string) => `speaker-invite/${token}`,

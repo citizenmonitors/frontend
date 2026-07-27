@@ -1,7 +1,10 @@
 "use client";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import useFormHandler from "@/app/hooks/useFormHandler";
+import useGoogleAuth from "@/app/hooks/useGoogleAuth";
 import useSessionValidate from "@/app/hooks/useSessionValidate";
+import AuthDivider from "@/app/components/auth/ui/AuthDivider";
+import GoogleAuthButton from "@/app/components/auth/ui/GoogleAuthButton";
 import { showAlert } from "@/app/redux/features/alertSlice";
 import { loginUser, refreshUser } from "@/app/redux/features/userSlice";
 import { Button, Checkbox, Input, Tooltip } from "antd";
@@ -28,6 +31,11 @@ function Login() {
   });
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const {
+    authenticateWithGoogle,
+    isGoogleAuthenticating,
+    showGoogleError,
+  } = useGoogleAuth();
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(true);
@@ -165,6 +173,14 @@ function Login() {
           Login
         </Button>
       </form>
+      <div className="w-full max-w-[648px] mb-8">
+        <AuthDivider label="Or continue with" />
+        <GoogleAuthButton
+          onCredential={authenticateWithGoogle}
+          onError={showGoogleError}
+          disabled={isGoogleAuthenticating}
+        />
+      </div>
       <p className="text-xs md:text-sm text-gray-300 font-medium text-center mb-3">
         Are you new here?{" "}
         <Link href={"/auth/signup"} className="text-brand-400 hover:underline">

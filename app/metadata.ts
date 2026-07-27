@@ -145,6 +145,20 @@ export const resetPasswordMetadata = {
   },
 };
 
+export const setPasswordMetadata = {
+  title: "Set Password - Citizen Monitors",
+  description: "Set a new password for your Citizen Monitors account securely.",
+  keywords: ["set password", "citizen monitors", "account security", "password setup"],
+  openGraph: {
+    title: "Set Password - Citizen Monitors",
+    description: "Create a new password to finish your Google/email signup securely.",
+    url: `${process.env.METADATA_BASEURL!}/auth/set-password`,
+    siteName: "Citizen Monitors",
+    type: "website",
+    locale: "en_GB",
+  },
+};
+
 export const forgotPasswordMetadata = {
   title: "Account Recovery - Citizen Monitors",
   description: "Request a password reset link to regain access to your Citizen Monitors account.",

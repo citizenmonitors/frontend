@@ -98,8 +98,30 @@
     @apply !border-gray-300;
   }
 
+  > .ant-tabs-nav {
+    @apply overflow-hidden isolate;
+
+    > .ant-tabs-nav-operations {
+      @apply z-50;
+    }
+  }
+
   > .ant-tabs-nav > .ant-tabs-nav-wrap > .ant-tabs-nav-list {
     @apply w-full md:w-auto justify-center md:justify-start;
+  }
+}
+
+.citizen-academy-tabs {
+  > .ant-tabs-nav::before {
+    @apply !border-gray-300;
+  }
+
+  > .ant-tabs-nav {
+    @apply overflow-hidden isolate;
+
+    > .ant-tabs-nav-operations {
+      @apply z-50;
+    }
   }
 }
 

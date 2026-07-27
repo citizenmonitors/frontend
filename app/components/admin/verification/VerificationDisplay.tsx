@@ -7,6 +7,7 @@ import VerificationTable from "./VerificationTable";
 import moment from "moment";
 import AppExport from "../../shared/AppExport";
 import { AdminTableVerificationUser } from "@/app/redux/admin-features/verificationSlice";
+import sortByCreatedAtAsc from "@/app/utils/sortByCreatedAtAsc";
 
 type VerificationDisplayProps = {
   users?: Array<AdminTableVerificationUser>;
@@ -36,25 +37,27 @@ export default function VerificationDisplay({ users = [] }: VerificationDisplayP
   }, [users]);
 
   const filteredUsers = useMemo(() => {
-    return users.filter((user) => {
-      const state = formatString.normalCase(user.state) + " State";
-      const year = moment(user.createdAt).format("YYYY");
+    return sortByCreatedAtAsc(
+      users.filter((user) => {
+        const state = formatString.normalCase(user.state) + " State";
+        const year = moment(user.createdAt).format("YYYY");
 
-      if (
-        filterData.state.selected !== "all states" &&
-        filterData.state.selected !== state
-      )
-        return false;
-      if (filterData.date.selected !== "all dates" && filterData.date.selected !== year)
-        return false;
-      if (
-        filterData.gender.selected !== "all genders" &&
-        filterData.gender.selected !== user.gender
-      )
-        return false;
+        if (
+          filterData.state.selected !== "all states" &&
+          filterData.state.selected !== state
+        )
+          return false;
+        if (filterData.date.selected !== "all dates" && filterData.date.selected !== year)
+          return false;
+        if (
+          filterData.gender.selected !== "all genders" &&
+          filterData.gender.selected !== user.gender
+        )
+          return false;
 
-      return true;
-    });
+        return true;
+      })
+    );
   }, [users, filterData]);
 
   const exportHeaderKeyMap: Record<string, keyof AdminTableVerificationUser> = {

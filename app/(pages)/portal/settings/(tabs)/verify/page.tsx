@@ -4,15 +4,24 @@ import SettingsHeader from "@/app/components/portal/settings/SettingsHeader";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import { showAlert } from "@/app/redux/features/alertSlice";
 import { clearUserStatus } from "@/app/redux/features/userSlice";
+import { canUpgradeToObserver, canUpgradeToVolunteer } from "@/app/utils/userRoleAccess";
 import { Button } from "antd";
 import { ArrowRight2 } from "iconsax-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
 export default function ObserverVerification() {
   const userState = useAppSelector((state) => state.user);
   const userDetails = userState.details!;
   const dispatch = useAppDispatch();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (canUpgradeToVolunteer(userDetails.role)) {
+      router.replace("/portal/settings/upgrade-volunteer");
+    }
+  }, [router, userDetails.role]);
 
   useEffect(() => {
     if (userState.status.upgradeAccount === "rejected") {
@@ -35,6 +44,10 @@ export default function ObserverVerification() {
     }
   }, [userState.status.upgradeAccount]);
 
+  if (canUpgradeToVolunteer(userDetails.role)) {
+    return null;
+  }
+
   return (
     <React.Fragment>
       <SettingsHeader>Observer Verification</SettingsHeader>
@@ -54,7 +67,7 @@ export default function ObserverVerification() {
             </Button>
           </Link>
         </div>
-      ) : (
+      ) : canUpgradeToObserver(userDetails.role) ? (
         <div
           id="settings-verify"
           className="py-6 bg-white md:py-8 px-3 md:px-8 ring-1 ring-gray-300 rounded-lg w-full max-w-[736px] mx-auto"
@@ -63,11 +76,16 @@ export default function ObserverVerification() {
             Verify yourself, become a Citizen Monitors Observer.
           </h3>
           <p className="text-gray-500 text-sm text-center mb-8 max-w-screen-xs mx-auto">
-            Upload the required documents to become an observer.
+            Upload the required documents to become an observer. PVC verification and
+            observer bank details are completed here.
           </p>
 
           <VerifyForm />
         </div>
+      ) : (
+        <p className="text-sm text-center text-gray-500 py-8">
+          Observer verification is available to Volunteers only.
+        </p>
       )}
     </React.Fragment>
   );

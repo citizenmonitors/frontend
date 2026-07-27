@@ -62,8 +62,8 @@ function ObserverVerificationForm() {
     // If bank details are provided, ensure they are valid
     if (
       (!bankData.current ||
-      bankAccountName.trim().length === 0 ||
-      bankAccountNumber.trim().length === 0) &&
+        bankAccountName.trim().length === 0 ||
+        bankAccountNumber.trim().length === 0) &&
       (bankData.current || bankAccountName.trim().length > 0 || bankAccountNumber.trim().length > 0)
     ) {
       dispatch(
@@ -134,7 +134,7 @@ function ObserverVerificationForm() {
     maxCount: 1,
     showUploadList: false,
     accept: acceptedFileTypes.observerID,
-    fileList: observerIds.front ? [observerIds.front] : [],
+    openFileDialogOnClick: true,
     beforeUpload(file) {
       const maxFileSize = 5 * 1024 * 1024;
 
@@ -159,7 +159,7 @@ function ObserverVerificationForm() {
     maxCount: 1,
     showUploadList: false,
     accept: acceptedFileTypes.observerID,
-    fileList: observerIds.back ? [observerIds.back] : [],
+    openFileDialogOnClick: true,
     beforeUpload(file) {
       const maxFileSize = 5 * 1024 * 1024;
 
@@ -222,25 +222,20 @@ function ObserverVerificationForm() {
       onSubmit={(e) => e.preventDefault()}
     >
       <div className="grid col-span-2">
-        <div className="text-sm font-medium">
-          Upload your Permanent Voters Card (PVC)
-        </div>
+        <div className="text-sm font-medium">Upload your Permanent Voters Card (PVC)</div>
         <p className="text-sm text-gray-500 mb-4">
-          Ensure to attach the front and back image(s) of your Permanent Voters Card
-          (PVC).
+          Ensure to attach the front and back image(s) of your Permanent Voters Card (PVC).
         </p>
         <div className="grid gap-5 lg:grid-cols-2">
           <div className="flex flex-col gap-2 text-sm text-gray-500">
-            <label
-              className="text-sm font-medium text-gray-700"
-              htmlFor="verify-id-front"
-            >
+            <label className="text-sm font-medium text-gray-700" htmlFor="verify-id-front">
               Front <span className="text-error-600">*</span>
             </label>
             <Dragger
               id="verify-id-front"
               style={{ background: "white", height: "100%" }}
               {...observerIdFrontUploadProps}
+              fileList={observerIds.front ? [observerIds.front] : []}
             >
               <div className="grid mb-2 place-items-center">
                 <UploadIcon fileType={observerIds.front?.type as any} />
@@ -250,7 +245,7 @@ function ObserverVerificationForm() {
                   <span className="text-sm font-semibold text-brand-600">
                     {observerIds.front.name}
                   </span>
-                  <p className="mb-3 text-xs text-gray-400">Front or Both Side(s)</p>
+                  <span className="mb-3 text-xs text-gray-400">Front or Both Side(s)</span>
                   <span className="text-xs text-gray-700">
                     {formatNumber.fileSize(observerIds.front.size || 0)}
                   </span>
@@ -258,8 +253,8 @@ function ObserverVerificationForm() {
               ) : (
                 <div>
                   <p className="text-gray-600">
-                    <span className="font-semibold text-brand-600">Click to upload</span>{" "}
-                    or drag and drop
+                    <span className="font-semibold text-brand-600">Click to upload</span> or drag
+                    and drop
                   </p>
                   <p className="mb-2 text-xs text-gray-400">
                     JPG and PNG formats only • Max. 5MB
@@ -281,6 +276,7 @@ function ObserverVerificationForm() {
               id="verify-id-back"
               style={{ background: "white", height: "100%" }}
               {...observerIdBackUploadProps}
+              fileList={observerIds.back ? [observerIds.back] : []}
             >
               <div className="grid mb-2 place-items-center">
                 <UploadIcon fileType={observerIds.back?.type as any} />
@@ -290,7 +286,7 @@ function ObserverVerificationForm() {
                   <span className="text-sm font-semibold text-brand-600">
                     {observerIds.back.name}
                   </span>
-                  <p className="mb-3 text-xs text-gray-400">Back Side</p>
+                  <span className="mb-3 text-xs text-gray-400">Back Side</span>
                   <span className="text-xs text-gray-700">
                     {formatNumber.fileSize(observerIds.back.size || 0)}
                   </span>
@@ -298,8 +294,8 @@ function ObserverVerificationForm() {
               ) : (
                 <div>
                   <p className="text-gray-600">
-                    <span className="font-semibold text-brand-600">Click to upload</span>{" "}
-                    or drag and drop
+                    <span className="font-semibold text-brand-600">Click to upload</span> or drag
+                    and drop
                   </p>
                   <p className="mb-2 text-xs text-gray-400">
                     JPG and PNG formats only • Max. 5MB

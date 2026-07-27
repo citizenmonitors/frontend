@@ -18,6 +18,8 @@ import outboxSlice from "./admin-features/outboxSlice";
 import notificationSlice from "./admin-features/notificationSlice";
 import pvcIssuesSlice from "./features/pvcIssuesSlice";
 import adminPvcIssuesSlice from "./admin-features/pvcIssuesSlice";
+import pulseSlice from "./features/pulseSlice";
+import electionDiscussionSlice from "./features/electionDiscussionSlice";
 
 const store = configureStore({
   reducer: {
@@ -40,6 +42,8 @@ const store = configureStore({
     adminNotification: notificationSlice,
     pvcIssues: pvcIssuesSlice,
     adminPvcIssues: adminPvcIssuesSlice,
+    pulse: pulseSlice,
+    electionDiscussion: electionDiscussionSlice,
   }
 });
 

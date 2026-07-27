@@ -9,6 +9,7 @@ import formatString from "@/app/utils/formatString";
 import moment from "moment";
 import AppExport from "../../shared/AppExport";
 import { AdminElectionUpload } from "@/app/redux/types";
+import sortByCreatedAtAsc from "@/app/utils/sortByCreatedAtAsc";
 
 export default function UploadsDisplay() {
   const uploadState = useAppSelector((state) => state.adminUpload);
@@ -42,40 +43,42 @@ export default function UploadsDisplay() {
   }, [uploads]);
 
   const filteredUploads = useMemo(() => {
-    return uploads.filter((upload) => {
-      const election = formatString.kebabToNormalCase(upload.election);
-      const state = formatString.normalCase(upload.state) + " State";
-      const year = moment(upload.createdAt).format("YYYY");
+    return sortByCreatedAtAsc(
+      uploads.filter((upload) => {
+        const election = formatString.kebabToNormalCase(upload.election);
+        const state = formatString.normalCase(upload.state) + " State";
+        const year = moment(upload.createdAt).format("YYYY");
 
-      if (
-        filterData.election.selected !== "all elections" &&
-        filterData.election.selected !== election
-      )
-        return false;
+        if (
+          filterData.election.selected !== "all elections" &&
+          filterData.election.selected !== election
+        )
+          return false;
 
-      if (
-        filterData.state.selected !== "all states" &&
-        filterData.state.selected !== state
-      )
-        return false;
+        if (
+          filterData.state.selected !== "all states" &&
+          filterData.state.selected !== state
+        )
+          return false;
 
-      if (filterData.date.selected !== "all dates" && filterData.date.selected !== year)
-        return false;
+        if (filterData.date.selected !== "all dates" && filterData.date.selected !== year)
+          return false;
 
-      if (
-        filterData.uploadType.selected !== "all types" &&
-        filterData.uploadType.selected !== upload.resultUploaded
-      )
-        return false;
+        if (
+          filterData.uploadType.selected !== "all types" &&
+          filterData.uploadType.selected !== upload.resultUploaded
+        )
+          return false;
 
-      if (
-        filterData.verification.selected !== "all verifications" &&
-        filterData.verification.selected !== upload.role
-      )
-        return false;
+        if (
+          filterData.verification.selected !== "all verifications" &&
+          filterData.verification.selected !== upload.role
+        )
+          return false;
 
-      return true;
-    });
+        return true;
+      })
+    );
   }, [uploads, filterData]);
 
   const exportHeaderKeyMap: Record<string, keyof AdminElectionUpload> = {

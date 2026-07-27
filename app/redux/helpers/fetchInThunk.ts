@@ -1,9 +1,7 @@
-import { AxiosResponse } from "axios";
-
 type FetchInThunkParams = {
-  asyncCallback: () => Promise<AxiosResponse<any, any>>;
+  asyncCallback: () => Promise<{ data: any }>;
   rejectWithValue: (value: unknown) => any;
-}
+};
 
 async function fetchInThunk({ asyncCallback, rejectWithValue }: FetchInThunkParams) {
   try {

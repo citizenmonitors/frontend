@@ -63,7 +63,7 @@ export type DBObject = {
 
 // App
 export type FetchState = 'not started' | 'pending' | 'fulfilled' | 'rejected';
-export type UserRole = 'observer' | 'volunteer' | 'super-admin' | 'admin';
+export type UserRole = 'observer' | 'volunteer' | 'public-viewer' | 'super-admin' | 'admin';
 
 export type ObserverVerificationDetails = {
   observerId: Array<FileInfo>;
@@ -89,6 +89,8 @@ export type User = DBObject & {
   profileImage: FileInfo | null;
   gender: string;
   nationality?: string;
+  anonymousUsername?: string;
+  useAnonymousIdentity?: boolean;
   dateOfBirth: string;
   state: string;
   lga: string;
@@ -394,3 +396,115 @@ export type Podcast = {
   content: string,
   read: boolean,
 } & DBObject;
+
+export type PulseVisibilityScope = "ward" | "lga" | "polling-unit" | string;
+
+export type PulseAuthor = {
+  id: string;
+  displayName: string;
+  usedAnonymous: boolean;
+};
+
+export type PulsePost = {
+  id: string;
+  body: string;
+  imageUrl?: string | null;
+  visibilityScope: PulseVisibilityScope;
+  author: PulseAuthor;
+  likesCount: number;
+  commentsCount: number;
+  isLikedByCurrentUser: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type PulseComment = {
+  id: string;
+  postId: string;
+  body: string;
+  author: PulseAuthor;
+  likesCount: number;
+  isLikedByCurrentUser: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type PulsePostsPage = {
+  posts: PulsePost[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type CreatePulsePostPayload = {
+  body: string;
+  visibilityScope?: PulseVisibilityScope;
+  useAnonymousDisplay: boolean;
+  image?: File;
+};
+
+export type CreatePulseCommentPayload = {
+  postId: string;
+  body: string;
+  useAnonymousDisplay?: boolean;
+};
+
+export type FetchPulsePostsParams = {
+  page?: number;
+  limit?: number;
+};
+
+export type ElectionDiscussionPost = {
+  id: string;
+  body: string;
+  imageUrls: string[];
+  videoUrls: string[];
+  allowSocialShare: boolean;
+  author: PulseAuthor;
+  likesCount: number;
+  commentsCount: number;
+  sharesCount: number;
+  isLikedByCurrentUser: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type ElectionDiscussionComment = {
+  id: string;
+  postId: string;
+  body: string;
+  author: PulseAuthor;
+  likesCount: number;
+  isLikedByCurrentUser: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type ElectionDiscussionPostsPage = {
+  posts: ElectionDiscussionPost[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type CreateElectionDiscussionPostPayload = {
+  activeElectionId: string;
+  body: string;
+  allowSocialShare: boolean;
+  useAnonymousDisplay: boolean;
+  images?: RcFile[];
+  videos?: RcFile[];
+};
+
+export type CreateElectionDiscussionCommentPayload = {
+  activeElectionId: string;
+  postId: string;
+  body: string;
+  useAnonymousDisplay?: boolean;
+};
+
+export type FetchElectionDiscussionPostsParams = {
+  activeElectionId: string;
+  page?: number;
+  limit?: number;
+};

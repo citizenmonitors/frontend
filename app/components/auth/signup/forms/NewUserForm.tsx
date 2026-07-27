@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import useFormHandler from "@/app/hooks/useFormHandler";
+import useGoogleAuth from "@/app/hooks/useGoogleAuth";
 import { showAlert } from "@/app/redux/features/alertSlice";
 import { registerUser } from "@/app/redux/features/signupSlice";
 import { Button, Input, Tooltip } from "antd";
@@ -10,12 +11,23 @@ import React, { useContext, useEffect, useState } from "react";
 import { isStrongPassword } from "validator";
 import isEmail from "validator/lib/isEmail";
 import { SignupUserContext } from "../../../../(pages)/auth/signup/SignupUserProvider";
+import AuthDivider from "../../ui/AuthDivider";
+import GoogleAuthButton from "../../ui/GoogleAuthButton";
+import { saveSignupDraft } from "@/app/data/signupDraft";
 
 function NewUserForm() {
   const signupState = useAppSelector((state) => state.signup);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { updateCurrentUser } = useContext(SignupUserContext);
+  const {
+    authenticateWithGoogle,
+    isGoogleAuthenticating,
+    showGoogleError,
+  } = useGoogleAuth({
+    mode: "signup",
+    nextPath: "/auth/signup/biodata",
+  });
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const initialFormState = {
@@ -81,6 +93,9 @@ function NewUserForm() {
 
     if (status === "fulfilled") {
       updateCurrentUser({
+        email: formData.email,
+      });
+      saveSignupDraft({
         email: formData.email,
       });
       dispatch(
@@ -186,6 +201,14 @@ function NewUserForm() {
           Verify Email
         </Button>
       </form>
+      <div className="w-full max-w-[648px] mb-8">
+        <AuthDivider label="Or continue with" />
+        <GoogleAuthButton
+          onCredential={authenticateWithGoogle}
+          onError={showGoogleError}
+          disabled={isGoogleAuthenticating}
+        />
+      </div>
       <p className="text-xs md:text-sm text-gray-300 font-medium text-center mb-3">
         Already have an account?{" "}
         <Link href={"/auth/login"} className="text-brand-400 hover:underline">

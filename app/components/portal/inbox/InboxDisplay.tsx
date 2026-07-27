@@ -8,6 +8,7 @@ import moment from "moment";
 import AppFilter from "../../shared/AppFilter";
 import InboxTable from "./InboxTable";
 import { Spin } from "antd";
+import sortByCreatedAtAsc from "@/app/utils/sortByCreatedAtAsc";
 
 export default function InboxDisplay() {
   const dispatch = useAppDispatch();
@@ -30,23 +31,25 @@ export default function InboxDisplay() {
 
   // Filter podcasts based on selected filters
   const filteredPodcasts = useMemo(() => {
-    return podcasts.filter((podcast) => {
-      const year = moment(podcast.createdAt).format("YYYY");
-      const read = !!podcast.read;
+    return sortByCreatedAtAsc(
+      podcasts.filter((podcast) => {
+        const year = moment(podcast.createdAt).format("YYYY");
+        const read = !!podcast.read;
 
-      if (
-        filterData.status.selected !== "read-/-unread" &&
-        read !== (filterData.status.selected === "read")
-      ) {
-        return false;
-      }
+        if (
+          filterData.status.selected !== "read-/-unread" &&
+          read !== (filterData.status.selected === "read")
+        ) {
+          return false;
+        }
 
-      if (filterData.date.selected !== "all dates" && filterData.date.selected !== year) {
-        return false;
-      }
+        if (filterData.date.selected !== "all dates" && filterData.date.selected !== year) {
+          return false;
+        }
 
-      return true;
-    });
+        return true;
+      })
+    );
   }, [podcasts, filterData]);
 
   return (

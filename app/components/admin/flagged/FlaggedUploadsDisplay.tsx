@@ -9,6 +9,7 @@ import { AdminFlaggedUpload } from "@/app/redux/types";
 import AppFilter from "../../shared/AppFilter";
 import AppExport from "../../shared/AppExport";
 import FlaggedUploadsTable from "./FlaggedUploadsTable";
+import sortByCreatedAtAsc from "@/app/utils/sortByCreatedAtAsc";
 
 export default function FlaggedUploadsDisplay() {
   const flaggedUploadState = useAppSelector((state) => state.adminFlaggedUpload);
@@ -46,41 +47,43 @@ export default function FlaggedUploadsDisplay() {
   }, [uploads]);
 
   const filteredUploads = useMemo(() => {
-    return uploads.filter((upload) => {
-      const election = formatString.kebabToNormalCase(upload.election);
-      const pollingUnit = formatString.kebabToNormalCase(upload.pollingUnit);
-      const year = moment(upload.createdAt).format("YYYY");
-      const priority = upload.hidden ? "High" : "Low";
+    return sortByCreatedAtAsc(
+      uploads.filter((upload) => {
+        const election = formatString.kebabToNormalCase(upload.election);
+        const pollingUnit = formatString.kebabToNormalCase(upload.pollingUnit);
+        const year = moment(upload.createdAt).format("YYYY");
+        const priority = upload.hidden ? "High" : "Low";
 
-      if (
-        filterData.election.selected !== "all elections" &&
-        filterData.election.selected !== election
-      )
-        return false;
+        if (
+          filterData.election.selected !== "all elections" &&
+          filterData.election.selected !== election
+        )
+          return false;
 
-      if (
-        filterData.pollingUnit.selected !== "all polling units" &&
-        filterData.pollingUnit.selected !== pollingUnit
-      )
-        return false;
+        if (
+          filterData.pollingUnit.selected !== "all polling units" &&
+          filterData.pollingUnit.selected !== pollingUnit
+        )
+          return false;
 
-      if (filterData.date.selected !== "all dates" && filterData.date.selected !== year)
-        return false;
+        if (filterData.date.selected !== "all dates" && filterData.date.selected !== year)
+          return false;
 
-      if (
-        filterData.uploadType.selected !== "all types" &&
-        filterData.uploadType.selected !== upload.resultUploaded
-      )
-        return false;
+        if (
+          filterData.uploadType.selected !== "all types" &&
+          filterData.uploadType.selected !== upload.resultUploaded
+        )
+          return false;
 
-      if (
-        filterData.priority.selected !== "all priorities" &&
-        filterData.priority.selected !== priority
-      )
-        return false;
+        if (
+          filterData.priority.selected !== "all priorities" &&
+          filterData.priority.selected !== priority
+        )
+          return false;
 
-      return true;
-    });
+        return true;
+      })
+    );
   }, [uploads, filterData]);
 
   const exportHeaderKeyMap: Record<string, keyof AdminFlaggedUpload> = {

@@ -1,17 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
+"use client";
+
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { useAppDispatch } from "@/app/hooks/redux";
 import useFormHandler from "@/app/hooks/useFormHandler";
 import { showAlert } from "@/app/redux/features/alertSlice";
-import {
-  Button,
-  DatePicker,
-  Image as AntdImage,
-  Input,
-  Select,
-  Tooltip,
-  Upload,
-  UploadProps,
-} from "antd";
+import { Button, DatePicker, Input, Select, Tooltip, Upload, UploadProps } from "antd";
 import { ArrowRight, Edit2, InfoCircle, ProfileAdd, Trash } from "iconsax-react";
 import moment from "moment";
 import NextImage from "next/image";
@@ -22,6 +15,12 @@ import { SignupUserContext } from "../../../../(pages)/auth/signup/SignupUserPro
 import { RcFile } from "antd/es/upload";
 import { useRouter } from "next/navigation";
 import formatNumber from "@/app/utils/formatNumber";
+import {
+  buildCountrySelectOptions,
+  CountryFlag,
+  filterCountrySelectOption,
+} from "@/app/utils/countrySelectOptions";
+import { readSignupDraft } from "@/app/data/signupDraft";
 
 function BiodataForm() {
   const router = useRouter();
@@ -30,14 +29,49 @@ function BiodataForm() {
   const profileImage = currentUser.profileImage as unknown as RcFile | null | undefined;
 
   const initialFormState = {
-    email: currentUser.email || "email@email.com",
+    email: "",
     firstName: "",
     lastName: "",
-    gender: undefined,
-    dateOfBirth: undefined,
+    gender: undefined as string | undefined,
+    nationality: undefined as string | undefined,
+    dateOfBirth: undefined as any,
   };
-  const { formData, handleFormInputChange } =
+  const { formData, setFormData, handleFormInputChange } =
     useFormHandler<typeof initialFormState>(initialFormState);
+
+  useEffect(() => {
+    const draft = readSignupDraft();
+    const nextEmail = currentUser.email || draft?.email || "";
+    const nextFirstName = currentUser.firstName || draft?.firstName || "";
+    const nextLastName = currentUser.lastName || draft?.lastName || "";
+
+    setFormData((prev) => ({
+      ...prev,
+      ...(nextEmail ? { email: nextEmail } : {}),
+      ...(nextFirstName && !prev.firstName ? { firstName: nextFirstName } : {}),
+      ...(nextLastName && !prev.lastName ? { lastName: nextLastName } : {}),
+    }));
+
+    if (nextEmail && !currentUser.email) {
+      updateCurrentUser({
+        email: nextEmail,
+        ...(nextFirstName ? { firstName: nextFirstName } : {}),
+        ...(nextLastName ? { lastName: nextLastName } : {}),
+      });
+    }
+  }, [currentUser.email, currentUser.firstName, currentUser.lastName]);
+
+  const nationalitySelectOptions = useMemo(
+    () =>
+      buildCountrySelectOptions().map((opt) => ({
+        value: opt.value,
+        label: opt.label,
+        country: opt.country,
+        flag: opt.flag,
+        isoCode: opt.isoCode,
+      })),
+    []
+  );
   const [profilePreview, setProfilePreview] = useState<string>("");
   const profileImageUploadProps: UploadProps = {
     id: "signup-profile-image",
@@ -46,7 +80,7 @@ function BiodataForm() {
     maxCount: 1,
     showUploadList: false,
     accept: acceptedFileTypes.profilePicture,
-    fileList: profileImage ? [profileImage] : [],
+    openFileDialogOnClick: true,
     beforeUpload: async (file) => {
       const maxFileSize = 1 * 1024 * 1024;
       if (file.size > maxFileSize) {
@@ -58,9 +92,9 @@ function BiodataForm() {
         );
         return Upload.LIST_IGNORE;
       }
-      let b = await getBase64(file);
+      const preview = await getBase64(file);
       updateCurrentUser({ profileImage: file as any });
-      setProfilePreview(b);
+      setProfilePreview(preview);
       return false;
     },
   };
@@ -83,7 +117,7 @@ function BiodataForm() {
 
     const dob = moment((formData.dateOfBirth as { $d: Date }).$d);
     const isOlderThan18 = moment().diff(dob, "years") >= 18;
-  
+
     if (!isOlderThan18) {
       dispatch(
         showAlert({
@@ -110,72 +144,79 @@ function BiodataForm() {
     >
       <div className="grid gap-[6px] col-start-1 col-span-2">
         <span className="text-sm font-medium flex justify-between items-center">
-          <label htmlFor="signup-profile-image">Profile Photo</label>
+          <span>Profile Photo</span>
           <Tooltip className="text-center" title="Add your profile image (Max. 1MB).">
             <InfoCircle size={16} className="text-gray-400" />
           </Tooltip>
         </span>
-        <ImgCrop cropShape="round">
+
+        <ImgCrop cropShape="round" modalProps={{ zIndex: 2000 }}>
           <Upload {...profileImageUploadProps}>
-            <div className="preview h-[64px] w-[64px] md:h-[100px] md:w-[100px] rounded-full bg-gray-100 overflow-hidden">
-              {!profilePreview ? (
-                <div className="user-card-profile h-full w-full grid place-content-center rounded-full bg-gradient-to-b from-brand-600 to-brand-500 text-white ">
-                  <ProfileAdd size={40} />
-                </div>
-              ) : (
-                <NextImage
-                  src={profilePreview}
-                  alt="profile"
-                  className="w-full h-full"
-                  width={100}
-                  height={100}
-                />
-              )}
-            </div>
-            <div className="info flex flex-col gap-1 md:gap-2 ">
-              {profileImage ? (
-                <React.Fragment>
-                  <div
-                    className="text-sm  text-center  mx-auto flex items-center gap-[0.5ch]"
-                    title={profileImage.name}
+            <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 justify-center cursor-pointer">
+              <div className="preview h-[64px] w-[64px] md:h-[100px] md:w-[100px] rounded-full bg-gray-100 overflow-hidden">
+                {!profilePreview ? (
+                  <div className="user-card-profile h-full w-full grid place-content-center rounded-full bg-gradient-to-b from-brand-600 to-brand-500 text-white">
+                    <ProfileAdd size={40} />
+                  </div>
+                ) : (
+                  <NextImage
+                    src={profilePreview}
+                    alt="profile"
+                    className="w-full h-full"
+                    width={100}
+                    height={100}
+                    unoptimized
+                  />
+                )}
+              </div>
+              <div className="info flex flex-col gap-1 md:gap-2">
+                {profileImage ? (
+                  <React.Fragment>
+                    <div
+                      className="text-sm text-center mx-auto flex items-center gap-[0.5ch]"
+                      title={profileImage.name}
+                    >
+                      <span className="inline-block truncate max-w-[192px] text-gray-500">
+                        {profileImage.name}
+                      </span>{" "}
+                      <span className="text-gray-400 font-medium">
+                        ({formatNumber.fileSize(profileImage.size || 0)})
+                      </span>
+                    </div>
+                    <div className="flex justify-center">
+                      <Button
+                        type="text"
+                        htmlType="button"
+                        className="text-brand-500 hover:!text-brand-600 font-medium flex items-center"
+                        icon={<Edit2 size={16} variant="Bold" />}
+                      >
+                        Change
+                      </Button>
+                      <Button
+                        type="text"
+                        htmlType="button"
+                        className="text-error-500 hover:!text-error-600 font-medium flex items-center"
+                        icon={<Trash size={16} variant="Bold" />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateCurrentUser({ profileImage: null });
+                          setProfilePreview("");
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </React.Fragment>
+                ) : (
+                  <Button
+                    type="text"
+                    htmlType="button"
+                    className="text-brand-500 hover:!text-brand-600 font-medium"
                   >
-                    <span className="inline-block truncate max-w-[192px] text-gray-500">
-                      {profileImage.name}
-                    </span>{" "}
-                    <span className="text-gray-400 font-medium">
-                      ({formatNumber.fileSize(profileImage.size || 0)})
-                    </span>
-                  </div>
-                  <div className="flex justify-center">
-                    <Button
-                      type="text"
-                      className="text-brand-500 hover:!text-brand-600 font-medium flex items-center"
-                      icon={<Edit2 size={16} variant="Bold" />}
-                    >
-                      Change
-                    </Button>
-                    <Button
-                      type="text"
-                      className="text-error-500 hover:!text-error-600 font-medium flex items-center"
-                      icon={<Trash size={16} variant="Bold" />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        updateCurrentUser({ profileImage: null });
-                        setProfilePreview("");
-                      }}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                </React.Fragment>
-              ) : (
-                <Button
-                  type="text"
-                  className="text-brand-500 hover:!text-brand-600 font-medium"
-                >
-                  Add Profile Photo
-                </Button>
-              )}
+                    Add Profile Photo
+                  </Button>
+                )}
+              </div>
             </div>
           </Upload>
         </ImgCrop>
@@ -245,6 +286,30 @@ function BiodataForm() {
             </Tooltip>
           }
           type="text"
+        />
+      </div>
+
+      <div className="grid gap-[6px] col-start-1 col-span-2">
+        <label htmlFor="signup-nationality" className="text-sm font-medium">
+          Nationality
+        </label>
+        <Select
+          id="signup-nationality"
+          size="large"
+          showSearch
+          value={formData.nationality}
+          onChange={handleFormInputChange("nationality", "static")}
+          placeholder="Select Nationality"
+          options={nationalitySelectOptions}
+          optionFilterProp="country"
+          filterOption={filterCountrySelectOption}
+          optionRender={(option) => (
+            <div className="flex items-center gap-2">
+              <CountryFlag flag={option.data.flag} name={option.data.country} />
+              <span className="text-gray-700">{option.data.country}</span>
+            </div>
+          )}
+          virtual={false}
         />
       </div>
 

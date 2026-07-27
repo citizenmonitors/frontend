@@ -6,6 +6,7 @@ import copyObject from "@/app/utils/copyObject";
 import moment from "moment";
 import AppFilter from "../../shared/AppFilter";
 import OutboxTable from "./OutboxTable";
+import sortByCreatedAtAsc from "@/app/utils/sortByCreatedAtAsc";
 
 export default function OutboxDisplay() {
   const dispatch = useAppDispatch();
@@ -28,21 +29,23 @@ export default function OutboxDisplay() {
 
   // Filter podcasts based on selected filters
   const filteredPodcasts = useMemo(() => {
-    return podcasts.filter((podcast) => {
-      const year = moment(podcast.createdAt).format("YYYY");
+    return sortByCreatedAtAsc(
+      podcasts.filter((podcast) => {
+        const year = moment(podcast.createdAt).format("YYYY");
 
-      if (filterData.userType.selected !== "all users" && 
-          !podcast.recipients.includes(filterData.userType.selected)) {
-        return false;
-      }
+        if (filterData.userType.selected !== "all users" && 
+            !podcast.recipients.includes(filterData.userType.selected)) {
+          return false;
+        }
 
-      if (filterData.date.selected !== "all dates" && 
-          filterData.date.selected !== year) {
-        return false;
-      }
+        if (filterData.date.selected !== "all dates" && 
+            filterData.date.selected !== year) {
+          return false;
+        }
 
-      return true;
-    });
+        return true;
+      })
+    );
   }, [podcasts, filterData]);
 
   return (

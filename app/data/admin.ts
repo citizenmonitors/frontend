@@ -99,6 +99,10 @@ const settingsRoutes = [
     name: "Password",
   },
   {
+    route: `${settingsPath}/citizen-academy`,
+    name: "Citizen Academy",
+  },
+  {
     route: "/privacy-policy",
     name: "Privacy Policy",
   },

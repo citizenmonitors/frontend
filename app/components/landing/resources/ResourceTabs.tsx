@@ -1,6 +1,6 @@
 "use client";
 import { Select, Tabs } from "antd";
-import { BookSaved, DocumentText, HeartCircle, VideoOctagon } from "iconsax-react";
+import { BookSaved, DocumentText, VideoOctagon } from "iconsax-react";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import Support from "../../shared/svg/Support";

@@ -9,22 +9,39 @@ import { Button, DatePicker, Input, Select, Tooltip, Upload, UploadProps } from 
 import ImgCrop from "antd-img-crop";
 import { RcFile } from "antd/es/upload";
 import dayjs from "dayjs";
-import { Edit2, InfoCircle, ProfileAdd, Trash } from "iconsax-react";
+import { Edit2, InfoCircle, ProfileAdd } from "iconsax-react";
 import React, { useEffect, useMemo, useState } from "react";
 import NextImage from "next/image";
-import { backendDomain } from "@/app/data/backend";
 import acceptedFileTypes from "@/app/data/acceptedFileTypes";
 import formatNumber from "@/app/utils/formatNumber";
+import RegeneratePublicNameSection from "@/app/components/portal/settings/RegeneratePublicNameSection";
+import {
+  buildCountrySelectOptions,
+  CountryFlag,
+  filterCountrySelectOption,
+} from "@/app/utils/countrySelectOptions";
 
 export default function ProfileDetails() {
   const dispatch = useAppDispatch();
   const userState = useAppSelector((state) => state.user);
   const userDetails = userState.details!;
-  const { formData, handleFormInputChange, setFormData } = useFormHandler({
+  const { formData, handleFormInputChange } = useFormHandler({
     firstName: userDetails.firstName,
     lastName: userDetails.lastName,
     gender: userDetails.gender,
+    nationality: userDetails.nationality,
   });
+  const nationalitySelectOptions = useMemo(
+    () =>
+      buildCountrySelectOptions().map((opt) => ({
+        value: opt.value,
+        label: opt.label,
+        country: opt.country,
+        flag: opt.flag,
+        isoCode: opt.isoCode,
+      })),
+    []
+  );
 
   const [profileModified, setProfileModified] = useState<boolean>(false);
   const [profilePreview, setProfilePreview] = useState<string>("");
@@ -36,7 +53,7 @@ export default function ProfileDetails() {
     maxCount: 1,
     showUploadList: false,
     accept: acceptedFileTypes.profilePicture,
-    fileList: profileImage ? [profileImage] : [],
+    openFileDialogOnClick: true,
     beforeUpload: async (file) => {
       const maxFileSize = 1 * 1024 * 1024;
       if (file.size > maxFileSize) {
@@ -48,9 +65,9 @@ export default function ProfileDetails() {
         );
         return Upload.LIST_IGNORE;
       }
-      let b = await getBase64(file);
+      const preview = await getBase64(file);
       setProfileImage(file);
-      setProfilePreview(b);
+      setProfilePreview(preview);
       setProfileModified(true);
       return false;
     },
@@ -63,6 +80,7 @@ export default function ProfileDetails() {
       firstName: userDetails.firstName,
       lastName: userDetails.lastName,
       gender: userDetails.gender,
+      nationality: userDetails.nationality ?? "",
       dateOfBirth: userDetails.dateOfBirth,
     };
 
@@ -70,6 +88,7 @@ export default function ProfileDetails() {
       firstName: formData.firstName.trim(),
       lastName: formData.lastName.trim(),
       gender: formData.gender,
+      nationality: formData.nationality ?? "",
       dateOfBirth: dateOfBirth.format("YYYY-MM-DD"),
     };
 
@@ -158,86 +177,89 @@ export default function ProfileDetails() {
                 <InfoCircle size={16} className="text-gray-400" />
               </Tooltip>
             </span>
-            <ImgCrop cropShape="round">
+            <ImgCrop cropShape="round" modalProps={{ zIndex: 2000 }}>
               <Upload {...profileImageUploadProps}>
-                <div className="preview h-[64px] w-[64px] md:h-[100px] md:w-[100px] rounded-full bg-gray-100 overflow-hidden">
-                  {!profileModified && userDetails.profileImage ? (
-                    <NextImage
-                      src={userDetails.profileImage.url}
-                      alt="profile"
-                      className="w-full h-full"
-                      width={100}
-                      height={100}
-                    />
-                  ) : !profilePreview ? (
-                    <div className="user-card-profile h-full w-full grid place-content-center rounded-full bg-gradient-to-b from-brand-600 to-brand-500 text-white ">
-                      <ProfileAdd size={40} />
-                    </div>
-                  ) : (
-                    <NextImage
-                      src={profilePreview}
-                      alt="profile"
-                      className="w-full h-full"
-                      width={100}
-                      height={100}
-                    />
-                  )}
-                </div>
-                <div className="info flex flex-col gap-1 md:gap-2 ">
-                  {!profileModified && userDetails.profileImage ? (
-                    <React.Fragment>
-                      <div
-                        className="text-sm  text-center  mx-auto flex items-center gap-[0.5ch]"
-                        title={userDetails.profileImage.name}
-                      >
-                        <span className="inline-block truncate max-w-[192px] text-gray-500">
-                          {userDetails.profileImage.name}
-                        </span>{" "}
-                        <span className="text-gray-400 font-medium">
-                          ({formatNumber.fileSize(userDetails.profileImage.size || 0)})
-                        </span>
+                <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 justify-center cursor-pointer">
+                  <div className="preview h-[64px] w-[64px] md:h-[100px] md:w-[100px] rounded-full bg-gray-100 overflow-hidden">
+                    {!profileModified && userDetails.profileImage ? (
+                      <NextImage
+                        src={userDetails.profileImage.url}
+                        alt="profile"
+                        className="w-full h-full"
+                        width={100}
+                        height={100}
+                      />
+                    ) : !profilePreview ? (
+                      <div className="user-card-profile h-full w-full grid place-content-center rounded-full bg-gradient-to-b from-brand-600 to-brand-500 text-white">
+                        <ProfileAdd size={40} />
                       </div>
-                      <div className="flex justify-center">
-                        <Button
-                          type="text"
-                          className="text-brand-500 hover:!text-brand-600 font-medium flex items-center"
-                          icon={<Edit2 size={16} variant="Bold" />}
+                    ) : (
+                      <NextImage
+                        src={profilePreview}
+                        alt="profile"
+                        className="w-full h-full"
+                        width={100}
+                        height={100}
+                        unoptimized
+                      />
+                    )}
+                  </div>
+                  <div className="info flex flex-col gap-1 md:gap-2">
+                    {!profileModified && userDetails.profileImage ? (
+                      <React.Fragment>
+                        <div
+                          className="text-sm text-center mx-auto flex items-center gap-[0.5ch]"
+                          title={userDetails.profileImage.name}
                         >
-                          Change
-                        </Button>
-                      </div>
-                    </React.Fragment>
-                  ) : profileImage ? (
-                    <React.Fragment>
-                      <div
-                        className="text-sm  text-center  mx-auto flex items-center gap-[0.5ch]"
-                        title={profileImage.name}
-                      >
-                        <span className="inline-block truncate max-w-[192px] text-gray-500">
-                          {profileImage.name}
-                        </span>{" "}
-                        <span className="text-gray-400 font-medium">
-                          ({formatNumber.fileSize(profileImage.size || 0)})
-                        </span>
-                      </div>
-                      <div className="flex justify-center">
-                        <Button
-                          type="text"
-                          className="text-brand-500 hover:!text-brand-600 font-medium flex items-center"
-                          icon={<Edit2 size={16} variant="Bold" />}
+                          <span className="inline-block truncate max-w-[192px] text-gray-500">
+                            {userDetails.profileImage.name}
+                          </span>{" "}
+                          <span className="text-gray-400 font-medium">
+                            ({formatNumber.fileSize(userDetails.profileImage.size || 0)})
+                          </span>
+                        </div>
+                        <div className="flex justify-center">
+                          <Button
+                            type="text"
+                            className="text-brand-500 hover:!text-brand-600 font-medium flex items-center"
+                            icon={<Edit2 size={16} variant="Bold" />}
+                          >
+                            Change
+                          </Button>
+                        </div>
+                      </React.Fragment>
+                    ) : profileImage ? (
+                      <React.Fragment>
+                        <div
+                          className="text-sm text-center mx-auto flex items-center gap-[0.5ch]"
+                          title={profileImage.name}
                         >
-                          Change
-                        </Button>
-                      </div>
-                    </React.Fragment>
-                  ) : (
-                    <Button
-                      type="text"
-                      className="text-brand-500 hover:!text-brand-600 font-medium"
-                    >
-                      Add Profile Photo
-                    </Button>
-                  )}
+                          <span className="inline-block truncate max-w-[192px] text-gray-500">
+                            {profileImage.name}
+                          </span>{" "}
+                          <span className="text-gray-400 font-medium">
+                            ({formatNumber.fileSize(profileImage.size || 0)})
+                          </span>
+                        </div>
+                        <div className="flex justify-center">
+                          <Button
+                            type="text"
+                            className="text-brand-500 hover:!text-brand-600 font-medium flex items-center"
+                            icon={<Edit2 size={16} variant="Bold" />}
+                          >
+                            Change
+                          </Button>
+                        </div>
+                      </React.Fragment>
+                    ) : (
+                      <Button
+                        type="text"
+                        className="text-brand-500 hover:!text-brand-600 font-medium"
+                      >
+                        Add Profile Photo
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </Upload>
             </ImgCrop>
@@ -319,6 +341,30 @@ export default function ProfileDetails() {
             />
           </div>
 
+          <div className="grid gap-[6px] col-start-1 col-span-2">
+            <label htmlFor="profile-update-nationality" className="text-sm font-medium">
+              Nationality
+            </label>
+            <Select
+              id="profile-update-nationality"
+              size="large"
+              showSearch
+              value={formData.nationality}
+              onChange={handleFormInputChange("nationality", "static")}
+              placeholder="Select Nationality"
+              options={nationalitySelectOptions}
+              optionFilterProp="country"
+              filterOption={filterCountrySelectOption}
+              optionRender={(option) => (
+                <div className="flex items-center gap-2">
+                  <CountryFlag flag={option.data.flag} name={option.data.country} />
+                  <span className="text-gray-700">{option.data.country}</span>
+                </div>
+              )}
+              virtual={false}
+            />
+          </div>
+
           <div className="buttons grid gap-4 col-span-2">
             <Button
               type="primary"
@@ -332,6 +378,8 @@ export default function ProfileDetails() {
             </Button>
           </div>
         </form>
+
+        <RegeneratePublicNameSection />
       </div>
     </React.Fragment>
   );

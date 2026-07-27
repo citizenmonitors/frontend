@@ -6,11 +6,12 @@ import React from "react";
 
 type SettingsHeaderProps = {
   children: React.ReactNode;
+  backHref?: string;
 };
-export default function SettingsHeader({ children }: SettingsHeaderProps) {
+export default function SettingsHeader({ children, backHref }: SettingsHeaderProps) {
   const router = useRouter();
   function handleRouterBack() {
-    router.replace(dashboardPaths.settings);
+    router.replace(backHref ?? dashboardPaths.settings);
   }
 
   return (

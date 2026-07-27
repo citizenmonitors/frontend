@@ -27,8 +27,27 @@ type UserInfoBarChartProps = {
   }>;
 };
 
+const FALLBACK_COLORS = ["#038580", "#6EEDE7", "#026B63", "#FDB022"];
+
+/** Stable colors by label so public-viewer always has its own slice color. */
+function getUserInfoColor(name: string, index: number): string {
+  const key = name.trim().toLowerCase().replace(/\s+/g, "-");
+  const byName: Record<string, string> = {
+    male: "#038580",
+    female: "#6EEDE7",
+    other: "#026B63",
+    observer: "#2E90FA",
+    volunteer: "#FDB022",
+    "public-viewer": "#0BA5EC",
+    "public viewer": "#0BA5EC",
+    admin: "#98A2B3",
+    "super-admin": "#039855",
+    "super admin": "#039855",
+  };
+  return byName[key] ?? FALLBACK_COLORS[index % FALLBACK_COLORS.length];
+}
+
 function UserInfoBarChart({ data }: UserInfoBarChartProps) {
-  const colors = ["#038580", "#6EEDE7", "#026B63"];
   return (
     <div className="flex flex-col gap-2">
       {/* Bar Chart */}
@@ -44,10 +63,10 @@ function UserInfoBarChart({ data }: UserInfoBarChartProps) {
               fill="#8884d8"
               dataKey="count"
             >
-              {data.map((_, index) => (
+              {data.map((item, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={colors[index % colors.length]}
+                  fill={getUserInfoColor(item.name, index)}
                   style={{ outline: "none" }}
                 />
               ))}
@@ -61,7 +80,7 @@ function UserInfoBarChart({ data }: UserInfoBarChartProps) {
           <li key={index} className="flex items-center gap-2">
             <div
               className="w-2 h-2 min-w-0 rounded-full"
-              style={{ backgroundColor: colors[index % data.length] }}
+              style={{ backgroundColor: getUserInfoColor(item.name, index) }}
             />
             <span className="text-sm font-light text-gray-600">
               {formatString.normalCase(item.name)}

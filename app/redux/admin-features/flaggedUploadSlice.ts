@@ -114,10 +114,10 @@ type FlaggedResultsResponse = {
 }
 
 function sortFlaggedUploads(uploads: Array<AdminFlaggedUpload>) {
-  return uploads.sort((a, b) => {
-    return b.priorityLevel - a.priorityLevel;
+  return [...uploads].sort((a, b) => {
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
   });
-};
+}
 
 export const getFlaggedUploads = createAsyncThunk<FlaggedResultsResponse, void>(
   'admin-flagged-upload/getUploads',

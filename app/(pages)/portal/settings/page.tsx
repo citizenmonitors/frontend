@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "antd";
 import { ArrowRight2, Logout, Trash } from "iconsax-react";
 import useLogout from "@/app/hooks/useLogout";
-import { settingsRoutes } from "@/app/data/portal";
+import { getSettingsRoutes } from "@/app/data/portal";
 import Link from "next/link";
 import DeleteAccountModal from "../../../components/portal/settings/DeleteAccountModal";
 import { useAppSelector } from "@/app/hooks/redux";
@@ -15,6 +15,8 @@ export default function Settings() {
   const dispatch = useDispatch();
   const logout = useLogout();
   const userState = useAppSelector((state) => state.user);
+  const userDetails = userState.details!;
+  const visibleSettingsRoutes = getSettingsRoutes(userDetails.role);
 
   const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
   useEffect(() => {
@@ -38,8 +40,8 @@ export default function Settings() {
       </header>
       <div className="grid">
         <div id="settings-routes" className="mt-4 mb-6">
-          {settingsRoutes.map((route, index) => (
-            <React.Fragment key={index}>
+          {visibleSettingsRoutes.map((route, index) => (
+            <React.Fragment key={route.route}>
               <Link href={route.route} tabIndex={-1}>
                 <Button
                   type="text"
@@ -48,11 +50,10 @@ export default function Settings() {
                   block
                 >
                   <span>{route.name}</span>
-
                   <ArrowRight2 size={16} />
                 </Button>
               </Link>
-              {index < settingsRoutes.length - 1 && (
+              {index < visibleSettingsRoutes.length - 1 && (
                 <hr className="border-gray-200 md:border-gray-300" />
               )}
             </React.Fragment>

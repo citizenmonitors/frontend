@@ -14,7 +14,7 @@ export default function Coverage() {
   );
 
   return (
-    <SignupFormLayout title="Fill in your biodata.">
+    <SignupFormLayout title="Fill in your coverage details.">
       <CoverageDetailsForm />
     </SignupFormLayout>
   );

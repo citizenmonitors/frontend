@@ -35,6 +35,11 @@ export default function RoleTag({
               {formatString.normalCase(role)}
             </span>
           ),
+          "public-viewer": (
+            <span className="py-1 px-2 text-xs font-medium bg-bluelight-100 rounded-full text-bluelight-600">
+              Public Viewer
+            </span>
+          ),
         }[role]
       }
     </div>

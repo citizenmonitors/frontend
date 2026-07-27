@@ -20,6 +20,8 @@ export default function getUserRole(user: Pick<User, "role" | "pendingObserverVe
     output.icon = user.pendingObserverVerification ? null : (
       <Verify variant="Bold" className="text-[#EAA613]" />
     );
+  } else if (user.role === "public-viewer") {
+    output.name = "Public Viewer";
   } else {
     output.name = "Volunteer";
   }

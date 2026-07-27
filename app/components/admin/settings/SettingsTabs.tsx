@@ -4,7 +4,7 @@ import { Tabs } from "antd";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 
-const settingsTabRoutes = settingsRoutes.slice(0, -2);
+const settingsTabRoutes = settingsRoutes.slice(0, -3);
 const settingsTabs = settingsTabRoutes.map((tab) => ({
   key: tab.route,
   label: tab.name,

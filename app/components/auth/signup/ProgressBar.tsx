@@ -57,15 +57,18 @@ function ProgressBar() {
   const progressItems = ["Email", "Biodata", "Coverage", "Role"];
   const progressStage = useMemo(() => {
     const { email, dateOfBirth, state } = currentUser;
+
     if (state) {
       return 3;
-    } else if (dateOfBirth) {
-      return 2;
-    } else if (email) {
-      return 1;
-    } else {
-      return 0;
     }
+    if (dateOfBirth) {
+      return 2;
+    }
+    // Email verified (+ password set) → Email done, Biodata is current step.
+    if (email) {
+      return 1;
+    }
+    return 0;
   }, [currentUser]);
   const progressPercent = (progressStage / (progressItems.length - 1)) * 100;
 

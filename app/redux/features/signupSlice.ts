@@ -137,12 +137,16 @@ export const registerUser = createAsyncThunk<RegisterResponse, { email: string, 
   }
 );
 
-export const verifyOTP = createAsyncThunk<void, { email: string, verificationCode: string }>(
+export const verifyOTP = createAsyncThunk<
+  { token?: string },
+  { email: string; verificationCode: string }
+>(
   "signup/verifyOTP",
   async (verifyProps, { rejectWithValue }) => {
     return await fetchInThunk({
-      asyncCallback: () => axios.post(backendRoutes.auth.verifyEmail, verifyProps, backendAxiosConfig()),
-      rejectWithValue
+      asyncCallback: () =>
+        axios.post(backendRoutes.auth.verifyEmail, verifyProps, backendAxiosConfig()),
+      rejectWithValue,
     });
   }
 );
