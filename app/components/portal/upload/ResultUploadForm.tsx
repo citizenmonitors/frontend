@@ -39,6 +39,7 @@ import { binarySelectOptions, ratingSelectOptions } from "@/app/data/form";
 import acceptedFileTypes from "../../../data/acceptedFileTypes";
 import getElectionName from "@/app/utils/getElectionName";
 import formatNumber from "@/app/utils/formatNumber";
+import getUploadLocation from "@/app/utils/getUploadLocation";
 import Image from "next/image";
 import ElectionTimePicker from "../elections/ElectionTimePicker";
 import Link from "next/link";
@@ -73,6 +74,7 @@ export default function ResultUploadForm({
   const election = electionState.electionData.election!;
   const electionYear = moment(election.startDate).format("YYYY");
   const [surveyFormOpen, setSurveyFormOpen] = React.useState(false);
+  const [isCapturingLocation, setIsCapturingLocation] = React.useState(false);
   const isEditMode = !!prefilledFormData;
   const { formData, setFormData, handleFormInputChange } = useFormHandler({
     timeBegan: searchParams.get("timeBegan") || "",
@@ -430,37 +432,57 @@ export default function ResultUploadForm({
   }
 
   async function uploadResult() {
-    dispatch(
-      uploadElectionResult({
-        electionId: election._id,
-        result: {
-          timeBegan: formData.timeBegan!,
-          accreditedVoters: formData.accreditedVoters!,
-          rejectedPapers: formData.rejectedPapers!,
-          spoiledBallotPapers: formData.spoiledBallotPapers!,
-          usedBallotPapers: formData.usedBallotPapers!,
-          partiesVotes: getValidPartyResults(),
-          voteRating: formData.voteRating!,
-          voteBuying: formData.voteBuying!,
-          voterIntimidation: formData.voterIntimidation!,
-          resultPicture: resultPicture!.originFileObj as unknown as FileInfo,
-          resultVideo: resultVideo
-            ? (resultVideo!.originFileObj as unknown as FileInfo)
-            : undefined,
-        } as unknown as ElectionResult,
-      })
-    );
-    if (searchParams.get("flag")) {
+    setIsCapturingLocation(true);
+    try {
+      const requiresLocation = userDetails.role === "observer";
+      const uploadLocation = requiresLocation
+        ? await getUploadLocation()
+        : undefined;
+
       dispatch(
-        getPollingUnitResults({
-          actionProps: {
-            action: "flag",
-            electionId: searchParams.get("flagResultId")!,
-            dataType: searchParams.get("flagDataType")! as any,
-            flagReason: searchParams.get("flagReason")!,
-          },
+        uploadElectionResult({
+          electionId: election._id,
+          result: {
+            timeBegan: formData.timeBegan!,
+            accreditedVoters: formData.accreditedVoters!,
+            rejectedPapers: formData.rejectedPapers!,
+            spoiledBallotPapers: formData.spoiledBallotPapers!,
+            usedBallotPapers: formData.usedBallotPapers!,
+            partiesVotes: getValidPartyResults(),
+            voteRating: formData.voteRating!,
+            voteBuying: formData.voteBuying!,
+            voterIntimidation: formData.voterIntimidation!,
+            resultPicture: resultPicture!.originFileObj as unknown as FileInfo,
+            resultVideo: resultVideo
+              ? (resultVideo!.originFileObj as unknown as FileInfo)
+              : undefined,
+            ...(uploadLocation ? { uploadLocation } : {}),
+          } as unknown as ElectionResult,
         })
       );
+      if (searchParams.get("flag")) {
+        dispatch(
+          getPollingUnitResults({
+            actionProps: {
+              action: "flag",
+              electionId: searchParams.get("flagResultId")!,
+              dataType: searchParams.get("flagDataType")! as any,
+              flagReason: searchParams.get("flagReason")!,
+            },
+          })
+        );
+      }
+    } catch (error: any) {
+      dispatch(
+        showAlert({
+          message:
+            error?.message ||
+            "Please turn on your location to submit election results.",
+          type: "error",
+        })
+      );
+    } finally {
+      setIsCapturingLocation(false);
     }
   }
 
@@ -1059,9 +1081,10 @@ export default function ResultUploadForm({
         size="large"
         onClick={handleFormSubmit}
         loading={
-          isEditMode
+          isCapturingLocation ||
+          (isEditMode
             ? electionState.status.updateElectionResult === "pending"
-            : electionState.status.uploadElectionResult === "pending"
+            : electionState.status.uploadElectionResult === "pending")
         }
       >
         {isEditMode
@@ -1070,6 +1093,12 @@ export default function ResultUploadForm({
             ? "Submit Results and Flag"
             : "Submit Results"}
       </Button>
+
+      {userDetails.role === "observer" && !isEditMode && (
+        <p className="text-xs text-center text-gray-500 -mt-2">
+          Observers must enable location access before submitting results.
+        </p>
+      )}
 
       <SentimentAnalysisModal
         open={surveyFormOpen}

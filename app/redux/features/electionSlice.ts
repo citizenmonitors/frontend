@@ -401,11 +401,16 @@ export const uploadElectionResult = createAsyncThunk<
 >(
   "election/uploadResult",
   async ({ electionId, result }, { rejectWithValue }) => {
+    const payload: Record<string, unknown> = { ...result };
+    if (payload.uploadLocation && typeof payload.uploadLocation === "object") {
+      payload.uploadLocation = JSON.stringify(payload.uploadLocation);
+    }
+
     return await fetchInThunk({
       asyncCallback: () =>
         axios.post(
           backendRoutes.dashboard.elections.uploadResult(electionId),
-          result,
+          payload,
           backendAxiosConfig({ type: "multipart/form-data" })
         ),
       rejectWithValue,
@@ -451,11 +456,16 @@ export const uploadElectionReport = createAsyncThunk<
 >(
   "election/uploadReport",
   async ({ electionId, report }, { rejectWithValue }) => {
+    const payload: Record<string, unknown> = { ...report };
+    if (payload.uploadLocation && typeof payload.uploadLocation === "object") {
+      payload.uploadLocation = JSON.stringify(payload.uploadLocation);
+    }
+
     return await fetchInThunk({
       asyncCallback: () =>
         axios.post(
           backendRoutes.dashboard.elections.uploadReport(electionId),
-          report,
+          payload,
           backendAxiosConfig({ type: "multipart/form-data" })
         ),
       rejectWithValue,

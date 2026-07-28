@@ -146,6 +146,14 @@ export type ElectionPartyResult = {
   count: number;
 }
 
+export type UploadLocation = {
+  latitude: number;
+  longitude: number;
+  address: string;
+  accuracy: number;
+  capturedAt: string | Date;
+};
+
 export type ElectionResult = DBObject & {
   timeBegan: string;
   accreditedVoters: number;
@@ -160,6 +168,7 @@ export type ElectionResult = DBObject & {
   ward: string,
   pollingUnit: string,
   election: PopulatedElection & DBObject;
+  uploadLocation?: UploadLocation;
   // Survey
   voteBuying: BinaryOption;
   voterIntimidation: BinaryOption;
@@ -177,6 +186,7 @@ export type ElectionReport = DBObject & {
   ward: string,
   pollingUnit: string,
   election: PopulatedElection & DBObject;
+  uploadLocation?: UploadLocation;
   // Survey
   electionRating: RatingOption;
 }
