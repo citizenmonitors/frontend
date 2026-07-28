@@ -25,7 +25,12 @@ import {
   uploadElectionReport,
 } from "@/app/redux/features/electionSlice";
 import formatNumber from "@/app/utils/formatNumber";
-import { ElectionReport, FileInfo, RatingOption } from "@/app/redux/types";
+import {
+  ElectionReport,
+  FileInfo,
+  RatingOption,
+  UploadLocation,
+} from "@/app/redux/types";
 import { useRouter, useSearchParams } from "next/navigation";
 import acceptedFileTypes from "../../../data/acceptedFileTypes";
 import getElectionName from "@/app/utils/getElectionName";
@@ -56,6 +61,7 @@ export default function ReportUploadForm({
   const router = useRouter();
   const [surveyFormOpen, setSurveyFormOpen] = React.useState(false);
   const [isCapturingLocation, setIsCapturingLocation] = React.useState(false);
+  const capturedUploadLocationRef = React.useRef<UploadLocation | undefined>();
   const isEditMode = !!prefilledFormData;
   const { formData, setFormData, handleFormInputChange } = useFormHandler({
     selectIncident: prefilledFormData?.selectIncident || undefined,
@@ -179,7 +185,7 @@ export default function ReportUploadForm({
     },
   };
 
-  function handleFormSubmit() {
+  async function handleFormSubmit() {
     if (
       formData.selectIncident === undefined ||
       !formData.incidentNote.trim()
@@ -245,12 +251,35 @@ export default function ReportUploadForm({
 
     if (isEditMode) {
       updateReport();
-    } else {
-      setSurveyFormOpen(true);
+      return;
     }
+
+    if (userDetails.role === "observer") {
+      setIsCapturingLocation(true);
+      try {
+        capturedUploadLocationRef.current = await getUploadLocation();
+        setSurveyFormOpen(true);
+      } catch (error: any) {
+        capturedUploadLocationRef.current = undefined;
+        dispatch(
+          showAlert({
+            message:
+              error?.message ||
+              "Please turn on your location to submit an incident report.",
+            type: "error",
+          })
+        );
+      } finally {
+        setIsCapturingLocation(false);
+      }
+      return;
+    }
+
+    capturedUploadLocationRef.current = undefined;
+    setSurveyFormOpen(true);
   }
 
-  async function updateReport() {
+  function updateReport() {
     const updatedReport: Partial<ElectionReport> = {
       selectIncident: formData.selectIncident,
       incidentNote: formData.incidentNote,
@@ -307,59 +336,41 @@ export default function ReportUploadForm({
     );
   }
 
-  async function uploadReport() {
-    setIsCapturingLocation(true);
-    try {
-      const requiresLocation = userDetails.role === "observer";
-      const uploadLocation = requiresLocation
-        ? await getUploadLocation()
-        : undefined;
+  function uploadReport() {
+    const uploadLocation = capturedUploadLocationRef.current;
+    const incidentPicturesDT = new DataTransfer();
+    incidentPictures.forEach((f) =>
+      incidentPicturesDT.items.add(f.originFileObj!)
+    );
+    const incidentVideosDT = new DataTransfer();
+    incidentVideos.forEach((f) =>
+      incidentVideosDT.items.add(f.originFileObj!)
+    );
 
-      const incidentPicturesDT = new DataTransfer();
-      incidentPictures.forEach((f) =>
-        incidentPicturesDT.items.add(f.originFileObj!)
-      );
-      const incidentVideosDT = new DataTransfer();
-      incidentVideos.forEach((f) =>
-        incidentVideosDT.items.add(f.originFileObj!)
-      );
-
+    dispatch(
+      uploadElectionReport({
+        electionId: election._id,
+        report: {
+          selectIncident: formData.selectIncident!,
+          incidentNote: formData.incidentNote,
+          incidentPictures: incidentPicturesDT.files as unknown as FileInfo[],
+          incidentVideos: incidentVideosDT.files as unknown as FileInfo[],
+          electionRating: formData.voteRating!,
+          ...(uploadLocation ? { uploadLocation } : {}),
+        } as unknown as ElectionReport,
+      })
+    );
+    if (searchParams.get("flag")) {
       dispatch(
-        uploadElectionReport({
-          electionId: election._id,
-          report: {
-            selectIncident: formData.selectIncident!,
-            incidentNote: formData.incidentNote,
-            incidentPictures: incidentPicturesDT.files as unknown as FileInfo[],
-            incidentVideos: incidentVideosDT.files as unknown as FileInfo[],
-            electionRating: formData.voteRating!,
-            ...(uploadLocation ? { uploadLocation } : {}),
-          } as unknown as ElectionReport,
+        getPollingUnitResults({
+          actionProps: {
+            action: "flag",
+            electionId: searchParams.get("flagResultId")!,
+            dataType: searchParams.get("flagDataType")! as any,
+            flagReason: searchParams.get("flagReason")!,
+          },
         })
       );
-      if (searchParams.get("flag")) {
-        dispatch(
-          getPollingUnitResults({
-            actionProps: {
-              action: "flag",
-              electionId: searchParams.get("flagResultId")!,
-              dataType: searchParams.get("flagDataType")! as any,
-              flagReason: searchParams.get("flagReason")!,
-            },
-          })
-        );
-      }
-    } catch (error: any) {
-      dispatch(
-        showAlert({
-          message:
-            error?.message ||
-            "Please turn on your location to submit an incident report.",
-          type: "error",
-        })
-      );
-    } finally {
-      setIsCapturingLocation(false);
     }
   }
 

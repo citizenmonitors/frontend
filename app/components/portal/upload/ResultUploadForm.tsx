@@ -24,6 +24,7 @@ import {
   ElectionResult,
   FileInfo,
   RatingOption,
+  UploadLocation,
 } from "@/app/redux/types";
 import {
   clearElectionUploadData,
@@ -75,6 +76,7 @@ export default function ResultUploadForm({
   const electionYear = moment(election.startDate).format("YYYY");
   const [surveyFormOpen, setSurveyFormOpen] = React.useState(false);
   const [isCapturingLocation, setIsCapturingLocation] = React.useState(false);
+  const capturedUploadLocationRef = React.useRef<UploadLocation | undefined>();
   const isEditMode = !!prefilledFormData;
   const { formData, setFormData, handleFormInputChange } = useFormHandler({
     timeBegan: searchParams.get("timeBegan") || "",
@@ -248,7 +250,7 @@ export default function ResultUploadForm({
     setPartyFormData({ partyName: undefined });
   }
 
-  function handleFormSubmit() {
+  async function handleFormSubmit() {
     if (!isEditMode && !formData.timeBegan) {
       dispatch(
         showAlert({
@@ -426,63 +428,69 @@ export default function ResultUploadForm({
 
     if (isEditMode) {
       updateResult();
-    } else {
-      setSurveyFormOpen(true);
+      return;
     }
-  }
 
-  async function uploadResult() {
-    setIsCapturingLocation(true);
-    try {
-      const requiresLocation = userDetails.role === "observer";
-      const uploadLocation = requiresLocation
-        ? await getUploadLocation()
-        : undefined;
-
-      dispatch(
-        uploadElectionResult({
-          electionId: election._id,
-          result: {
-            timeBegan: formData.timeBegan!,
-            accreditedVoters: formData.accreditedVoters!,
-            rejectedPapers: formData.rejectedPapers!,
-            spoiledBallotPapers: formData.spoiledBallotPapers!,
-            usedBallotPapers: formData.usedBallotPapers!,
-            partiesVotes: getValidPartyResults(),
-            voteRating: formData.voteRating!,
-            voteBuying: formData.voteBuying!,
-            voterIntimidation: formData.voterIntimidation!,
-            resultPicture: resultPicture!.originFileObj as unknown as FileInfo,
-            resultVideo: resultVideo
-              ? (resultVideo!.originFileObj as unknown as FileInfo)
-              : undefined,
-            ...(uploadLocation ? { uploadLocation } : {}),
-          } as unknown as ElectionResult,
-        })
-      );
-      if (searchParams.get("flag")) {
+    if (userDetails.role === "observer") {
+      setIsCapturingLocation(true);
+      try {
+        capturedUploadLocationRef.current = await getUploadLocation();
+        setSurveyFormOpen(true);
+      } catch (error: any) {
+        capturedUploadLocationRef.current = undefined;
         dispatch(
-          getPollingUnitResults({
-            actionProps: {
-              action: "flag",
-              electionId: searchParams.get("flagResultId")!,
-              dataType: searchParams.get("flagDataType")! as any,
-              flagReason: searchParams.get("flagReason")!,
-            },
+          showAlert({
+            message:
+              error?.message ||
+              "Please turn on your location to submit election results.",
+            type: "error",
           })
         );
+      } finally {
+        setIsCapturingLocation(false);
       }
-    } catch (error: any) {
+      return;
+    }
+
+    capturedUploadLocationRef.current = undefined;
+    setSurveyFormOpen(true);
+  }
+
+  function uploadResult() {
+    const uploadLocation = capturedUploadLocationRef.current;
+
+    dispatch(
+      uploadElectionResult({
+        electionId: election._id,
+        result: {
+          timeBegan: formData.timeBegan!,
+          accreditedVoters: formData.accreditedVoters!,
+          rejectedPapers: formData.rejectedPapers!,
+          spoiledBallotPapers: formData.spoiledBallotPapers!,
+          usedBallotPapers: formData.usedBallotPapers!,
+          partiesVotes: getValidPartyResults(),
+          voteRating: formData.voteRating!,
+          voteBuying: formData.voteBuying!,
+          voterIntimidation: formData.voterIntimidation!,
+          resultPicture: resultPicture!.originFileObj as unknown as FileInfo,
+          resultVideo: resultVideo
+            ? (resultVideo!.originFileObj as unknown as FileInfo)
+            : undefined,
+          ...(uploadLocation ? { uploadLocation } : {}),
+        } as unknown as ElectionResult,
+      })
+    );
+    if (searchParams.get("flag")) {
       dispatch(
-        showAlert({
-          message:
-            error?.message ||
-            "Please turn on your location to submit election results.",
-          type: "error",
+        getPollingUnitResults({
+          actionProps: {
+            action: "flag",
+            electionId: searchParams.get("flagResultId")!,
+            dataType: searchParams.get("flagDataType")! as any,
+            flagReason: searchParams.get("flagReason")!,
+          },
         })
       );
-    } finally {
-      setIsCapturingLocation(false);
     }
   }
 
