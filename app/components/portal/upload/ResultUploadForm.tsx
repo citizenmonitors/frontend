@@ -872,6 +872,19 @@ export default function ResultUploadForm({
                 }}
               />
             ))}
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-brand-200 bg-brand-25 px-4 py-3 lg:col-span-2 xl:col-span-3">
+              <span className="text-sm font-medium text-gray-700">
+                Total Party Votes
+              </span>
+              <span className="text-base font-semibold text-brand-600">
+                {formatNumber.commas(
+                  politicalPartyResults.reduce(
+                    (sum, party) => sum + (Number(party.count) || 0),
+                    0
+                  )
+                )}
+              </span>
+            </div>
           </div>
         ) : (
           <p className="py-4 text-sm text-center text-gray-500">
