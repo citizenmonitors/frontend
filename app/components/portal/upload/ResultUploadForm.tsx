@@ -24,7 +24,6 @@ import {
   ElectionResult,
   FileInfo,
   RatingOption,
-  UploadLocation,
 } from "@/app/redux/types";
 import {
   clearElectionUploadData,
@@ -40,7 +39,6 @@ import { binarySelectOptions, ratingSelectOptions } from "@/app/data/form";
 import acceptedFileTypes from "../../../data/acceptedFileTypes";
 import getElectionName from "@/app/utils/getElectionName";
 import formatNumber from "@/app/utils/formatNumber";
-import getUploadLocation from "@/app/utils/getUploadLocation";
 import Image from "next/image";
 import ElectionTimePicker from "../elections/ElectionTimePicker";
 import Link from "next/link";
@@ -75,8 +73,6 @@ export default function ResultUploadForm({
   const election = electionState.electionData.election!;
   const electionYear = moment(election.startDate).format("YYYY");
   const [surveyFormOpen, setSurveyFormOpen] = React.useState(false);
-  const [isCapturingLocation, setIsCapturingLocation] = React.useState(false);
-  const capturedUploadLocationRef = React.useRef<UploadLocation | undefined>();
   const isEditMode = !!prefilledFormData;
   const { formData, setFormData, handleFormInputChange } = useFormHandler({
     timeBegan: searchParams.get("timeBegan") || "",
@@ -171,11 +167,25 @@ export default function ResultUploadForm({
         );
         return Upload.LIST_IGNORE;
       }
-      setResultPicture(file);
+      setResultPicture({
+        uid: file.uid,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        originFileObj: file,
+      });
       return false;
     },
     onChange: (info) => {
-      setResultPicture(info.fileList[0]);
+      const file = info.fileList[0];
+      if (!file) {
+        setResultPicture(null);
+        return;
+      }
+      setResultPicture({
+        ...file,
+        originFileObj: file.originFileObj || (file as any),
+      });
     },
   };
   const resultVideoUploadProps: UploadProps = {
@@ -197,11 +207,25 @@ export default function ResultUploadForm({
         );
         return Upload.LIST_IGNORE;
       }
-      setResultVideo(file);
+      setResultVideo({
+        uid: file.uid,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        originFileObj: file,
+      });
       return false;
     },
     onChange: (info) => {
-      setResultVideo(info.fileList[0]);
+      const file = info.fileList[0];
+      if (!file) {
+        setResultVideo(null);
+        return;
+      }
+      setResultVideo({
+        ...file,
+        originFileObj: file.originFileObj || (file as any),
+      });
     },
   };
 
@@ -431,33 +455,27 @@ export default function ResultUploadForm({
       return;
     }
 
-    if (userDetails.role === "observer") {
-      setIsCapturingLocation(true);
-      try {
-        capturedUploadLocationRef.current = await getUploadLocation();
-        setSurveyFormOpen(true);
-      } catch (error: any) {
-        capturedUploadLocationRef.current = undefined;
-        dispatch(
-          showAlert({
-            message:
-              error?.message ||
-              "Please turn on your location to submit election results.",
-            type: "error",
-          })
-        );
-      } finally {
-        setIsCapturingLocation(false);
-      }
-      return;
-    }
-
-    capturedUploadLocationRef.current = undefined;
     setSurveyFormOpen(true);
   }
 
   function uploadResult() {
-    const uploadLocation = capturedUploadLocationRef.current;
+    const pictureFile =
+      (resultPicture?.originFileObj as File | undefined) ||
+      (resultPicture as unknown as File | undefined);
+    const videoFile = resultVideo
+      ? (resultVideo.originFileObj as File | undefined) ||
+        (resultVideo as unknown as File | undefined)
+      : undefined;
+
+    if (!pictureFile || !(pictureFile instanceof File)) {
+      dispatch(
+        showAlert({
+          message: "Please upload signed result sheets.",
+          type: "error",
+        })
+      );
+      return;
+    }
 
     dispatch(
       uploadElectionResult({
@@ -472,11 +490,10 @@ export default function ResultUploadForm({
           voteRating: formData.voteRating!,
           voteBuying: formData.voteBuying!,
           voterIntimidation: formData.voterIntimidation!,
-          resultPicture: resultPicture!.originFileObj as unknown as FileInfo,
-          resultVideo: resultVideo
-            ? (resultVideo!.originFileObj as unknown as FileInfo)
+          resultPicture: pictureFile as unknown as FileInfo,
+          resultVideo: videoFile
+            ? (videoFile as unknown as FileInfo)
             : undefined,
-          ...(uploadLocation ? { uploadLocation } : {}),
         } as unknown as ElectionResult,
       })
     );
@@ -1087,12 +1104,12 @@ export default function ResultUploadForm({
         type="primary"
         block
         size="large"
+        htmlType="button"
         onClick={handleFormSubmit}
         loading={
-          isCapturingLocation ||
-          (isEditMode
+          isEditMode
             ? electionState.status.updateElectionResult === "pending"
-            : electionState.status.uploadElectionResult === "pending")
+            : electionState.status.uploadElectionResult === "pending"
         }
       >
         {isEditMode
@@ -1101,12 +1118,6 @@ export default function ResultUploadForm({
             ? "Submit Results and Flag"
             : "Submit Results"}
       </Button>
-
-      {userDetails.role === "observer" && !isEditMode && (
-        <p className="text-xs text-center text-gray-500 -mt-2">
-          Observers must enable location access before submitting results.
-        </p>
-      )}
 
       <SentimentAnalysisModal
         open={surveyFormOpen}

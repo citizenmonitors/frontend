@@ -14,9 +14,22 @@ import {
 } from "../types";
 import axios from "axios";
 import { backendRoutes } from "@/app/data/backend";
-import backendAxiosConfig from "@/app/data/axiosConfig";
+import backendAxiosConfig, {
+  backendMultipartAxiosConfig,
+} from "@/app/data/axiosConfig";
 import fetchInThunk from "../helpers/fetchInThunk";
 import handleStateError from "../helpers/handleStateError";
+
+/** Build multipart body so File fields (resultPicture, etc.) are actually sent. */
+function toMultipartBody(data: Record<string, unknown>) {
+  const cleaned: Record<string, unknown> = {};
+  Object.entries(data).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      cleaned[key] = value;
+    }
+  });
+  return axios.toFormData(cleaned);
+}
 
 type InitialElectionState = {
   elections: Array<Election>;
@@ -401,17 +414,12 @@ export const uploadElectionResult = createAsyncThunk<
 >(
   "election/uploadResult",
   async ({ electionId, result }, { rejectWithValue }) => {
-    const payload: Record<string, unknown> = { ...result };
-    if (payload.uploadLocation && typeof payload.uploadLocation === "object") {
-      payload.uploadLocation = JSON.stringify(payload.uploadLocation);
-    }
-
     return await fetchInThunk({
       asyncCallback: () =>
         axios.post(
           backendRoutes.dashboard.elections.uploadResult(electionId),
-          payload,
-          backendAxiosConfig({ type: "multipart/form-data" })
+          toMultipartBody(result as unknown as Record<string, unknown>),
+          backendMultipartAxiosConfig()
         ),
       rejectWithValue,
     });
@@ -428,8 +436,8 @@ export const updateElectionResult = createAsyncThunk<
       asyncCallback: () =>
         axios.put(
           backendRoutes.dashboard.elections.updateResult(electionId),
-          result,
-          backendAxiosConfig({ type: "multipart/form-data" })
+          toMultipartBody(result as unknown as Record<string, unknown>),
+          backendMultipartAxiosConfig()
         ),
       rejectWithValue,
     });
@@ -456,17 +464,12 @@ export const uploadElectionReport = createAsyncThunk<
 >(
   "election/uploadReport",
   async ({ electionId, report }, { rejectWithValue }) => {
-    const payload: Record<string, unknown> = { ...report };
-    if (payload.uploadLocation && typeof payload.uploadLocation === "object") {
-      payload.uploadLocation = JSON.stringify(payload.uploadLocation);
-    }
-
     return await fetchInThunk({
       asyncCallback: () =>
         axios.post(
           backendRoutes.dashboard.elections.uploadReport(electionId),
-          payload,
-          backendAxiosConfig({ type: "multipart/form-data" })
+          toMultipartBody(report as unknown as Record<string, unknown>),
+          backendMultipartAxiosConfig()
         ),
       rejectWithValue,
     });
@@ -483,8 +486,8 @@ export const updateElectionReport = createAsyncThunk<
       asyncCallback: () =>
         axios.put(
           backendRoutes.dashboard.elections.updateReport(electionId),
-          report,
-          backendAxiosConfig({ type: "multipart/form-data" })
+          toMultipartBody(report as unknown as Record<string, unknown>),
+          backendMultipartAxiosConfig()
         ),
       rejectWithValue,
     });

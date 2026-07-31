@@ -29,12 +29,10 @@ import {
   ElectionReport,
   FileInfo,
   RatingOption,
-  UploadLocation,
 } from "@/app/redux/types";
 import { useRouter, useSearchParams } from "next/navigation";
 import acceptedFileTypes from "../../../data/acceptedFileTypes";
 import getElectionName from "@/app/utils/getElectionName";
-import getUploadLocation from "@/app/utils/getUploadLocation";
 import Link from "next/link";
 
 type ReportUploadFormProps = {
@@ -60,8 +58,6 @@ export default function ReportUploadForm({
   const electionYear = moment(election.startDate).format("YYYY");
   const router = useRouter();
   const [surveyFormOpen, setSurveyFormOpen] = React.useState(false);
-  const [isCapturingLocation, setIsCapturingLocation] = React.useState(false);
-  const capturedUploadLocationRef = React.useRef<UploadLocation | undefined>();
   const isEditMode = !!prefilledFormData;
   const { formData, setFormData, handleFormInputChange } = useFormHandler({
     selectIncident: prefilledFormData?.selectIncident || undefined,
@@ -254,28 +250,6 @@ export default function ReportUploadForm({
       return;
     }
 
-    if (userDetails.role === "observer") {
-      setIsCapturingLocation(true);
-      try {
-        capturedUploadLocationRef.current = await getUploadLocation();
-        setSurveyFormOpen(true);
-      } catch (error: any) {
-        capturedUploadLocationRef.current = undefined;
-        dispatch(
-          showAlert({
-            message:
-              error?.message ||
-              "Please turn on your location to submit an incident report.",
-            type: "error",
-          })
-        );
-      } finally {
-        setIsCapturingLocation(false);
-      }
-      return;
-    }
-
-    capturedUploadLocationRef.current = undefined;
     setSurveyFormOpen(true);
   }
 
@@ -337,7 +311,6 @@ export default function ReportUploadForm({
   }
 
   function uploadReport() {
-    const uploadLocation = capturedUploadLocationRef.current;
     const incidentPicturesDT = new DataTransfer();
     incidentPictures.forEach((f) =>
       incidentPicturesDT.items.add(f.originFileObj!)
@@ -356,7 +329,6 @@ export default function ReportUploadForm({
           incidentPictures: incidentPicturesDT.files as unknown as FileInfo[],
           incidentVideos: incidentVideosDT.files as unknown as FileInfo[],
           electionRating: formData.voteRating!,
-          ...(uploadLocation ? { uploadLocation } : {}),
         } as unknown as ElectionReport,
       })
     );
@@ -696,12 +668,12 @@ export default function ReportUploadForm({
         type="primary"
         block
         size="large"
+        htmlType="button"
         onClick={handleFormSubmit}
         loading={
-          isCapturingLocation ||
-          (isEditMode
+          isEditMode
             ? electionState.status.updateElectionReport === "pending"
-            : electionState.status.uploadElectionReport === "pending")
+            : electionState.status.uploadElectionReport === "pending"
         }
       >
         {isEditMode
@@ -710,12 +682,6 @@ export default function ReportUploadForm({
             ? "Submit Report and Flag"
             : "Submit Report"}
       </Button>
-
-      {userDetails.role === "observer" && !isEditMode && (
-        <p className="text-xs text-center text-gray-500 -mt-2">
-          Observers must enable location access before submitting incident reports.
-        </p>
-      )}
 
       <SentimentAnalysisModal
         open={surveyFormOpen}

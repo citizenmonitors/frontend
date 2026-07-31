@@ -93,6 +93,19 @@ const backendAxiosConfig = (options?: BackendAxiosConfigOptions) => {
   return config;
 };
 
+/**
+ * Multipart config that lets axios set the boundary automatically.
+ * Manually setting `Content-Type: multipart/form-data` without a boundary
+ * can drop nested fields like uploadLocation on the server.
+ */
+export function backendMultipartAxiosConfig(): AxiosRequestConfig {
+  const config = backendAxiosConfig({ type: "multipart/form-data" });
+  if (config.headers && typeof config.headers === "object") {
+    delete (config.headers as Record<string, string>)["Content-Type"];
+  }
+  return config;
+}
+
 export default backendAxiosConfig;
 
 let backendAccessInterceptorAttached = false;
