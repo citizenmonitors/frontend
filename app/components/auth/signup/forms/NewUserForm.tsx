@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import useFormHandler from "@/app/hooks/useFormHandler";
 import useGoogleAuth from "@/app/hooks/useGoogleAuth";
 import { showAlert } from "@/app/redux/features/alertSlice";
-import { registerUser } from "@/app/redux/features/signupSlice";
+import { registerUser, ackEmailRegistration } from "@/app/redux/features/signupSlice";
 import { Button, Input, Tooltip } from "antd";
 import { Eye, EyeSlash, InfoCircle, Verify } from "iconsax-react";
 import Link from "next/link";
@@ -13,7 +13,7 @@ import isEmail from "validator/lib/isEmail";
 import { SignupUserContext } from "../../../../(pages)/auth/signup/SignupUserProvider";
 import AuthDivider from "../../ui/AuthDivider";
 import GoogleAuthButton from "../../ui/GoogleAuthButton";
-import { saveSignupDraft } from "@/app/data/signupDraft";
+import { saveSignupDraft, readSignupDraft } from "@/app/data/signupDraft";
 
 function NewUserForm() {
   const signupState = useAppSelector((state) => state.signup);
@@ -92,6 +92,11 @@ function NewUserForm() {
     }
 
     if (status === "fulfilled") {
+      if (readSignupDraft()?.emailVerified) {
+        dispatch(ackEmailRegistration());
+        return;
+      }
+
       updateCurrentUser({
         email: formData.email,
       });
@@ -104,7 +109,8 @@ function NewUserForm() {
           type: "success",
         })
       );
-      router.push("/auth/signup/verify");
+      dispatch(ackEmailRegistration());
+      router.replace("/auth/signup/verify");
     }
   }, [signupState.status.emailRegistration]);
 

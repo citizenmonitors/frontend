@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import { showAlert } from "@/app/redux/features/alertSlice";
-import { verifyOTP } from "@/app/redux/features/signupSlice";
+import { ackEmailVerification, verifyOTP } from "@/app/redux/features/signupSlice";
 import { Button } from "antd";
 import { useRouter } from "next/navigation";
 import OTPInput from "react-otp-input";
 import VerifyCounter from "../../../../(pages)/auth/signup/(step-1)/verify/components/VerifyCounter";
 import { SignupUserContext } from "../../../../(pages)/auth/signup/SignupUserProvider";
-import { saveSignupDraft, setSignupNextPath } from "@/app/data/signupDraft";
+import { readSignupDraft, saveSignupDraft, setSignupNextPath } from "@/app/data/signupDraft";
 import { cookieData } from "@/app/data/cookieData";
 import Cookies from "js-cookie";
 
@@ -17,6 +17,7 @@ export default function VerifyOTPForm() {
   const dispatch = useAppDispatch();
   const { currentUser } = useContext(SignupUserContext);
   const [OTP, setOTP] = useState("");
+  const email = currentUser.email || readSignupDraft()?.email;
 
   async function submitOTP() {
     if (OTP.length < 6) {
@@ -29,9 +30,20 @@ export default function VerifyOTPForm() {
       return;
     }
 
+    if (!email) {
+      dispatch(
+        showAlert({
+          message: "Please sign up first.",
+          type: "error",
+        })
+      );
+      router.replace("/auth/signup");
+      return;
+    }
+
     try {
       const result = await dispatch(
-        verifyOTP({ email: currentUser.email!, verificationCode: OTP })
+        verifyOTP({ email, verificationCode: OTP })
       ).unwrap();
 
       if (result?.token) {
@@ -41,7 +53,7 @@ export default function VerifyOTPForm() {
       }
 
       saveSignupDraft({
-        email: currentUser.email,
+        email,
         emailVerified: true,
         passwordSet: true,
       });
@@ -53,6 +65,7 @@ export default function VerifyOTPForm() {
           type: "success",
         })
       );
+      dispatch(ackEmailVerification());
       router.replace("/auth/signup/biodata");
     } catch {
       // rejected status handled by the effect below

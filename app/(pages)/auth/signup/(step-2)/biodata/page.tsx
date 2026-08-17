@@ -30,7 +30,7 @@ export default function Biodata() {
           type: "error",
         })
       );
-      router.push("/auth/signup");
+      router.replace("/auth/signup");
     }
   }, [ready, currentUser.email, draftEmail, dispatch, router]);
 

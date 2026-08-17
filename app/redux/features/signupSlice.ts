@@ -43,6 +43,16 @@ const signupSlice = createSlice({
       state.status = initialState.status;
       state.isObserverAllowed = initialState.isObserverAllowed;
     },
+    ackEmailRegistration(state) {
+      if (state.status.emailRegistration === "fulfilled") {
+        state.status.emailRegistration = "not started";
+      }
+    },
+    ackEmailVerification(state) {
+      if (state.status.emailVerification === "fulfilled") {
+        state.status.emailVerification = "not started";
+      }
+    },
   },
   extraReducers: (builder) => {
     // Register User Email and Password
@@ -206,5 +216,6 @@ export const submitRole = createAsyncThunk<SubmitRoleResponse, { user: Partial<U
   }
 )
 
-export const { clearSignupState } = signupSlice.actions;
+export const { clearSignupState, ackEmailRegistration, ackEmailVerification } =
+  signupSlice.actions;
 export default signupSlice.reducer;
