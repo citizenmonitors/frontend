@@ -43,17 +43,17 @@ export default function VerifyOTPForm() {
       saveSignupDraft({
         email: currentUser.email,
         emailVerified: true,
+        passwordSet: true,
       });
       setSignupNextPath("/auth/signup/biodata");
 
       dispatch(
         showAlert({
-          message:
-            "Your email has been verified. Set a password to continue your signup.",
+          message: "Your email has been verified. Continue with your biodata.",
           type: "success",
         })
       );
-      router.push("/auth/set-password");
+      router.replace("/auth/signup/biodata");
     } catch {
       // rejected status handled by the effect below
     }

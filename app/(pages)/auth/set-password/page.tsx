@@ -42,7 +42,7 @@ function SetPassword() {
         type: "warning",
       })
     );
-    router.replace(signupNextPath ? "/auth/signup" : "/auth/login");
+    router.replace(signupNextPath || "/auth/login");
   }, [dispatch, router]);
 
   const handleFormSubmit = () => {

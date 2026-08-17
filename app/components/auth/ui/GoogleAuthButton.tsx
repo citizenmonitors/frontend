@@ -18,6 +18,9 @@ type GoogleIdentityServices = {
       initialize: (config: {
         client_id: string;
         callback: (response: GoogleCredentialResponse) => void;
+        auto_select?: boolean;
+        cancel_on_tap_outside?: boolean;
+        use_fedcm_for_prompt?: boolean;
       }) => void;
       renderButton: (
         parent: HTMLElement,
@@ -42,6 +45,10 @@ declare global {
 
 const GSI_SCRIPT_SRC = "https://accounts.google.com/gsi/client";
 
+let gsiInitializedClientId: string | null = null;
+let activeCredentialHandler: ((idToken: string) => void) | null = null;
+let activeErrorHandler: ((message: string) => void) | null = null;
+
 function GoogleMark({ className = "" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" width="18" height="18" aria-hidden>
@@ -65,6 +72,39 @@ function GoogleMark({ className = "" }: { className?: string }) {
   );
 }
 
+function ensureGsiScript() {
+  const existingScript = document.querySelector<HTMLScriptElement>(
+    `script[src="${GSI_SCRIPT_SRC}"]`
+  );
+  if (existingScript) return;
+
+  const script = document.createElement("script");
+  script.src = GSI_SCRIPT_SRC;
+  script.async = true;
+  script.defer = true;
+  document.head.appendChild(script);
+}
+
+function initializeGoogleIdentity(clientId: string) {
+  if (!window.google) return false;
+  if (gsiInitializedClientId === clientId) return true;
+
+  window.google.accounts.id.initialize({
+    client_id: clientId,
+    auto_select: false,
+    cancel_on_tap_outside: true,
+    callback: (response) => {
+      if (!response.credential) {
+        activeErrorHandler?.("Google did not return an ID token.");
+        return;
+      }
+      activeCredentialHandler?.(response.credential);
+    },
+  });
+  gsiInitializedClientId = clientId;
+  return true;
+}
+
 export default function GoogleAuthButton({
   onCredential,
   onError,
@@ -80,44 +120,42 @@ export default function GoogleAuthButton({
   onErrorRef.current = onError;
 
   useEffect(() => {
+    const credentialHandler = (idToken: string) => onCredentialRef.current(idToken);
+    const errorHandler = (message: string) => onErrorRef.current?.(message);
+    activeCredentialHandler = credentialHandler;
+    activeErrorHandler = errorHandler;
+
+    return () => {
+      if (activeCredentialHandler === credentialHandler) {
+        activeCredentialHandler = null;
+      }
+      if (activeErrorHandler === errorHandler) {
+        activeErrorHandler = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (!clientId) return;
 
     let cancelled = false;
-    let didRender = false;
     let pollTimer: number | undefined;
 
     const renderGoogleButton = () => {
-      if (cancelled || didRender || !window.google || !containerRef.current) {
-        return false;
-      }
+      if (cancelled || !containerRef.current) return false;
+      if (!initializeGoogleIdentity(clientId)) return false;
 
-      try {
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          callback: (response) => {
-            if (!response.credential) {
-              onErrorRef.current?.("Google did not return an ID token.");
-              return;
-            }
-            onCredentialRef.current(response.credential);
-          },
-        });
-
-        containerRef.current.replaceChildren();
-        window.google.accounts.id.renderButton(containerRef.current, {
-          type: "standard",
-          theme: "outline",
-          size: "large",
-          text: "continue_with",
-          shape: "rectangular",
-          width: Math.min(containerRef.current.clientWidth || 400, 400),
-        });
-        didRender = true;
-        setReady(true);
-        return true;
-      } catch {
-        return false;
-      }
+      containerRef.current.replaceChildren();
+      window.google!.accounts.id.renderButton(containerRef.current, {
+        type: "standard",
+        theme: "outline",
+        size: "large",
+        text: "continue_with",
+        shape: "rectangular",
+        width: Math.min(containerRef.current.clientWidth || 400, 400),
+      });
+      setReady(true);
+      return true;
     };
 
     const tryRenderWhenReady = () => {
@@ -127,20 +165,9 @@ export default function GoogleAuthButton({
       }
     };
 
+    ensureGsiScript();
     pollTimer = window.setInterval(tryRenderWhenReady, 250);
     tryRenderWhenReady();
-
-    const existingScript = document.querySelector<HTMLScriptElement>(
-      `script[src="${GSI_SCRIPT_SRC}"]`
-    );
-
-    if (!existingScript) {
-      const script = document.createElement("script");
-      script.src = GSI_SCRIPT_SRC;
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-    }
 
     return () => {
       cancelled = true;
@@ -154,7 +181,6 @@ export default function GoogleAuthButton({
         disabled ? "pointer-events-none opacity-60" : ""
       }`}
     >
-      {/* Always show a normal Google button look; official GSI button covers it when ready */}
       {!ready && (
         <div className="flex h-10 w-full max-w-[400px] items-center justify-center gap-3 rounded-lg border border-[#dadce0] bg-white px-3 text-sm font-medium text-[#3c4043]">
           <GoogleMark />
