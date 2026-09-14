@@ -1,7 +1,7 @@
 "use client";
 
 import { PulsePost } from "@/app/redux/types";
-import { formatPulseTimeAgo, getVisibilityScopeLabel } from "@/app/utils/pulseUtils";
+import { formatPulseTimeAgo, getPulsePostLocationLabel } from "@/app/utils/pulseUtils";
 import { Image as AntImage } from "antd";
 import { Like1, Message, Profile, Share } from "iconsax-react";
 import React from "react";
@@ -37,7 +37,7 @@ export default function PulsePostCard({
             </p>
             <p className="flex items-center gap-1 truncate text-[11px] text-error-500 sm:text-xs">
               <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-error-500" />
-              {getVisibilityScopeLabel(post.visibilityScope)}
+              {getPulsePostLocationLabel(post)}
             </p>
           </div>
         </div>

@@ -57,7 +57,7 @@ export default function VoteDistributionChart({
   );
 
   return (
-    <section className="h-full rounded-xl border border-gray-200 bg-white p-4 md:p-5">
+    <section className="relative z-0 h-full overflow-visible rounded-xl border border-gray-200 bg-white p-4 md:p-5">
       <header className="mb-4">
         <h3 className="text-base font-semibold text-gray-900 md:text-lg">
           Vote count distribution
@@ -65,7 +65,7 @@ export default function VoteDistributionChart({
         <p className="text-sm text-gray-500">See how vote is distributed</p>
       </header>
 
-      <div className="h-[240px] w-full md:h-[280px]">
+      <div className="relative z-10 h-[240px] w-full overflow-visible md:h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid vertical={false} stroke="#EAECF0" />
@@ -86,6 +86,7 @@ export default function VoteDistributionChart({
               cursor={{ fill: "rgba(5, 163, 156, 0.06)" }}
               content={<BarHoverTooltip />}
               allowEscapeViewBox={{ x: true, y: true }}
+              wrapperStyle={{ zIndex: 50, outline: "none", pointerEvents: "none" }}
             />
             <Bar dataKey="votes" radius={[6, 6, 0, 0]} maxBarSize={42}>
               {data.map((entry) => (

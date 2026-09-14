@@ -18,12 +18,12 @@ export default function IntegrityCoverageBar({
   totalResultsPublished,
 }: IntegrityCoverageBarProps) {
   return (
-    <div className="flex min-h-9 w-full flex-col gap-1.5 rounded-md bg-brand-50 px-3 py-2 sm:h-8 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:py-0 md:px-4">
+    <div className="flex min-h-9 w-full flex-col gap-1.5 rounded-md bg-brand-50 px-3 py-2 md:h-8 md:flex-row md:items-center md:justify-between md:gap-3 md:py-0 md:px-4">
       <div className="flex min-w-0 items-center gap-2 text-brand-800">
         <Timer1 size={14} className="shrink-0 text-brand-600" variant="Bold" />
-        <p className="text-xs leading-snug sm:truncate">
-          <span className="sm:hidden">Valid: </span>
-          <span className="hidden sm:inline">Validity &amp; Integrity: </span>
+        <p className="text-xs leading-snug md:truncate">
+          <span className="md:hidden">Valid: </span>
+          <span className="hidden md:inline">Validity &amp; Integrity: </span>
           <span className="font-semibold tabular-nums">
             {formatNumber.commas(fullyCompliantResults)}
           </span>{" "}
@@ -34,7 +34,7 @@ export default function IntegrityCoverageBar({
           results
         </p>
       </div>
-      <p className="shrink-0 self-end text-xs font-semibold tabular-nums text-brand-700 sm:self-auto">
+      <p className="shrink-0 self-end text-xs font-semibold tabular-nums text-brand-700 md:self-auto">
         {formatScorePercent(score)}
       </p>
     </div>

@@ -20,14 +20,69 @@ function normalizeAuthor(raw: Record<string, unknown> | undefined): PulseAuthor 
   };
 }
 
+function normalizeLocationLabel(raw: Record<string, unknown>): string | null {
+  const direct =
+    raw.locationLabel ??
+    raw.locationName ??
+    raw.displayLocation ??
+    raw.areaName ??
+    raw.area;
+  if (typeof direct === "string" && direct.trim()) return direct.trim();
+
+  const nested =
+    raw.location && typeof raw.location === "object"
+      ? (raw.location as Record<string, unknown>)
+      : null;
+
+  const parts = [
+    nested?.pollingUnit ?? raw.pollingUnit ?? raw.pollingUnitName,
+    nested?.ward ?? raw.ward ?? raw.wardName,
+    nested?.lga ?? raw.lga ?? raw.lgaName,
+    nested?.state ?? raw.state ?? raw.stateName,
+  ]
+    .map((part) => (typeof part === "string" ? part.trim() : ""))
+    .filter(Boolean);
+
+  if (parts.length === 0) return null;
+  // Prefer the most specific available label
+  return parts[0];
+}
+
+function normalizeLocation(
+  raw: Record<string, unknown>
+): PulsePost["location"] {
+  const nested =
+    raw.location && typeof raw.location === "object"
+      ? (raw.location as Record<string, unknown>)
+      : {};
+
+  const location = {
+    state: String(nested.state ?? raw.state ?? "").trim() || undefined,
+    lga: String(nested.lga ?? raw.lga ?? "").trim() || undefined,
+    ward: String(nested.ward ?? raw.ward ?? "").trim() || undefined,
+    pollingUnit: String(
+      nested.pollingUnit ?? raw.pollingUnit ?? ""
+    ).trim() || undefined,
+  };
+
+  if (!location.state && !location.lga && !location.ward && !location.pollingUnit) {
+    return null;
+  }
+  return location;
+}
+
 function normalizePost(raw: Record<string, unknown>): PulsePost {
   const imageUrl = raw.imageUrl ?? raw.imageURL ?? null;
+  const location = normalizeLocation(raw);
+  const locationLabel = normalizeLocationLabel(raw);
 
   return {
     id: String(raw.id ?? raw._id ?? ""),
     body: String(raw.body ?? raw.content ?? ""),
     imageUrl: typeof imageUrl === "string" && imageUrl.length > 0 ? imageUrl : null,
     visibilityScope: String(raw.visibilityScope ?? "public"),
+    locationLabel,
+    location,
     author: normalizeAuthor(raw.author as Record<string, unknown> | undefined),
     likesCount: Number(raw.likesCount ?? 0),
     commentsCount: Number(raw.commentsCount ?? 0),

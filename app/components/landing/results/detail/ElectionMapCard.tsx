@@ -247,7 +247,7 @@ export default function ElectionMapCard({
                       setActiveId(null);
                       setPinBottom(false);
                     }}
-                    className="grid h-8 w-8 shrink-0 place-content-center rounded-md text-gray-400 hover:bg-gray-50 hover:text-gray-700"
+                    className="grid h-11 w-11 shrink-0 place-content-center rounded-md text-gray-400 hover:bg-gray-50 hover:text-gray-700"
                     aria-label="Dismiss map details"
                   >
                     ×
@@ -258,7 +258,7 @@ export default function ElectionMapCard({
               <ul className="grid gap-3">
                 {breakdown.map((row) => (
                   <li key={row.party} className="grid gap-1.5">
-                    <div className="flex items-center gap-2 text-xs">
+                    <div className="flex min-w-0 items-center gap-2 text-xs">
                       <span
                         className="h-2 w-2 shrink-0 rounded-full"
                         style={{ backgroundColor: row.color }}
@@ -278,7 +278,7 @@ export default function ElectionMapCard({
                           }}
                         />
                       </div>
-                      <span className="w-12 shrink-0 text-right font-semibold tabular-nums text-gray-900">
+                      <span className="min-w-0 shrink-0 text-right font-semibold tabular-nums text-gray-900 sm:w-12">
                         {formatNumber.commas(row.votes)}
                       </span>
                     </div>

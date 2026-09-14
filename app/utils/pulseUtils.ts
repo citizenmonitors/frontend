@@ -32,4 +32,35 @@ export function getVisibilityScopeLabel(scope: string) {
   }
 }
 
+/** Prefer the post's place name: "Post Within Alimosho" */
+export function getPulsePostLocationLabel(post: {
+  locationLabel?: string | null;
+  location?: {
+    state?: string;
+    lga?: string;
+    ward?: string;
+    pollingUnit?: string;
+  } | null;
+  visibilityScope?: string;
+}) {
+  const fromFields =
+    post.locationLabel?.trim() ||
+    post.location?.pollingUnit?.trim() ||
+    post.location?.ward?.trim() ||
+    post.location?.lga?.trim() ||
+    post.location?.state?.trim() ||
+    "";
+
+  if (fromFields) {
+    return `Post Within ${fromFields}`;
+  }
+
+  const scope = post.visibilityScope;
+  if (scope && !["public", "nationwide", "national"].includes(scope)) {
+    return getVisibilityScopeLabel(scope);
+  }
+
+  return "Post Within Nigeria";
+}
+
 export const PULSE_BODY_MAX_LENGTH = 5000;

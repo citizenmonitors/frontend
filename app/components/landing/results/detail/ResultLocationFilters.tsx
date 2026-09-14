@@ -76,7 +76,7 @@ export default function ResultLocationFilters({
                   value={stateQuery}
                   onChange={(e) => setStateQuery(e.target.value)}
                   placeholder="Search states..."
-                  className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-8 pr-2 text-sm outline-none focus:border-brand-400"
+                  className="min-h-11 w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-8 pr-2 text-sm outline-none focus:border-brand-400"
                 />
               </label>
             </div>

@@ -4,29 +4,38 @@ import { cookieData } from "@/app/data/cookieData";
 import { Button, Spin } from "antd";
 import { MessageText1 } from "iconsax-react";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import { showAlert } from "@/app/redux/features/alertSlice";
 import { getPulsePosts, togglePulsePostLike } from "@/app/redux/features/pulseSlice";
 import { validateSession } from "@/app/redux/features/userSlice";
 import { PulsePost } from "@/app/redux/types";
-import { buildLoginHref } from "@/app/utils/authRedirect";
 import CreatePulsePostModal from "./CreatePulsePostModal";
 import PulseCommentsModal from "./PulseCommentsModal";
 import PulseEmptyState from "./PulseEmptyState";
+import PulseLoginModal from "./PulseLoginModal";
 import PulsePostCard from "./PulsePostCard";
 
-const PULSE_LOGIN_HREF = buildLoginHref("/pulse");
+type PendingAuthAction =
+  | { type: "create" }
+  | { type: "like"; postId: string }
+  | { type: "comment"; postId: string }
+  | { type: "generic" };
 
 export default function PulseFeed() {
   const dispatch = useAppDispatch();
-  const router = useRouter();
   const pulseState = useAppSelector((state) => state.pulse);
   const userDetails = useAppSelector((state) => state.user.details);
   const sessionStatus = useAppSelector((state) => state.user.status.validateSession);
   const [createOpen, setCreateOpen] = useState(false);
   const [commentsPostId, setCommentsPostId] = useState<string | null>(null);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [loginMessage, setLoginMessage] = useState(
+    "Sign in to post, like, and comment on Pulse."
+  );
+  const [pendingAction, setPendingAction] = useState<PendingAuthAction | null>(
+    null
+  );
 
   useEffect(() => {
     dispatch(getPulsePosts());
@@ -38,28 +47,43 @@ export default function PulseFeed() {
     dispatch(validateSession());
   }, [dispatch, sessionStatus]);
 
-  function requireAuth(action: string) {
+  useEffect(() => {
+    if (!userDetails || !pendingAction) return;
+
+    const action = pendingAction;
+    setPendingAction(null);
+
+    if (action.type === "create") {
+      setCreateOpen(true);
+      return;
+    }
+    if (action.type === "like") {
+      dispatch(togglePulsePostLike(action.postId));
+      return;
+    }
+    if (action.type === "comment") {
+      setCommentsPostId(action.postId);
+    }
+  }, [userDetails, pendingAction, dispatch]);
+
+  function requireAuth(action: string, pending?: PendingAuthAction) {
     if (userDetails) return true;
     if (Cookies.get(cookieData.login.name) && sessionStatus === "pending") {
       return false;
     }
-    dispatch(
-      showAlert({
-        message: `Please log in to ${action}.`,
-        type: "warning",
-      })
-    );
-    router.push(PULSE_LOGIN_HREF);
+    setLoginMessage(`Please log in to ${action}.`);
+    setPendingAction(pending ?? { type: "generic" });
+    setLoginOpen(true);
     return false;
   }
 
   function handleLike(postId: string) {
-    if (!requireAuth("like posts")) return;
+    if (!requireAuth("like posts", { type: "like", postId })) return;
     dispatch(togglePulsePostLike(postId));
   }
 
   function handleOpenCreate() {
-    if (!requireAuth("post on Pulse")) return;
+    if (!requireAuth("post on Pulse", { type: "create" })) return;
     setCreateOpen(true);
   }
 
@@ -77,12 +101,22 @@ export default function PulseFeed() {
     dispatch(showAlert({ message: "Post copied to clipboard.", type: "success" }));
   }
 
-  const loading = pulseState.status.getPosts === "pending";
+  function handleLoginSuccess() {
+    setLoginOpen(false);
+  }
+
+  function handleLoginClose() {
+    setLoginOpen(false);
+    setPendingAction(null);
+  }
+
+  const loading =
+    pulseState.status.getPosts === "pending" && pulseState.posts.length === 0;
   const hasPosts = pulseState.posts.length > 0;
 
   return (
     <div className="relative min-w-0">
-      <div className="sticky top-[72px] z-40 -mx-4 mb-5 border-b border-gray-200/80 bg-white/95 px-4 pb-3 pt-2 shadow-[0_8px_20px_rgba(16,24,40,0.06)] backdrop-blur-md sm:top-[76px] sm:-mx-6 sm:mb-6 sm:px-6 md:top-[68px] md:-mx-8 md:mb-8 md:px-8">
+      <div className="mb-5 sm:mb-6 md:mb-8">
         <h1 className="font-league text-2xl font-semibold leading-tight text-gray-700 sm:text-display-xs lg:text-display-base">
           Pulse
         </h1>
@@ -114,21 +148,34 @@ export default function PulseFeed() {
           ))}
         </div>
       ) : (
-        <p className="pb-28 text-center text-sm text-gray-500 sm:pb-24">
-          No posts yet. Be the first to share an update.
-        </p>
+        <div className="flex flex-col items-center gap-5 pb-8 pt-2 sm:pb-10">
+          <p className="text-center text-sm text-gray-500">
+            No posts yet. Be the first to share an update.
+          </p>
+          <Button
+            type="primary"
+            size="large"
+            className="!flex !h-12 !items-center !justify-center !rounded-full !px-6 !shadow-md"
+            icon={<MessageText1 size={18} />}
+            onClick={handleOpenCreate}
+          >
+            Post
+          </Button>
+        </div>
       )}
 
-      <Button
-        type="primary"
-        size="large"
-        className="!fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-[45] !flex !h-12 !min-w-12 !items-center !justify-center !rounded-full !px-4 !shadow-lg sm:right-6 sm:!px-5 md:right-8 lg:right-[max(2rem,calc((100vw-800px)/2+1rem))]"
-        icon={<MessageText1 size={18} />}
-        onClick={handleOpenCreate}
-        aria-label="Create a Pulse post"
-      >
-        <span className="hidden sm:inline">Post</span>
-      </Button>
+      {hasPosts ? (
+        <Button
+          type="primary"
+          size="large"
+          className="!fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-[45] !flex !h-12 !min-w-12 !items-center !justify-center !rounded-full !px-4 !shadow-lg sm:right-6 sm:!px-5 md:right-8 lg:right-[max(2rem,calc((100vw-800px)/2+1rem))]"
+          icon={<MessageText1 size={18} />}
+          onClick={handleOpenCreate}
+          aria-label="Create a Pulse post"
+        >
+          <span className="hidden sm:inline">Post</span>
+        </Button>
+      ) : null}
 
       {userDetails ? (
         <CreatePulsePostModal open={createOpen} onClose={() => setCreateOpen(false)} />
@@ -137,7 +184,20 @@ export default function PulseFeed() {
         postId={commentsPostId}
         open={!!commentsPostId}
         onClose={() => setCommentsPostId(null)}
-        requireAuth={requireAuth}
+        requireAuth={(action) =>
+          requireAuth(
+            action,
+            commentsPostId
+              ? { type: "comment", postId: commentsPostId }
+              : { type: "generic" }
+          )
+        }
+      />
+      <PulseLoginModal
+        open={loginOpen}
+        onClose={handleLoginClose}
+        onSuccess={handleLoginSuccess}
+        contextMessage={loginMessage}
       />
     </div>
   );

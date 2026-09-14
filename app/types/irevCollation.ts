@@ -23,22 +23,6 @@ export type ElectionChartsPayload = {
   series: ElectionChartSeriesItem[];
 };
 
-/** Shape expected from results chart API (or mapped from collation candidates) */
-export type ElectionChartSeriesItem = {
-  id: string;
-  label: string;
-  party: string;
-  partyName: string;
-  votes: number;
-  share: number;
-  color: string;
-};
-
-export type ElectionChartsPayload = {
-  updatedAt: string;
-  series: ElectionChartSeriesItem[];
-};
-
 export type CollationTotals = {
   registeredVoters: number;
   accreditedVoters: number;

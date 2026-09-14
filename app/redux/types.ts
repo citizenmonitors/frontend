@@ -426,6 +426,14 @@ export type PulsePost = {
   body: string;
   imageUrl?: string | null;
   visibilityScope: PulseVisibilityScope;
+  /** Human-readable place for the post (ward / LGA / PU / state) */
+  locationLabel?: string | null;
+  location?: {
+    state?: string;
+    lga?: string;
+    ward?: string;
+    pollingUnit?: string;
+  } | null;
   author: PulseAuthor;
   likesCount: number;
   commentsCount: number;

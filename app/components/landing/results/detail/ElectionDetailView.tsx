@@ -57,7 +57,7 @@ export default function ElectionDetailView({ slug }: ElectionDetailViewProps) {
     const meta = getElectionListingMetaBySlug(slug);
     const year = getYearForSlug(slug);
     return (
-      <div className="min-h-screen bg-gray-50/80 pb-16">
+      <div className="min-h-screen overflow-x-hidden bg-gray-50/80 pb-16">
         <div className="mx-auto w-full min-w-0 max-w-[1120px] px-5 pt-4 sm:px-8 md:pt-6 lg:max-w-[1180px] lg:px-10 xl:max-w-[1220px]">
           <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="min-w-0 flex-1">
@@ -90,7 +90,7 @@ export default function ElectionDetailView({ slug }: ElectionDetailViewProps) {
   const slice = mode === "raw" ? election.raw : election.verified;
 
   return (
-    <div className="min-h-screen bg-gray-50/80 pb-16">
+    <div className="min-h-screen overflow-x-hidden bg-gray-50/80 pb-16">
       <div className="mx-auto w-full min-w-0 max-w-[1120px] px-5 pt-4 sm:px-8 md:pt-6 lg:max-w-[1180px] lg:px-10 xl:max-w-[1220px]">
         <header className="mb-6 flex flex-col gap-4 md:mb-8 md:flex-row md:items-start md:justify-between">
           <div className="flex min-w-0 flex-1 gap-3">
@@ -125,7 +125,7 @@ export default function ElectionDetailView({ slug }: ElectionDetailViewProps) {
               </h2>
               <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
                 <CollationModeToggle mode={mode} onChange={setMode} />
-                <div className="grid w-full grid-cols-4 rounded-lg bg-gray-100 p-1 sm:inline-flex sm:w-auto">
+                <div className="grid w-full grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1 xs:grid-cols-4 sm:inline-flex sm:w-auto sm:gap-0">
                   {viewModes.map((item) => {
                     const active = viewMode === item.key;
                     return (
@@ -133,7 +133,7 @@ export default function ElectionDetailView({ slug }: ElectionDetailViewProps) {
                         key={item.key}
                         type="button"
                         onClick={() => setViewMode(item.key)}
-                        className={`min-h-11 rounded-md px-1.5 py-2 text-[11px] font-medium transition-colors sm:px-3 sm:text-sm ${
+                        className={`min-h-11 rounded-md px-2 py-2 text-xs font-medium transition-colors sm:px-3 sm:text-sm ${
                           active
                             ? "bg-white text-brand-700 shadow-sm"
                             : "text-gray-500 hover:text-gray-700"
@@ -178,11 +178,15 @@ export default function ElectionDetailView({ slug }: ElectionDetailViewProps) {
           />
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5">
-            <VoteDistributionChart series={charts.series} />
-            <CollationVoteShare
-              series={charts.series}
-              subtitle="All candidates across nation"
-            />
+            <div className="relative z-0 min-w-0">
+              <VoteDistributionChart series={charts.series} />
+            </div>
+            <div className="relative z-10 min-w-0">
+              <CollationVoteShare
+                series={charts.series}
+                subtitle="All candidates across nation"
+              />
+            </div>
           </div>
 
           <p className="text-center text-sm text-error-600">

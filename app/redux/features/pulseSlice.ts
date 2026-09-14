@@ -21,6 +21,9 @@ import {
   PulsePostsPage,
 } from "../types";
 
+/** Skip refetch while feed is fresher than this (client-side cache). */
+export const PULSE_FEED_STALE_MS = 2 * 60 * 1000;
+
 type PulseState = {
   posts: PulsePost[];
   comments: PulseComment[];
@@ -28,6 +31,8 @@ type PulseState = {
   total: number;
   page: number;
   limit: number;
+  /** Epoch ms when posts were last fetched successfully */
+  postsFetchedAt: number | null;
   status: {
     getPosts: FetchState;
     createPost: FetchState;
@@ -48,6 +53,7 @@ const initialState: PulseState = {
   total: 0,
   page: 1,
   limit: 20,
+  postsFetchedAt: null,
   status: {
     getPosts: "not started",
     createPost: "not started",
@@ -86,6 +92,7 @@ const pulseSlice = createSlice({
       state.total = action.payload.total;
       state.page = action.payload.page;
       state.limit = action.payload.limit;
+      state.postsFetchedAt = Date.now();
     });
     builder.addCase(getPulsePosts.rejected, (state, action: any) => {
       state.status.getPosts = "rejected";
@@ -99,6 +106,7 @@ const pulseSlice = createSlice({
       state.status.createPost = "fulfilled";
       state.posts = [action.payload, ...state.posts];
       state.total += 1;
+      state.postsFetchedAt = Date.now();
     });
     builder.addCase(createPulsePost.rejected, (state, action: any) => {
       state.status.createPost = "rejected";
@@ -177,15 +185,42 @@ const pulseSlice = createSlice({
   },
 });
 
-export const getPulsePosts = createAsyncThunk<PulsePostsPage, FetchPulsePostsParams | void>(
+export type GetPulsePostsArg = (FetchPulsePostsParams & { force?: boolean }) | void;
+
+export const getPulsePosts = createAsyncThunk<
+  PulsePostsPage,
+  GetPulsePostsArg,
+  { state: { pulse: PulseState } }
+>(
   "pulse/getPulsePosts",
   async (params, { rejectWithValue }) => {
+    const { force: _force, ...query } = (params ?? {}) as FetchPulsePostsParams & {
+      force?: boolean;
+    };
     return await fetchInThunk({
       asyncCallback: async () => ({
-        data: await fetchPulsePosts(params ?? {}),
+        data: await fetchPulsePosts(query),
       }),
       rejectWithValue,
     });
+  },
+  {
+    condition: (params, { getState }) => {
+      const pulse = getState().pulse;
+      if (pulse.status.getPosts === "pending") return false;
+
+      const force = Boolean(params && "force" in params && params.force);
+      if (force) return true;
+
+      if (
+        pulse.postsFetchedAt != null &&
+        Date.now() - pulse.postsFetchedAt < PULSE_FEED_STALE_MS
+      ) {
+        return false;
+      }
+
+      return true;
+    },
   }
 );
 

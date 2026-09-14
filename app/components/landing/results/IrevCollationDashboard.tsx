@@ -48,7 +48,7 @@ export default function IrevCollationDashboard({
           </p>
         </header>
 
-        <div className="overflow-hidden rounded-2xl border border-gray-200/80 bg-[#F7FAFC] p-4 shadow-sm md:p-6 lg:p-8">
+        <div className="overflow-x-hidden overflow-y-visible rounded-2xl border border-gray-200/80 bg-[#F7FAFC] p-4 shadow-sm md:p-6 lg:p-8">
           <div className="mb-6 flex flex-col gap-5 sm:mb-8 sm:flex-row sm:items-end sm:justify-between sm:gap-6 md:mb-10">
             <div className="min-w-0 space-y-3 md:space-y-4">
               <h3 className="text-base font-bold text-gray-900 md:text-lg">
@@ -97,13 +97,13 @@ export default function IrevCollationDashboard({
             <CollationSummaryStats totals={slice.totals} />
 
             <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-12 lg:gap-5">
-              <div className="lg:col-span-7 xl:col-span-8">
+              <div className="relative z-0 min-w-0 lg:col-span-7 xl:col-span-8">
                 <CollationCandidateResults
                   candidates={slice.candidates}
                   detailHref={detailHref}
                 />
               </div>
-              <div className="lg:col-span-5 xl:col-span-4">
+              <div className="relative z-10 min-w-0 lg:col-span-5 xl:col-span-4">
                 <CollationVoteShare candidates={slice.candidates} />
               </div>
             </div>

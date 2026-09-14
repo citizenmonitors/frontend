@@ -23,6 +23,8 @@ type UseGoogleAuthOptions = {
   mode?: "login" | "signup";
   /** Where to send the user after a successful login (non-admin) */
   successRedirect?: string | null;
+  /** When set, skips router navigation and calls this instead */
+  onLoginSuccess?: () => void;
 };
 
 function getErrorMessage(error: any): string {
@@ -43,7 +45,7 @@ function isAlreadyRegisteredError(message: string): boolean {
 }
 
 export default function useGoogleAuth(options: UseGoogleAuthOptions = {}) {
-  const { nextPath, mode = "login", successRedirect } = options;
+  const { nextPath, mode = "login", successRedirect, onLoginSuccess } = options;
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [isGoogleAuthenticating, setIsGoogleAuthenticating] = useState(false);
@@ -112,6 +114,10 @@ export default function useGoogleAuth(options: UseGoogleAuthOptions = {}) {
         const session = await dispatch(validateSession()).unwrap();
         const role = session.user?.user?.role;
         dispatch(showAlert({ message: "Signed in with Google.", type: "success" }));
+        if (onLoginSuccess) {
+          onLoginSuccess();
+          return;
+        }
         const next = getPostLoginPath(role, successRedirect);
         consumeAuthRedirect();
         router.replace(next);
@@ -144,7 +150,7 @@ export default function useGoogleAuth(options: UseGoogleAuthOptions = {}) {
         setIsGoogleAuthenticating(false);
       }
     },
-    [dispatch, mode, nextPath, router, showGoogleError, successRedirect]
+    [dispatch, mode, nextPath, onLoginSuccess, router, showGoogleError, successRedirect]
   );
 
   return {

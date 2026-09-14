@@ -87,6 +87,15 @@ export default function AreaResultsTable({ rows, mode }: AreaResultsTableProps) 
     return Array.from({ length: maxButtons }, (_, i) => start + i);
   }, [page, totalPages]);
 
+  const mobilePageNumbers = useMemo(() => {
+    const maxButtons = 3;
+    if (totalPages <= maxButtons) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const start = Math.max(1, Math.min(page - 1, totalPages - maxButtons + 1));
+    return Array.from({ length: maxButtons }, (_, i) => start + i);
+  }, [page, totalPages]);
+
   const colSpan =
     placeLabels.length + 1 + (mode !== "pus" ? 1 : 0) + (isPuMode ? 1 : 0);
 
@@ -124,14 +133,14 @@ export default function AreaResultsTable({ rows, mode }: AreaResultsTableProps) 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={searchPlaceholders[mode]}
-            className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-800 outline-none ring-brand-500/20 placeholder:text-gray-400 focus:border-brand-400 focus:ring-2"
+            className="min-h-11 w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-800 outline-none ring-brand-500/20 placeholder:text-gray-400 focus:border-brand-400 focus:ring-2"
           />
         </label>
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <select
             value={ledBy}
             onChange={(e) => setLedBy(e.target.value)}
-            className="appearance-none rounded-lg border border-gray-200 bg-white py-2.5 pl-3 pr-9 text-sm text-gray-700 outline-none focus:border-brand-400"
+            className="min-h-11 w-full appearance-none rounded-lg border border-gray-200 bg-white py-2.5 pl-3 pr-9 text-sm text-gray-700 outline-none focus:border-brand-400 sm:w-auto"
             aria-label="Filter by leading party"
           >
             <option value="all">Led by</option>
@@ -149,7 +158,7 @@ export default function AreaResultsTable({ rows, mode }: AreaResultsTableProps) 
         <button
           type="button"
           onClick={handleShare}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:ml-auto"
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:ml-auto sm:w-auto"
         >
           <ExportSquare size={16} />
           Share
@@ -169,8 +178,14 @@ export default function AreaResultsTable({ rows, mode }: AreaResultsTableProps) 
               className="rounded-xl border border-gray-200 bg-white p-4"
             >
               <div className="flex items-start justify-between gap-3">
-                <p className="font-bold text-gray-900">{row.name}</p>
-                {isPuMode ? <ViewActionButton row={row} /> : null}
+                <p className="min-w-0 flex-1 break-words font-bold text-gray-900">
+                  {row.name}
+                </p>
+                {isPuMode ? (
+                  <span className="shrink-0">
+                    <ViewActionButton row={row} />
+                  </span>
+                ) : null}
               </div>
               {mode !== "pus" ? (
                 <p className="mt-1 text-xs text-gray-500">
@@ -329,7 +344,7 @@ export default function AreaResultsTable({ rows, mode }: AreaResultsTableProps) 
       </div>
 
       {filtered.length > PAGE_SIZE ? (
-        <div className="flex items-center justify-center gap-1 lg:hidden">
+        <div className="flex max-w-full flex-wrap items-center justify-center gap-1 lg:hidden">
           <button
             type="button"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -339,7 +354,7 @@ export default function AreaResultsTable({ rows, mode }: AreaResultsTableProps) 
           >
             <ArrowLeft2 size={16} />
           </button>
-          {pageNumbers.map((n) => {
+          {mobilePageNumbers.map((n) => {
             const active = n === page;
             return (
               <button
