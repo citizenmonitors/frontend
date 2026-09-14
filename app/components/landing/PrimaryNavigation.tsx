@@ -12,15 +12,61 @@ import Logo from "../shared/svg/Logo";
 import LogoFlat from "../shared/svg/LogoFlat";
 import { usePathname } from "next/navigation";
 import getRootPath from "@/app/utils/getRootPath";
+import useSoftSession from "@/app/hooks/useSoftSession";
 
 function PrimaryNavigation() {
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
   const toggleMobileNavigation = () => setMobileNavigationOpen((prev) => !prev);
   const pathName = usePathname();
   const rootPathName = getRootPath(pathName);
+  const { isAuthenticated, dashboardHref } = useSoftSession();
 
-  const lgLinks = new Set([0, 1, 2, 3, 4, 5]);
-  const mdLinks = new Set([0, 1, 2, 6]);
+  const lgLinks = new Set([0, 1, 2, 3, 4, 5, 6]);
+  const mdLinks = new Set([0, 1, 2, 7]);
+
+  const authActions = isAuthenticated ? (
+    <>
+      <Link href={dashboardHref} className="w-full max-w-[200px] mx-auto">
+        <Button size="large" type="primary" className="lg:h-[55px] lg:px-6">
+          Dashboard
+        </Button>
+      </Link>
+    </>
+  ) : (
+    <>
+      <Link href={"/auth/login"} className="w-full max-w-[200px] mx-auto">
+        <Button size="large" className="lg:h-[55px] lg:px-6">
+          Login
+        </Button>
+      </Link>
+      <Link href={"/auth/signup"} className="w-full max-w-[200px] mx-auto">
+        <Button size="large" className="lg:h-[55px] lg:px-6" type="primary">
+          Sign up
+        </Button>
+      </Link>
+    </>
+  );
+
+  const mobileAuthActions = isAuthenticated ? (
+    <Link href={dashboardHref} className="w-[90%] mx-auto">
+      <Button block size="large" type="primary" className="text-sm h-[48px]">
+        Dashboard
+      </Button>
+    </Link>
+  ) : (
+    <>
+      <Link href={"/auth/login"} className="w-[90%] mx-auto">
+        <Button block size="large" className="text-sm h-[48px]">
+          Login
+        </Button>
+      </Link>
+      <Link href={"/auth/signup"} className="w-[90%] mx-auto">
+        <Button block size="large" type="primary" className="text-sm h-[48px]">
+          Sign up
+        </Button>
+      </Link>
+    </>
+  );
 
   return (
     <div
@@ -51,19 +97,19 @@ function PrimaryNavigation() {
               >
                 <Dropdown
                   menu={{
-                    items: link.subMenu.map((link) => ({
+                    items: link.subMenu.map((item) => ({
                       label: (
-                        <Link href={link.href}>
+                        <Link href={item.href}>
                           <Button
                             size="large"
                             block
                             type="text"
-                            disabled={link.comingSoon}
+                            disabled={item.comingSoon}
                             className={
-                              link.highlight ? "text-brand-500" : "hover:!text-brand-500"
+                              item.highlight ? "text-brand-500" : "hover:!text-brand-500"
                             }
                           >
-                            {link.name}
+                            {item.name}
                           </Button>
                         </Link>
                       ),
@@ -109,18 +155,7 @@ function PrimaryNavigation() {
             )
           )}
         </ul>
-        <div className="auth-buttons hidden md:flex gap-4 ml-auto">
-          <Link href={"/auth/login"} className="w-full max-w-[200px] mx-auto">
-            <Button size="large" className="lg:h-[55px] lg:px-6">
-              Login
-            </Button>
-          </Link>
-          <Link href={"/auth/signup"} className="w-full max-w-[200px] mx-auto">
-            <Button size="large" className="lg:h-[55px] lg:px-6" type="primary">
-              Sign up
-            </Button>
-          </Link>
-        </div>
+        <div className="auth-buttons hidden md:flex gap-4 ml-auto">{authActions}</div>
 
         {/* Mobile Navigation */}
         <button
@@ -171,11 +206,11 @@ function PrimaryNavigation() {
                     <Dropdown
                       trigger={["click"]}
                       menu={{
-                        items: link.subMenu.map((link) => ({
+                        items: link.subMenu.map((item) => ({
                           label: (
-                            <Link href={link.href}>
+                            <Link href={item.href}>
                               <Button size="large" block type="text">
-                                {link.name}
+                                {item.name}
                               </Button>
                             </Link>
                           ),
@@ -219,16 +254,7 @@ function PrimaryNavigation() {
               )}
             </ul>
             <div className="auth-buttons flex flex-col gap-4 mb-[30px]">
-              <Link href={"/auth/login"} className="w-[90%] mx-auto">
-                <Button block size="large" className="text-sm h-[48px]">
-                  Login
-                </Button>
-              </Link>
-              <Link href={"/auth/signup"} className="w-[90%] mx-auto">
-                <Button block size="large" type="primary" className="text-sm h-[48px]">
-                  Sign up
-                </Button>
-              </Link>
+              {mobileAuthActions}
             </div>
             <ul className="flex flex-col items-center gap-6 text-sm">
               {topLinks.map((link) => (

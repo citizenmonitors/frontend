@@ -16,6 +16,14 @@ const primaryLinks: Array<Link> = [
     href: '/#about',
   },
   {
+    name: 'Results',
+    href: '/results',
+  },
+  {
+    name: 'Pulse',
+    href: '/pulse',
+  },
+  {
     name: 'Insights',
     href: '/insights',
   },
@@ -34,7 +42,7 @@ const primaryLinks: Array<Link> = [
   },
 ];
 
-const truncatedLinks = primaryLinks.slice(-3);
+const truncatedLinks = primaryLinks.slice(3);
 primaryLinks.push({
   name: 'More',
   href: '',

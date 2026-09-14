@@ -17,11 +17,18 @@ type PulseCommentsModalProps = {
   postId: string | null;
   open: boolean;
   onClose: () => void;
+  requireAuth?: (action: string) => boolean;
 };
 
-export default function PulseCommentsModal({ postId, open, onClose }: PulseCommentsModalProps) {
+export default function PulseCommentsModal({
+  postId,
+  open,
+  onClose,
+  requireAuth,
+}: PulseCommentsModalProps) {
   const dispatch = useAppDispatch();
   const pulseState = useAppSelector((state) => state.pulse);
+  const userDetails = useAppSelector((state) => state.user.details);
   const [body, setBody] = useState("");
 
   useEffect(() => {
@@ -48,8 +55,14 @@ export default function PulseCommentsModal({ postId, open, onClose }: PulseComme
     }
   }, [pulseState.status.createComment]);
 
+  function ensureAuth(action: string) {
+    if (requireAuth) return requireAuth(action);
+    return Boolean(userDetails);
+  }
+
   function handleSubmit() {
     if (!postId || !body.trim()) return;
+    if (!ensureAuth("comment")) return;
     dispatch(
       createPulseComment({
         postId,
@@ -59,6 +72,12 @@ export default function PulseCommentsModal({ postId, open, onClose }: PulseComme
     );
   }
 
+  function handleLikeComment(commentId: string) {
+    if (!postId) return;
+    if (!ensureAuth("like comments")) return;
+    dispatch(togglePulseCommentLike({ postId, commentId }));
+  }
+
   return (
     <Modal
       open={open}
@@ -66,7 +85,11 @@ export default function PulseCommentsModal({ postId, open, onClose }: PulseComme
       footer={null}
       closable={false}
       width={560}
+      centered
       className="pulse-comments-modal"
+      styles={{
+        body: { padding: 16 },
+      }}
       destroyOnClose
     >
       <div className="grid gap-4">
@@ -77,33 +100,33 @@ export default function PulseCommentsModal({ postId, open, onClose }: PulseComme
           </button>
         </div>
 
-        <div className="max-h-[360px] overflow-y-auto grid gap-4 pr-1">
+        <div className="grid max-h-[360px] gap-4 overflow-y-auto pr-1">
           {pulseState.status.getComments === "pending" ? (
             <div className="grid place-content-center py-10">
               <Spin />
             </div>
           ) : pulseState.comments.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-8">
+            <p className="py-8 text-center text-sm text-gray-500">
               No comments yet. Start the conversation.
             </p>
           ) : (
             pulseState.comments.map((item) => (
               <div key={item.id} className="grid gap-2 border-b border-gray-100 pb-4 last:border-0">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-9 w-9 rounded-full bg-brand-25 border border-brand-200 grid place-content-center overflow-hidden shrink-0">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="grid h-9 w-9 shrink-0 place-content-center overflow-hidden rounded-full border border-brand-200 bg-brand-25">
                       <Profile size={18} className="text-brand-500" variant="Bold" />
                     </div>
-                    <p className="font-semibold text-gray-800 truncate">
+                    <p className="truncate font-semibold text-gray-800">
                       {item.author.displayName}
                     </p>
                   </div>
-                  <span className="text-xs text-gray-400 shrink-0">
+                  <span className="shrink-0 text-xs text-gray-400">
                     {formatPulseTimeAgo(item.createdAt)}
                   </span>
                 </div>
 
-                <p className="text-sm text-gray-600 leading-relaxed pl-12">{item.body}</p>
+                <p className="pl-12 text-sm leading-relaxed text-gray-600">{item.body}</p>
 
                 <div className="flex items-center justify-between pl-12">
                   <span className="text-xs text-gray-500">{item.likesCount} Likes</span>
@@ -114,10 +137,7 @@ export default function PulseCommentsModal({ postId, open, onClose }: PulseComme
                         ? "text-brand-500"
                         : "text-gray-400 hover:text-brand-500"
                     }`}
-                    onClick={() =>
-                      postId &&
-                      dispatch(togglePulseCommentLike({ postId, commentId: item.id }))
-                    }
+                    onClick={() => handleLikeComment(item.id)}
                   >
                     <Like1
                       size={18}
@@ -131,14 +151,14 @@ export default function PulseCommentsModal({ postId, open, onClose }: PulseComme
         </div>
 
         <div className="grid gap-3 border-t border-gray-200 pt-4">
-          <div className="flex items-start gap-3 rounded-xl bg-gray-50 border border-gray-200 p-3">
-            <Message size={20} className="text-gray-400 mt-1 shrink-0" />
+          <div className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3">
+            <Message size={20} className="mt-1 shrink-0 text-gray-400" />
             <Input.TextArea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               placeholder="Leave Comment, @ To Mention"
               autoSize={{ minRows: 2, maxRows: 4 }}
-              className="!bg-transparent !border-0 !shadow-none"
+              className="!border-0 !bg-transparent !shadow-none"
             />
           </div>
           <Button

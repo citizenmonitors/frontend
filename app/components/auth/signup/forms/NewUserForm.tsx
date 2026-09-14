@@ -3,11 +3,16 @@ import useFormHandler from "@/app/hooks/useFormHandler";
 import useGoogleAuth from "@/app/hooks/useGoogleAuth";
 import { showAlert } from "@/app/redux/features/alertSlice";
 import { registerUser, ackEmailRegistration } from "@/app/redux/features/signupSlice";
+import {
+  buildLoginHref,
+  getSafeRedirectPath,
+  rememberAuthRedirect,
+} from "@/app/utils/authRedirect";
 import { Button, Input, Tooltip } from "antd";
 import { Eye, EyeSlash, InfoCircle, Verify } from "iconsax-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useContext, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { isStrongPassword } from "validator";
 import isEmail from "validator/lib/isEmail";
 import { SignupUserContext } from "../../../../(pages)/auth/signup/SignupUserProvider";
@@ -19,6 +24,11 @@ function NewUserForm() {
   const signupState = useAppSelector((state) => state.signup);
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
+  const preferredRedirect = useMemo(
+    () => getSafeRedirectPath(searchParams.get("redirect")),
+    [searchParams]
+  );
   const { updateCurrentUser } = useContext(SignupUserContext);
   const {
     authenticateWithGoogle,
@@ -27,7 +37,12 @@ function NewUserForm() {
   } = useGoogleAuth({
     mode: "signup",
     nextPath: "/auth/signup/biodata",
+    successRedirect: preferredRedirect,
   });
+
+  useEffect(() => {
+    rememberAuthRedirect(preferredRedirect);
+  }, [preferredRedirect]);
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const initialFormState = {
@@ -217,7 +232,10 @@ function NewUserForm() {
       </div>
       <p className="text-xs md:text-sm text-gray-300 font-medium text-center mb-3">
         Already have an account?{" "}
-        <Link href={"/auth/login"} className="text-brand-400 hover:underline">
+        <Link
+          href={buildLoginHref(preferredRedirect)}
+          className="text-brand-400 hover:underline"
+        >
           Sign In
         </Link>
       </p>

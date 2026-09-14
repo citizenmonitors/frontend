@@ -19,4 +19,10 @@ function SignUp() {
   );
 }
 
-export default SignUp;
+export default function SignUpPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <SignUp />
+    </React.Suspense>
+  );
+}

@@ -196,4 +196,52 @@ export const pvcReportMetadata = {
   },
 };
 
+export const resultsMetadata = {
+  title: "Results - Validity & Integrity Score | Citizen Monitors",
+  description:
+    "Explore INEC IREV results with Citizen Monitors’ automatic Validity & Integrity Score. Compare raw published results with Electoral Act–valid verified collation.",
+  keywords: [
+    "election results",
+    "IREV",
+    "INEC",
+    "validity score",
+    "electoral act",
+    "nigeria elections",
+    "citizen monitors",
+    "verified collation",
+  ],
+  openGraph: {
+    title: "Results - Validity & Integrity Score | Citizen Monitors",
+    description:
+      "See how many INEC-published results meet Electoral Act requirements — checked automatically, no manual review.",
+    url: `${process.env.METADATA_BASEURL!}/results`,
+    siteName: "Citizen Monitors",
+    type: "website",
+    locale: "en_GB",
+  },
+};
+
+export const pulseMetadata = {
+  title: "Pulse | Citizen Monitors",
+  description:
+    "Join open citizen discussions on governance, elections, and community issues across Nigeria. Share updates, stay anonymous if you need to, and help surface patterns that matter.",
+  keywords: [
+    "pulse",
+    "citizen discussions",
+    "governance",
+    "nigeria elections",
+    "community updates",
+    "citizen monitors",
+  ],
+  openGraph: {
+    title: "Pulse | Citizen Monitors",
+    description:
+      "Open citizen discussions on governance and community issues across Nigeria.",
+    url: `${process.env.METADATA_BASEURL!}/pulse`,
+    siteName: "Citizen Monitors",
+    type: "website",
+    locale: "en_GB",
+  },
+};
+
 export default primaryMetadata;

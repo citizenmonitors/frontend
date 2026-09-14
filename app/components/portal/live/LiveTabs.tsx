@@ -11,13 +11,11 @@ export default function LiveTabs() {
       key: "verified-submissions",
       label: "Verified Submissions",
       children: <VerifiedSubmissions />,
-      active: true,
     },
     {
       key: "incident-reports",
       label: "Incident Reports",
       children: <IncidentReport />,
-      active: true,
     },
     {
       key: "sentiment-analysis",
@@ -33,7 +31,7 @@ export default function LiveTabs() {
 
   return (
     <div className="flex flex-col">
-      <Tabs items={liveResultTabs} id="elections-tab"/>
+      <Tabs items={liveResultTabs} id="elections-tab" />
     </div>
   );
 }

@@ -407,7 +407,13 @@ export type Podcast = {
   read: boolean,
 } & DBObject;
 
-export type PulseVisibilityScope = "ward" | "lga" | "polling-unit" | string;
+export type PulseVisibilityScope =
+  | "public"
+  | "nationwide"
+  | "ward"
+  | "lga"
+  | "polling-unit"
+  | string;
 
 export type PulseAuthor = {
   id: string;

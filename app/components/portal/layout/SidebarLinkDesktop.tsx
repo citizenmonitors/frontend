@@ -8,7 +8,10 @@ export default function SideBarLinkDesktop({
   link: Route;
   pathName: string;
 }) {
-  const isActive = pathName.startsWith(link.href);
+  const isActive =
+    link.href === "/pulse"
+      ? pathName === "/pulse" || pathName.startsWith("/pulse/")
+      : pathName.startsWith(link.href);
   // Find the sub-route that matches the current pathName, if any
   // If no sub-route matches, use the main link as the priority
   // This is useful for links that have sub-routes, like "Records" with "Result Upload" and "Report Upload"

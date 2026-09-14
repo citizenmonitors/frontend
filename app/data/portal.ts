@@ -6,6 +6,7 @@ export type Route = {
   icon: Icon,
   href: string,
   comingSoon?: boolean,
+  external?: boolean,
   subRoutes?: Array<{ title: string, icon: Icon, href: string }>
 }
 
@@ -40,7 +41,8 @@ const dashboardRoutes: Array<Route> = [
   {
     title: "Pulse",
     icon: Microphone2,
-    href: "/portal/pulse",
+    href: "/pulse",
+    external: true,
   },
   {
     title: "Calendar",

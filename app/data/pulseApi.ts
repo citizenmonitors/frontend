@@ -27,7 +27,7 @@ function normalizePost(raw: Record<string, unknown>): PulsePost {
     id: String(raw.id ?? raw._id ?? ""),
     body: String(raw.body ?? raw.content ?? ""),
     imageUrl: typeof imageUrl === "string" && imageUrl.length > 0 ? imageUrl : null,
-    visibilityScope: String(raw.visibilityScope ?? "ward"),
+    visibilityScope: String(raw.visibilityScope ?? "public"),
     author: normalizeAuthor(raw.author as Record<string, unknown> | undefined),
     likesCount: Number(raw.likesCount ?? 0),
     commentsCount: Number(raw.commentsCount ?? 0),
@@ -122,7 +122,7 @@ export async function createPulsePost(
 ): Promise<PulsePost> {
   const formData = new FormData();
   formData.append("body", payload.body);
-  formData.append("visibilityScope", payload.visibilityScope ?? "ward");
+  formData.append("visibilityScope", payload.visibilityScope ?? "public");
   formData.append("useAnonymousDisplay", String(payload.useAnonymousDisplay));
 
   if (payload.image instanceof File) {

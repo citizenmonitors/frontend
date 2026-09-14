@@ -19,6 +19,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { isMobilePhone } from "validator";
 import { SignupUserContext } from "../../../../(pages)/auth/signup/SignupUserProvider";
 import { refreshUser } from "@/app/redux/features/userSlice";
+import { consumeAuthRedirect } from "@/app/utils/authRedirect";
 
 function ObserverVerificationForm() {
   const signupState = useAppSelector((state) => state.signup);
@@ -119,7 +120,7 @@ function ObserverVerificationForm() {
       dispatch(clearSignupState());
       dispatch(refreshUser());
       setTimeout(() => {
-        router.push("/portal/dashboard");
+        router.push(consumeAuthRedirect() || "/portal/dashboard");
       }, 0);
     }
   }, [signupState.status.roleSubmission]);

@@ -24,70 +24,82 @@ export default function PulsePostCard({
   const displayName = post.author.displayName;
 
   return (
-    <article className="rounded-2xl bg-[#FFFDF8] border border-gray-200 p-4 md:p-5">
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="h-10 w-10 shrink-0 rounded-full bg-brand-25 border border-brand-200 grid place-content-center overflow-hidden">
-            <Profile size={20} className="text-brand-500" variant="Bold" />
+    <article className="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-[#FFFDF8] p-3.5 sm:rounded-2xl sm:p-4 md:p-5">
+      <div className="mb-3 flex items-start justify-between gap-2 sm:gap-3">
+        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+          <div className="grid h-9 w-9 shrink-0 place-content-center overflow-hidden rounded-full border border-brand-200 bg-brand-25 sm:h-10 sm:w-10">
+            <Profile size={18} className="text-brand-500 sm:hidden" variant="Bold" />
+            <Profile size={20} className="hidden text-brand-500 sm:block" variant="Bold" />
           </div>
           <div className="min-w-0">
-            <p className="font-semibold text-gray-800 truncate">{displayName}</p>
-            <p className="text-xs text-error-500 flex items-center gap-1 truncate">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-error-500 shrink-0" />
+            <p className="truncate text-sm font-semibold text-gray-800 sm:text-base">
+              {displayName}
+            </p>
+            <p className="flex items-center gap-1 truncate text-[11px] text-error-500 sm:text-xs">
+              <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-error-500" />
               {getVisibilityScopeLabel(post.visibilityScope)}
             </p>
           </div>
         </div>
-        <span className="text-xs text-gray-400 shrink-0">
+        <span className="shrink-0 pt-0.5 text-[11px] text-gray-400 sm:text-xs">
           {formatPulseTimeAgo(post.createdAt)}
         </span>
       </div>
 
-      <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-4 whitespace-pre-wrap">
+      <p className="mb-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-gray-700 sm:mb-4 md:text-base">
         {post.body}
       </p>
 
       {post.imageUrl && (
-        <div className="mb-4 flex justify-center">
+        <div className="mb-3 flex justify-center sm:mb-4">
           <AntImage
             src={post.imageUrl}
             alt="Post attachment"
-            className="!max-h-[280px] !w-auto !max-w-full rounded-xl object-contain"
-            wrapperClassName="flex max-w-[420px] justify-center overflow-hidden rounded-xl bg-gray-100"
+            className="!max-h-[220px] !w-auto !max-w-full rounded-lg object-contain sm:!max-h-[280px] sm:rounded-xl"
+            wrapperClassName="flex max-w-full justify-center overflow-hidden rounded-lg bg-gray-100 sm:max-w-[420px] sm:rounded-xl"
             style={{ cursor: "zoom-in" }}
           />
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-4 pt-3 border-t border-gray-200 text-sm text-gray-600">
+      <div className="flex items-center justify-between gap-1 border-t border-gray-200 pt-2.5 text-xs text-gray-600 sm:gap-4 sm:pt-3 sm:text-sm">
         <button
           type="button"
-          className={`flex items-center gap-2 transition-colors ${
+          className={`inline-flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg px-1 transition-colors sm:flex-none sm:justify-start sm:px-0 ${
             post.isLikedByCurrentUser ? "text-brand-500" : "hover:text-brand-500"
           }`}
           onClick={() => onLike(post.id)}
           disabled={liking}
         >
           <Like1 size={18} variant={post.isLikedByCurrentUser ? "Bold" : "Linear"} />
-          <span>{post.likesCount} Likes</span>
+          <span className="truncate">
+            <span className="sm:hidden">{post.likesCount}</span>
+            <span className="hidden sm:inline">{post.likesCount} Likes</span>
+          </span>
         </button>
 
         <button
           type="button"
-          className="flex items-center gap-2 hover:text-brand-500 transition-colors"
+          className="inline-flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg px-1 transition-colors hover:text-brand-500 sm:flex-none sm:justify-start sm:px-0"
           onClick={() => onComment(post.id)}
         >
           <Message size={18} />
-          <span>{post.commentsCount} Comments</span>
+          <span className="truncate">
+            <span className="sm:hidden">{post.commentsCount}</span>
+            <span className="hidden sm:inline">{post.commentsCount} Comments</span>
+          </span>
         </button>
 
         <button
           type="button"
-          className="flex items-center gap-2 hover:text-brand-500 transition-colors"
+          className="inline-flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg px-1 transition-colors hover:text-brand-500 sm:flex-none sm:justify-start sm:px-0"
           onClick={() => onShare(post)}
         >
           <Share size={18} />
-          <span>Share</span>
+          <span className="truncate">
+            <span className="sm:hidden">Share</span>
+            <span className="hidden sm:inline">Share</span>
+          </span>
         </button>
       </div>
     </article>

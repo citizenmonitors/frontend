@@ -7,22 +7,43 @@ import AuthDivider from "@/app/components/auth/ui/AuthDivider";
 import GoogleAuthButton from "@/app/components/auth/ui/GoogleAuthButton";
 import { showAlert } from "@/app/redux/features/alertSlice";
 import { loginUser, refreshUser } from "@/app/redux/features/userSlice";
+import {
+  buildSignupHref,
+  consumeAuthRedirect,
+  getPostLoginPath,
+  getSafeRedirectPath,
+  peekAuthRedirect,
+  rememberAuthRedirect,
+} from "@/app/utils/authRedirect";
 import { Button, Checkbox, Input, Tooltip } from "antd";
 import { Eye, EyeSlash, InfoCircle } from "iconsax-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, useMemo, useState } from "react";
 import { isEmpty, isEmail } from "validator";
 
 function Login() {
   const userState = useAppSelector((state) => state.user);
-  const userDetails = userState.details!;
+  const userDetails = userState.details;
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams.get("redirect");
+  const preferredRedirect = useMemo(
+    () => getSafeRedirectPath(redirectParam),
+    [redirectParam]
+  );
+
+  useEffect(() => {
+    rememberAuthRedirect(preferredRedirect);
+  }, [preferredRedirect]);
+
+  const sessionRedirect = getPostLoginPath(
+    userDetails?.role,
+    preferredRedirect
+  );
 
   useSessionValidate({
     success: {
-      redirect: ["super-admin", "admin"].includes(userDetails?.role)
-        ? "/admin/dashboard"
-        : "/portal/dashboard",
+      redirect: sessionRedirect,
       alert: {
         message: "Logged in.",
         type: "success",
@@ -35,7 +56,10 @@ function Login() {
     authenticateWithGoogle,
     isGoogleAuthenticating,
     showGoogleError,
-  } = useGoogleAuth();
+  } = useGoogleAuth({
+    mode: "login",
+    successRedirect: preferredRedirect,
+  });
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(true);
@@ -89,7 +113,11 @@ function Login() {
         })
       );
       dispatch(refreshUser());
-      router.replace(userState.isAdmin ? "/admin/dashboard" : "/portal/dashboard");
+      const next = userState.isAdmin
+        ? "/admin/dashboard"
+        : preferredRedirect || peekAuthRedirect() || "/portal/dashboard";
+      consumeAuthRedirect();
+      router.replace(next);
     }
   }, [userState.status.loginUser]);
 
@@ -98,6 +126,11 @@ function Login() {
       <h2 className="font-league font-semibold text-gray-700 text-xl md:text-display-base mb-6">
         Welcome Back!
       </h2>
+      {preferredRedirect === "/pulse" ? (
+        <p className="mb-5 -mt-2 text-sm text-gray-500 text-center md:text-left">
+          Sign in to post, like, and comment on Pulse.
+        </p>
+      ) : null}
       <form
         action=""
         className="grid w-full max-w-[648px] text-gray-700"
@@ -183,7 +216,10 @@ function Login() {
       </div>
       <p className="text-xs md:text-sm text-gray-300 font-medium text-center mb-3">
         Are you new here?{" "}
-        <Link href={"/auth/signup"} className="text-brand-400 hover:underline">
+        <Link
+          href={buildSignupHref(preferredRedirect)}
+          className="text-brand-400 hover:underline"
+        >
           Create an account
         </Link>
       </p>
@@ -191,4 +227,10 @@ function Login() {
   );
 }
 
-export default Login;
+export default function LoginPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <Login />
+    </React.Suspense>
+  );
+}

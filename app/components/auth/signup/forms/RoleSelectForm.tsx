@@ -11,6 +11,7 @@ import { SignupUserContext } from "../../../../(pages)/auth/signup/SignupUserPro
 import { clearSignupState, selectRole } from "@/app/redux/features/signupSlice";
 import { useRouter } from "next/navigation";
 import { logoutUser, refreshUser } from "@/app/redux/features/userSlice";
+import { consumeAuthRedirect } from "@/app/utils/authRedirect";
 
 export default function RoleSelectForm() {
   const router = useRouter();
@@ -80,7 +81,7 @@ export default function RoleSelectForm() {
         dispatch(clearSignupState());
         dispatch(refreshUser());
         setTimeout(() => {
-          router.push("/portal/dashboard");
+          router.push(consumeAuthRedirect() || "/portal/dashboard");
         }, 0);
       } else {
         dispatch(

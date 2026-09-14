@@ -17,6 +17,10 @@ export function formatPulseTimeAgo(date?: string) {
 
 export function getVisibilityScopeLabel(scope: string) {
   switch (scope) {
+    case "public":
+    case "nationwide":
+    case "national":
+      return "Public";
     case "ward":
       return "Post Within My Ward";
     case "lga":

@@ -7,6 +7,12 @@ import {
 import { setSignupNextPath } from "@/app/data/signupDraft";
 import { showAlert } from "@/app/redux/features/alertSlice";
 import { validateSession } from "@/app/redux/features/userSlice";
+import {
+  buildLoginHref,
+  getPostLoginPath,
+  getSafeRedirectPath,
+  consumeAuthRedirect,
+} from "@/app/utils/authRedirect";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -15,6 +21,8 @@ import { useAppDispatch } from "./redux";
 type UseGoogleAuthOptions = {
   nextPath?: string;
   mode?: "login" | "signup";
+  /** Where to send the user after a successful login (non-admin) */
+  successRedirect?: string | null;
 };
 
 function getErrorMessage(error: any): string {
@@ -35,7 +43,7 @@ function isAlreadyRegisteredError(message: string): boolean {
 }
 
 export default function useGoogleAuth(options: UseGoogleAuthOptions = {}) {
-  const { nextPath, mode = "login" } = options;
+  const { nextPath, mode = "login", successRedirect } = options;
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [isGoogleAuthenticating, setIsGoogleAuthenticating] = useState(false);
@@ -103,9 +111,10 @@ export default function useGoogleAuth(options: UseGoogleAuthOptions = {}) {
 
         const session = await dispatch(validateSession()).unwrap();
         const role = session.user?.user?.role;
-        const isAdmin = !!role && ["admin", "super-admin"].includes(role);
         dispatch(showAlert({ message: "Signed in with Google.", type: "success" }));
-        router.replace(isAdmin ? "/admin/dashboard" : "/portal/dashboard");
+        const next = getPostLoginPath(role, successRedirect);
+        consumeAuthRedirect();
+        router.replace(next);
       } catch (error: any) {
         const message = getErrorMessage(error);
 
@@ -118,7 +127,7 @@ export default function useGoogleAuth(options: UseGoogleAuthOptions = {}) {
                 type: "info",
               })
             );
-            router.replace("/auth/login");
+            router.replace(buildLoginHref(getSafeRedirectPath(successRedirect)));
             return;
           }
 
@@ -135,7 +144,7 @@ export default function useGoogleAuth(options: UseGoogleAuthOptions = {}) {
         setIsGoogleAuthenticating(false);
       }
     },
-    [dispatch, mode, nextPath, router, showGoogleError]
+    [dispatch, mode, nextPath, router, showGoogleError, successRedirect]
   );
 
   return {

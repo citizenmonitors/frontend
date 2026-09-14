@@ -10,13 +10,11 @@ export default function ElectionTabs() {
       key: "verified-submissions",
       label: "Verified Submissions",
       children: <VerifiedSubmissions />,
-      active: true,
     },
     {
       key: "incident-reports",
       label: "Incident Reports",
       children: <IncidentReports />,
-      active: true,
     },
     {
       key: "sentiment-analysis",
