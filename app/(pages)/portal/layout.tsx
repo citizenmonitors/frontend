@@ -33,7 +33,7 @@ function PortalLayout({ children }: any) {
   if (isAdmin) router.replace("/admin/dashboard");
 
   const dashboardLinks = dashboardRoutes;
-  const mobileNavTitles = ["Home", "Elections", "Records", "Pulse", "Live"];
+  const mobileNavTitles = ["Home", "Elections", "Records", "Calendar", "Live"];
   const mobileLinks = dashboardRoutes.filter((l) => mobileNavTitles.includes(l.title));
 
   return (

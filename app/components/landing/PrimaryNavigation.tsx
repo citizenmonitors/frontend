@@ -13,6 +13,7 @@ import LogoFlat from "../shared/svg/LogoFlat";
 import { usePathname } from "next/navigation";
 import getRootPath from "@/app/utils/getRootPath";
 import useSoftSession from "@/app/hooks/useSoftSession";
+import DashboardProfile from "@/app/components/portal/layout/DashboardProfile";
 
 function PrimaryNavigation() {
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
@@ -25,13 +26,14 @@ function PrimaryNavigation() {
   const mdLinks = new Set([0, 1, 2, 7]);
 
   const authActions = isAuthenticated ? (
-    <>
-      <Link href={dashboardHref} className="w-full max-w-[200px] mx-auto">
+    <div className="flex items-center gap-3 lg:gap-4">
+      <Link href={dashboardHref}>
         <Button size="large" type="primary" className="lg:h-[55px] lg:px-6">
           Dashboard
         </Button>
       </Link>
-    </>
+      <DashboardProfile />
+    </div>
   ) : (
     <>
       <Link href={"/auth/login"} className="w-full max-w-[200px] mx-auto">
@@ -48,11 +50,16 @@ function PrimaryNavigation() {
   );
 
   const mobileAuthActions = isAuthenticated ? (
-    <Link href={dashboardHref} className="w-[90%] mx-auto">
-      <Button block size="large" type="primary" className="text-sm h-[48px]">
-        Dashboard
-      </Button>
-    </Link>
+    <div className="flex w-[90%] flex-col gap-4 mx-auto">
+      <Link href={dashboardHref}>
+        <Button block size="large" type="primary" className="text-sm h-[48px]">
+          Dashboard
+        </Button>
+      </Link>
+      <div className="flex justify-center">
+        <DashboardProfile />
+      </div>
+    </div>
   ) : (
     <>
       <Link href={"/auth/login"} className="w-[90%] mx-auto">

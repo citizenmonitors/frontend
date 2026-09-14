@@ -1,4 +1,4 @@
-import { Calendar, DocumentText1, DocumentUpload, Edit2, HomeHashtag, Icon, Microphone2, Notepad2, Setting, SliderVertical1 } from "iconsax-react";
+import { Calendar, DocumentText1, DocumentUpload, Edit2, HomeHashtag, Icon, Notepad2, Setting, SliderVertical1 } from "iconsax-react";
 import { UserRole } from "../redux/types";
 
 export type Route = {
@@ -37,12 +37,6 @@ const dashboardRoutes: Array<Route> = [
         href: "/portal/uploads/report",
       },
     ]
-  },
-  {
-    title: "Pulse",
-    icon: Microphone2,
-    href: "/pulse",
-    external: true,
   },
   {
     title: "Calendar",

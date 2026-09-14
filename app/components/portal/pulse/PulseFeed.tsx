@@ -4,7 +4,6 @@ import { cookieData } from "@/app/data/cookieData";
 import { Button, Spin } from "antd";
 import { MessageText1 } from "iconsax-react";
 import Cookies from "js-cookie";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
@@ -28,10 +27,6 @@ export default function PulseFeed() {
   const sessionStatus = useAppSelector((state) => state.user.status.validateSession);
   const [createOpen, setCreateOpen] = useState(false);
   const [commentsPostId, setCommentsPostId] = useState<string | null>(null);
-  const dashboardHref =
-    userDetails?.role && ["admin", "super-admin"].includes(userDetails.role)
-      ? "/admin/dashboard"
-      : "/portal/dashboard";
 
   useEffect(() => {
     dispatch(getPulsePosts());
@@ -87,28 +82,18 @@ export default function PulseFeed() {
 
   return (
     <div className="relative min-w-0">
-      {/* Sits under sticky primary nav (~72–88px) */}
-      <div className="sticky top-[72px] z-40 -mx-4 mb-5 border-b border-gray-200/80 bg-white/95 px-4 pb-3 pt-1 shadow-[0_8px_20px_rgba(16,24,40,0.06)] backdrop-blur-md sm:top-[76px] sm:-mx-6 sm:mb-6 sm:px-6 md:top-[68px] md:-mx-8 md:mb-8 md:px-8">
-        <div className="mx-auto max-h-[min(58vh,32rem)] overflow-y-auto overscroll-contain">
-          <header className="mb-1 flex flex-wrap items-end justify-between gap-3 md:mb-2">
-            <h1 className="font-league text-2xl font-semibold leading-tight text-gray-700 sm:text-display-xs lg:text-display-base">
-              Pulse
-            </h1>
-            {userDetails ? (
-              <Link
-                href={dashboardHref}
-                className="text-sm font-semibold text-brand-600 transition-colors hover:text-brand-700 hover:underline"
-              >
-                Go to Dashboard
-              </Link>
-            ) : null}
-          </header>
-          <p className="mb-4 text-sm leading-relaxed text-gray-500 md:text-base">
-            Stay informed. Stay vigilant. Every update matters. Open discussions for
-            citizens across Nigeria.
-          </p>
-          <PulseEmptyState />
-        </div>
+      <div className="sticky top-[72px] z-40 -mx-4 mb-5 border-b border-gray-200/80 bg-white/95 px-4 pb-3 pt-2 shadow-[0_8px_20px_rgba(16,24,40,0.06)] backdrop-blur-md sm:top-[76px] sm:-mx-6 sm:mb-6 sm:px-6 md:top-[68px] md:-mx-8 md:mb-8 md:px-8">
+        <h1 className="font-league text-2xl font-semibold leading-tight text-gray-700 sm:text-display-xs lg:text-display-base">
+          Pulse
+        </h1>
+        <p className="mt-1 text-sm leading-relaxed text-gray-500 md:mt-2 md:text-base">
+          Stay informed. Stay vigilant. Every update matters. Open discussions for
+          citizens across Nigeria.
+        </p>
+      </div>
+
+      <div className="mb-5 sm:mb-6 md:mb-8">
+        <PulseEmptyState />
       </div>
 
       {loading ? (
