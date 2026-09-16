@@ -2,7 +2,10 @@
 
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import { showAlert } from "@/app/redux/features/alertSlice";
-import { createPulsePost } from "@/app/redux/features/pulseSlice";
+import {
+  clearCreatePostStatus,
+  createPulsePost,
+} from "@/app/redux/features/pulseSlice";
 import { generateAnonymousHandle, PULSE_BODY_MAX_LENGTH } from "@/app/utils/pulseUtils";
 import { Button, Input, Modal, Switch, Upload } from "antd";
 import { Camera, CloseCircle, InfoCircle } from "iconsax-react";
@@ -33,8 +36,10 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
   }, [open]);
 
   useEffect(() => {
+    if (!open) return;
     if (pulseState.status.createPost === "fulfilled") {
       dispatch(showAlert({ message: "Your post was shared on Pulse.", type: "success" }));
+      dispatch(clearCreatePostStatus());
       onClose();
     }
     if (pulseState.status.createPost === "rejected") {
@@ -44,8 +49,9 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
           type: "error",
         })
       );
+      dispatch(clearCreatePostStatus());
     }
-  }, [pulseState.status.createPost]);
+  }, [pulseState.status.createPost, pulseState.error.message, open, dispatch, onClose]);
 
   function handleSubmit() {
     if (!userDetails) {
@@ -74,6 +80,12 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
         body: body.trim(),
         visibilityScope: "public",
         useAnonymousDisplay,
+        location: {
+          state: userDetails.state,
+          lga: userDetails.lga,
+          ward: userDetails.ward,
+          pollingUnit: userDetails.pollingUnit,
+        },
         ...(image instanceof File ? { image } : {}),
       })
     );
@@ -119,8 +131,10 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
         <div className="flex gap-3 rounded-xl border border-[#B8E8D8] bg-[#E8F8F3] p-3 sm:p-4">
           <InfoCircle size={20} className="mt-0.5 shrink-0 text-brand-500" variant="Bold" />
           <p className="text-xs leading-relaxed text-gray-600 sm:text-sm">
-            Be factual. Be respectful. The Electoral Act protects free expression but prohibits
-            hate speech and incitement. — Citizen Monitors Community Guidelines
+            Be factual. Be respectful. Share what&apos;s happening in your
+            community — services, safety, governance, and everyday issues that
+            matter. Hate speech and incitement are not allowed. — Citizen
+            Monitors Community Guidelines
           </p>
         </div>
 

@@ -421,6 +421,16 @@ export type PulseAuthor = {
   usedAnonymous: boolean;
 };
 
+/** Nested original post when this item is a quote/repost */
+export type PulseQuotedPost = {
+  id: string;
+  body: string;
+  imageUrl?: string | null;
+  author: PulseAuthor;
+  locationLabel?: string | null;
+  createdAt?: string;
+};
+
 export type PulsePost = {
   id: string;
   body: string;
@@ -437,7 +447,10 @@ export type PulsePost = {
   author: PulseAuthor;
   likesCount: number;
   commentsCount: number;
+  repostsCount?: number;
   isLikedByCurrentUser: boolean;
+  /** Present when this post quotes / reposts another */
+  quotedPost?: PulseQuotedPost | null;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -465,6 +478,11 @@ export type CreatePulsePostPayload = {
   visibilityScope?: PulseVisibilityScope;
   useAnonymousDisplay: boolean;
   image?: File;
+  /** Original post id for quote/repost (sent to API when supported) */
+  quotePostId?: string;
+  /** Full original for optimistic UI if API does not echo it back */
+  quotedPost?: PulseQuotedPost;
+  location?: PulsePost["location"];
 };
 
 export type CreatePulseCommentPayload = {

@@ -71,10 +71,31 @@ function normalizeLocation(
   return location;
 }
 
+function normalizeQuotedPost(
+  raw: Record<string, unknown> | null | undefined
+): PulsePost["quotedPost"] {
+  if (!raw || typeof raw !== "object") return null;
+  const imageUrl = raw.imageUrl ?? raw.imageURL ?? null;
+  return {
+    id: String(raw.id ?? raw._id ?? ""),
+    body: String(raw.body ?? raw.content ?? ""),
+    imageUrl: typeof imageUrl === "string" && imageUrl.length > 0 ? imageUrl : null,
+    author: normalizeAuthor(raw.author as Record<string, unknown> | undefined),
+    locationLabel:
+      typeof raw.locationLabel === "string" ? raw.locationLabel : null,
+    createdAt: raw.createdAt as string | undefined,
+  };
+}
+
 function normalizePost(raw: Record<string, unknown>): PulsePost {
   const imageUrl = raw.imageUrl ?? raw.imageURL ?? null;
   const location = normalizeLocation(raw);
   const locationLabel = normalizeLocationLabel(raw);
+  const quotedRaw =
+    (raw.quotedPost as Record<string, unknown> | undefined) ||
+    (raw.repostOf as Record<string, unknown> | undefined) ||
+    (raw.originalPost as Record<string, unknown> | undefined) ||
+    null;
 
   return {
     id: String(raw.id ?? raw._id ?? ""),
@@ -86,9 +107,11 @@ function normalizePost(raw: Record<string, unknown>): PulsePost {
     author: normalizeAuthor(raw.author as Record<string, unknown> | undefined),
     likesCount: Number(raw.likesCount ?? 0),
     commentsCount: Number(raw.commentsCount ?? 0),
+    repostsCount: Number(raw.repostsCount ?? raw.repostCount ?? 0),
     isLikedByCurrentUser: Boolean(
       raw.isLikedByCurrentUser ?? raw.likedByMe ?? raw.liked ?? false
     ),
+    quotedPost: normalizeQuotedPost(quotedRaw),
     createdAt: raw.createdAt as string | undefined,
     updatedAt: raw.updatedAt as string | undefined,
   };
@@ -176,9 +199,17 @@ export async function createPulsePost(
   payload: CreatePulsePostPayload
 ): Promise<PulsePost> {
   const formData = new FormData();
-  formData.append("body", payload.body);
+  const bodyText =
+    payload.body.trim() || (payload.quotePostId ? " " : payload.body);
+  formData.append("body", bodyText);
   formData.append("visibilityScope", payload.visibilityScope ?? "public");
   formData.append("useAnonymousDisplay", String(payload.useAnonymousDisplay));
+
+  if (payload.quotePostId) {
+    formData.append("quotePostId", payload.quotePostId);
+    formData.append("originalPostId", payload.quotePostId);
+    formData.append("repostOfPostId", payload.quotePostId);
+  }
 
   if (payload.image instanceof File) {
     formData.append("image", payload.image, payload.image.name);
@@ -193,7 +224,20 @@ export async function createPulsePost(
 
   const post = extractRecord(data, "post");
   const source = post ?? (data as Record<string, unknown>);
-  return normalizePost(source);
+  const normalized = normalizePost(source);
+  const isQuote = Boolean(payload.quotePostId);
+  return {
+    ...normalized,
+    // Keep empty body for pure reposts in the UI even if API stored a space
+    body:
+      isQuote && !payload.body.trim()
+        ? ""
+        : normalized.body.trim() === "" && isQuote
+          ? ""
+          : normalized.body,
+    quotedPost: normalized.quotedPost || payload.quotedPost || null,
+    location: normalized.location || payload.location || null,
+  };
 }
 
 export async function togglePulsePostLike(postId: string): Promise<PulseLikeUpdate> {

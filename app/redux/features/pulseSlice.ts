@@ -81,6 +81,9 @@ const pulseSlice = createSlice({
       state.comments = [];
       state.activePostId = null;
     },
+    clearCreatePostStatus(state) {
+      state.status.createPost = "not started";
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getPulsePosts.pending, (state) => {
@@ -104,9 +107,23 @@ const pulseSlice = createSlice({
     });
     builder.addCase(createPulsePost.fulfilled, (state, action) => {
       state.status.createPost = "fulfilled";
-      state.posts = [action.payload, ...state.posts];
+      const quoted = action.meta.arg.quotedPost || action.payload.quotedPost;
+      const nextPost = {
+        ...action.payload,
+        quotedPost: quoted || action.payload.quotedPost || null,
+        location: action.payload.location || action.meta.arg.location || null,
+      };
+      state.posts = [nextPost, ...state.posts];
       state.total += 1;
       state.postsFetchedAt = Date.now();
+
+      if (quoted?.id) {
+        state.posts = state.posts.map((post) =>
+          post.id === quoted.id
+            ? { ...post, repostsCount: (post.repostsCount || 0) + 1 }
+            : post
+        );
+      }
     });
     builder.addCase(createPulsePost.rejected, (state, action: any) => {
       state.status.createPost = "rejected";
@@ -278,5 +295,6 @@ export const togglePulseCommentLike = createAsyncThunk<
   });
 });
 
-export const { clearPulse, setActivePostId, clearPulseComments } = pulseSlice.actions;
+export const { clearPulse, setActivePostId, clearPulseComments, clearCreatePostStatus } =
+  pulseSlice.actions;
 export default pulseSlice.reducer;

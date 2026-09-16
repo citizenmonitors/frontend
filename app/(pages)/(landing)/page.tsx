@@ -1,6 +1,7 @@
 import React from "react";
 import LandingLayout from "@/app/components/landing/_layout";
 import Intro from "@/app/components/landing/home/intro/Intro";
+import HomeLiveRecentElections from "@/app/components/landing/home/HomeLiveRecentElections";
 import About from "@/app/components/landing/home/about/About";
 import Showcase from "@/app/components/landing/home/showcase/Showcase";
 import Disclaimer from "@/app/components/shared/Disclaimer";
@@ -18,6 +19,7 @@ export default function Home() {
     <LandingLayout>
       <main className="landing-container">
         <Intro />
+        <HomeLiveRecentElections />
         <About />
         <Showcase />
         <section className="container">

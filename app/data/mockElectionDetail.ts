@@ -768,6 +768,36 @@ export function getChartCandidates(): CollationCandidate[] {
 
 export function getElectionDetailBySlug(slug: string) {
   if (slug !== OSUN_ELECTION_SLUG) return null;
+
+  const state = "Osun";
+  const lgas = mockLgaRows.map((row) => ({
+    ...row,
+    path: { state, lga: row.name },
+  }));
+
+  const ras = mockRaRows.map((row, index) => {
+    const parent = lgas[index % lgas.length];
+    return {
+      ...row,
+      parentId: parent.id,
+      path: { state, lga: parent.name, ward: row.name },
+    };
+  });
+
+  const pus = mockPuRows.map((row, index) => {
+    const parent = ras[index % ras.length];
+    return {
+      ...row,
+      parentId: parent.id,
+      path: {
+        state,
+        lga: parent.path?.lga,
+        ward: parent.name,
+        pollingUnit: row.name,
+      },
+    };
+  });
+
   return {
     slug: OSUN_ELECTION_SLUG,
     election: mockIrevCollation,
@@ -777,9 +807,9 @@ export function getElectionDetailBySlug(slug: string) {
     location: "Osun",
     incidentCount: mockIncidentCount,
     leaderboard: mockCandidateLeaderboard,
-    lgas: mockLgaRows,
-    ras: mockRaRows,
-    pus: mockPuRows,
+    lgas,
+    ras,
+    pus,
     mapRegions: mockMapRegions,
     mapLegend: mockMapLegend,
     chartCandidates: getChartCandidates(),

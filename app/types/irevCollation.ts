@@ -73,7 +73,7 @@ export type ScoreBand = "high" | "moderate" | "low";
 
 export type ResultViewMode = "candidates" | "lgas" | "ras" | "pus";
 
-export type ElectionDetailTab = "result" | "candidates" | "incidents";
+export type ElectionDetailTab = "result" | "post-incident";
 
 export type CandidateLeaderboardRow = CollationCandidate & {
   partyName: string;
@@ -86,12 +86,22 @@ export type CandidateLeaderboardRow = CollationCandidate & {
   };
 };
 
+export type AreaResultPath = {
+  state: string;
+  lga?: string;
+  ward?: string;
+  pollingUnit?: string;
+};
+
 export type AreaResultRow = {
   id: string;
   name: string;
   places: Array<{ party: string; votes: number; color: string }>;
   reported: number;
   totalUnits: number;
+  /** Parent LGA id (wards) or parent ward id (PUs) for drill-down */
+  parentId?: string;
+  path?: AreaResultPath;
 };
 
 export type MapRegion = {

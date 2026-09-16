@@ -20,7 +20,7 @@ export default function ResultsHero() {
       <div className="relative mx-auto grid w-full max-w-[1120px] items-center gap-6 px-5 py-8 sm:gap-8 sm:px-8 sm:py-12 md:gap-10 md:py-16 lg:max-w-[1180px] lg:grid-cols-2 lg:gap-12 lg:px-10 lg:py-20 xl:max-w-[1220px]">
         <div className="mx-auto max-w-xl text-center lg:mx-0 lg:text-left">
           <h1 className="font-league text-[26px] font-bold leading-[1.1] tracking-tight text-gray-900 xs:text-[28px] sm:text-[34px] md:text-[44px] lg:text-[52px]">
-            Explore Nigeria{" "}
+            Explore Nigeria&apos;s{" "}
             <span className="text-brand-500">Election Data</span> in real time.
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-gray-600 sm:mt-5 md:text-base md:leading-relaxed">

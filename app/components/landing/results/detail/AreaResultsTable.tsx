@@ -16,23 +16,28 @@ import PollingUnitResultSheetModal from "./PollingUnitResultSheetModal";
 type AreaResultsTableProps = {
   rows: AreaResultRow[];
   mode: Exclude<ResultViewMode, "candidates">;
+  onRowSelect?: (row: AreaResultRow) => void;
 };
 
 const PAGE_SIZE = 10;
 
 const searchPlaceholders: Record<Exclude<ResultViewMode, "candidates">, string> = {
   lgas: "Search LGAs",
-  ras: "Search Registration Areas",
+  ras: "Search Wards",
   pus: "Search Polling Units",
 };
 
 const nameHeaders: Record<Exclude<ResultViewMode, "candidates">, string> = {
   lgas: "LGAs",
-  ras: "Registration Areas",
+  ras: "Wards",
   pus: "PUs",
 };
 
-export default function AreaResultsTable({ rows, mode }: AreaResultsTableProps) {
+export default function AreaResultsTable({
+  rows,
+  mode,
+  onRowSelect,
+}: AreaResultsTableProps) {
   const [query, setQuery] = useState("");
   const [ledBy, setLedBy] = useState("all");
   const [page, setPage] = useState(1);
@@ -175,14 +180,26 @@ export default function AreaResultsTable({ rows, mode }: AreaResultsTableProps) 
           pageRows.map((row) => (
             <article
               key={row.id}
-              className="rounded-xl border border-gray-200 bg-white p-4"
+              role="button"
+              tabIndex={0}
+              onClick={() => onRowSelect?.(row)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onRowSelect?.(row);
+                }
+              }}
+              className="cursor-pointer rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-brand-200 hover:bg-brand-25/40"
             >
               <div className="flex items-start justify-between gap-3">
                 <p className="min-w-0 flex-1 break-words font-bold text-gray-900">
                   {row.name}
                 </p>
                 {isPuMode ? (
-                  <span className="shrink-0">
+                  <span
+                    className="shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <ViewActionButton row={row} />
                   </span>
                 ) : null}
@@ -255,11 +272,12 @@ export default function AreaResultsTable({ rows, mode }: AreaResultsTableProps) 
                 pageRows.map((row, index) => (
                   <tr
                     key={row.id}
-                    className={`border-b border-gray-100 last:border-b-0 ${
+                    onClick={() => onRowSelect?.(row)}
+                    className={`cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors hover:bg-brand-25/50 ${
                       index % 2 === 1 ? "bg-gray-50/80" : "bg-white"
                     }`}
                   >
-                    <td className="px-4 py-4 font-bold text-gray-900">
+                    <td className="px-4 py-4 font-bold text-brand-800 underline-offset-2 hover:underline">
                       {row.name}
                     </td>
                     {placeLabels.map((label, i) => {
@@ -290,7 +308,10 @@ export default function AreaResultsTable({ rows, mode }: AreaResultsTableProps) 
                       </td>
                     ) : null}
                     {isPuMode ? (
-                      <td className="px-4 py-4 text-right">
+                      <td
+                        className="px-4 py-4 text-right"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <ViewActionButton row={row} />
                       </td>
                     ) : null}

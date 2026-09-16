@@ -28,13 +28,13 @@ function Intro() {
                 <ArrowRight variant="Outline" size={16} />
               </Button>
             </Link>
-            <Link href={"/#faq"} tabIndex={-1} className="w-full sm:w-auto">
+            <Link href={"/pulse"} tabIndex={-1} className="w-full sm:w-auto">
               <Button
                 className="flex items-center gap-[.5ch] font-medium justify-center h-[48px] lg:h-[55px] lg:px-6"
                 block
                 size="large"
               >
-                <span>Learn More</span>
+                <span>Pulse</span>
               </Button>
             </Link>
           </div>

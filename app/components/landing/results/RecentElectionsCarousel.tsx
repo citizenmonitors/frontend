@@ -19,7 +19,15 @@ import CandidateAvatarPlaceholder from "./detail/CandidateAvatarPlaceholder";
 
 const GAP_PX = 16;
 
-export default function RecentElectionsCarousel() {
+type RecentElectionsCarouselProps = {
+  hideHeader?: boolean;
+  className?: string;
+};
+
+export default function RecentElectionsCarousel({
+  hideHeader = false,
+  className = "",
+}: RecentElectionsCarouselProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
     active: boolean;
@@ -111,7 +119,12 @@ export default function RecentElectionsCarousel() {
   }
 
   return (
-    <section className="min-w-0 w-full max-w-full overflow-hidden border-t border-gray-200 pt-10 md:pt-14">
+    <section
+      className={`min-w-0 w-full max-w-full overflow-hidden ${
+        hideHeader ? "" : "border-t border-gray-200 pt-10 md:pt-14"
+      } ${className}`}
+    >
+      {!hideHeader ? (
       <div className="mb-8 flex items-start justify-between gap-4 md:mb-10">
         <div className="min-w-0 max-w-xl space-y-3">
           <h2 className="text-[24px] font-bold leading-tight tracking-tight text-gray-900 md:text-[32px]">
@@ -143,6 +156,28 @@ export default function RecentElectionsCarousel() {
           </button>
         </div>
       </div>
+      ) : (
+        <div className="mb-6 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => scrollByDir(-1)}
+            disabled={!canPrev}
+            className="grid h-11 w-11 place-content-center rounded-full bg-brand-50 text-brand-700 transition-colors hover:bg-brand-100 disabled:cursor-not-allowed disabled:opacity-40"
+            aria-label="Previous elections"
+          >
+            <ArrowLeft2 size={18} />
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollByDir(1)}
+            disabled={!canNext}
+            className="grid h-11 w-11 place-content-center rounded-full bg-brand-50 text-brand-700 transition-colors hover:bg-brand-100 disabled:cursor-not-allowed disabled:opacity-40"
+            aria-label="Next elections"
+          >
+            <ArrowRight2 size={18} />
+          </button>
+        </div>
+      )}
 
       {/* Viewport: 3 cards + half of 4th; white fade covers the peek */}
       <div className="relative min-w-0 w-full overflow-hidden">

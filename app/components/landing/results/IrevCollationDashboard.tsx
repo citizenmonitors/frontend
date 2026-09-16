@@ -37,14 +37,10 @@ export default function IrevCollationDashboard({
           <h2 className="text-[28px] font-bold leading-tight tracking-tight text-gray-900 md:text-[40px]">
             Explore Election Result
           </h2>
-          <p className="text-sm text-gray-500 md:text-base">
-            View vote distribution, winning candidates, and party performance
-            across Nigeria.
-          </p>
-          <p className="text-xs text-gray-400 md:text-sm">
-            Out of every 100 results INEC has published, the score below shows
-            how many meet Electoral Act 2026 requirements — checked
-            automatically by Citizen Monitors.
+          <p className="text-sm leading-relaxed text-gray-500 md:text-base">
+            The following result displays the raw data obtained from INEC&apos;s
+            server, as well as the results after applying the criteria of the
+            Nigerian Electoral Act (as amended in 2026).
           </p>
         </header>
 

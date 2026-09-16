@@ -9,28 +9,28 @@ const electionTypes = [
   {
     title: "Presidential Elections",
     description:
-      "National elections for President and Vice President of the Federal Republic of Nigeria.",
+      "National elections for President and Vice Presidential Candidates of the Federal Republic of Nigeria.",
     iconKey: "presidential" as const,
     typeKey: "presidential" as const,
   },
   {
-    title: "Governorship Elections",
+    title: "Gubernatorial Elections",
     description:
-      "State-level elections for Governor and Deputy Governor across all 36 states and FCT.",
+      "State-level elections for Governor and Deputy Governorship candidates across all 36 states of Nigeria.",
     iconKey: "presidential" as const,
     typeKey: "governorship" as const,
   },
   {
-    title: "Senate Elections",
+    title: "Senatorial Elections",
     description:
-      "Federal upper chamber elections for Senators representing states and the FCT.",
+      "Federal Senatorial elections for all Senatorial candidates across all 109 federal constituencies.",
     iconKey: "senatorial" as const,
     typeKey: "senatorial" as const,
   },
   {
     title: "House of Representatives",
     description:
-      "Federal lower chamber elections for House members across 360 federal constituencies.",
+      "Federal House of Representative elections for all candidates in all 360 federal constituencies.",
     iconKey: "house-of-representatives" as const,
     typeKey: "house-of-representatives" as const,
   },
@@ -44,7 +44,7 @@ const electionTypes = [
   {
     title: "Local Government Elections",
     description:
-      "Grassroots elections for Chairmen and Councillors across 774 LGAs in Nigeria.",
+      "Grassroot elections for Chairmen and Councillors across 774 LGAs in Nigeria.",
     iconKey: "senatorial" as const,
     typeKey: "local-government" as const,
   },
