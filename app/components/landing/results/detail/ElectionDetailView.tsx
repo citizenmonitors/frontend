@@ -8,6 +8,7 @@ import {
   getElectionListingMetaBySlug,
   getYearForSlug,
 } from "@/app/data/mockElectionDetail";
+import formatNumber from "@/app/utils/formatNumber";
 import ElectionResultEmptyState from "./ElectionResultEmptyState";
 import ResultLocationFilters from "./ResultLocationFilters";
 import {
@@ -233,6 +234,16 @@ export default function ElectionDetailView({ slug }: ElectionDetailViewProps) {
                   </div>
                 </div>
               </div>
+
+              <p
+                className={`mb-4 text-sm font-bold leading-snug md:mb-5 md:text-base ${
+                  mode === "raw" ? "text-error-600" : "text-success-700"
+                }`}
+              >
+                {mode === "raw"
+                  ? "Showing a collation of raw collated data from the INEC IREV Portal"
+                  : `Showing ${formatNumber.commas(slice.resultsIncluded)} results that has been verified to be compliant with the Electoral Act 2026`}
+              </p>
 
               {(filterLgaName || filterWardName) &&
               (viewMode === "ras" || viewMode === "pus") ? (

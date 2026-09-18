@@ -21,13 +21,17 @@ const GAP_PX = 16;
 
 type RecentElectionsCarouselProps = {
   hideHeader?: boolean;
+  /** Homepage: full dark-green cards for strong visibility */
+  variant?: "default" | "dark";
   className?: string;
 };
 
 export default function RecentElectionsCarousel({
   hideHeader = false,
+  variant = "default",
   className = "",
 }: RecentElectionsCarouselProps) {
+  const isDark = variant === "dark";
   const scrollerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
     active: boolean;
@@ -207,18 +211,30 @@ export default function RecentElectionsCarousel({
                     dragRef.current.moved = false;
                   }
                 }}
-                className="flex min-w-0 shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-[0_1px_3px_rgba(16,24,40,0.06)] transition-shadow hover:shadow-md w-[calc((100%-16px)/1.35)] sm:w-[calc((100%-32px)/2.35)] lg:w-[calc((100%-48px)/3.5)]"
+                className={`flex min-w-0 shrink-0 snap-start flex-col overflow-hidden rounded-xl border transition-shadow hover:shadow-md w-[calc((100%-16px)/1.35)] sm:w-[calc((100%-32px)/2.35)] lg:w-[calc((100%-48px)/3.5)] ${
+                  isDark
+                    ? "border-brand-800 bg-brand-700 shadow-[0_4px_14px_rgba(2,107,99,0.35)] hover:bg-brand-800"
+                    : "border-gray-200 bg-white shadow-[0_1px_3px_rgba(16,24,40,0.06)]"
+                }`}
               >
                 <div className="flex flex-1 flex-col gap-5 p-4 py-5 md:gap-6 md:p-5 md:py-6">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-black">
+                    <span
+                      className={`text-[11px] font-semibold uppercase tracking-[0.08em] ${
+                        isDark ? "text-brand-100" : "text-black"
+                      }`}
+                    >
                       {election.electionType}
                     </span>
                     <span
                       className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
                         election.status === "completed"
-                          ? "bg-success-50 text-success-700"
-                          : "bg-warning-50 text-warning-700"
+                          ? isDark
+                            ? "bg-white/15 text-white"
+                            : "bg-success-50 text-success-700"
+                          : isDark
+                            ? "bg-warning-400/90 text-gray-900"
+                            : "bg-warning-50 text-warning-700"
                       }`}
                     >
                       {election.status === "completed" ? "Completed" : "Live"}
@@ -226,23 +242,41 @@ export default function RecentElectionsCarousel({
                   </div>
 
                   <div className="space-y-3">
-                    <h3 className="text-lg font-medium leading-snug text-black md:text-xl">
+                    <h3
+                      className={`text-lg font-medium leading-snug md:text-xl ${
+                        isDark ? "text-white" : "text-black"
+                      }`}
+                    >
                       {election.title}
                     </h3>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-gray-500">
+                    <div
+                      className={`flex flex-wrap gap-x-4 gap-y-1.5 text-xs ${
+                        isDark ? "text-brand-100" : "text-gray-500"
+                      }`}
+                    >
                       <span className="inline-flex items-center gap-1.5">
-                        <Calendar size={14} className="text-gray-400" />
+                        <Calendar
+                          size={14}
+                          className={isDark ? "text-brand-200" : "text-gray-400"}
+                        />
                         {election.date}
                       </span>
                       <span className="inline-flex items-center gap-1.5">
-                        <Location size={14} className="text-gray-400" />
+                        <Location
+                          size={14}
+                          className={isDark ? "text-brand-200" : "text-gray-400"}
+                        />
                         {election.location}
                       </span>
                     </div>
                   </div>
 
                   <div className="mt-auto space-y-3 pt-1">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400">
+                    <p
+                      className={`text-[10px] font-semibold uppercase tracking-[0.14em] ${
+                        isDark ? "text-brand-200" : "text-gray-400"
+                      }`}
+                    >
                       Winner
                     </p>
                     <div className="flex items-start gap-3">
@@ -250,28 +284,50 @@ export default function RecentElectionsCarousel({
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-medium uppercase tracking-wide text-black">
+                            <p
+                              className={`truncate text-sm font-medium uppercase tracking-wide ${
+                                isDark ? "text-white" : "text-black"
+                              }`}
+                            >
                               {election.winnerName}
                             </p>
-                            <p className="mt-0.5 text-xs font-medium text-gray-500">
+                            <p
+                              className={`mt-0.5 text-xs font-medium ${
+                                isDark ? "text-brand-100" : "text-gray-500"
+                              }`}
+                            >
                               {election.winnerParty}
                             </p>
                           </div>
                           <div className="shrink-0 text-right">
-                            <p className="text-sm font-medium tabular-nums leading-none text-black">
+                            <p
+                              className={`text-sm font-medium tabular-nums leading-none ${
+                                isDark ? "text-white" : "text-black"
+                              }`}
+                            >
                               {election.voteShare.toFixed(1)}%
                             </p>
-                            <p className="mt-1 text-[10px] uppercase tracking-wide text-gray-400">
+                            <p
+                              className={`mt-1 text-[10px] uppercase tracking-wide ${
+                                isDark ? "text-brand-200" : "text-gray-400"
+                              }`}
+                            >
                               Vote Share
                             </p>
                           </div>
                         </div>
-                        <div className="mt-3.5 h-1.5 overflow-hidden rounded-full bg-gray-100">
+                        <div
+                          className={`mt-3.5 h-1.5 overflow-hidden rounded-full ${
+                            isDark ? "bg-brand-900/50" : "bg-gray-100"
+                          }`}
+                        >
                           <div
                             className="h-full rounded-full"
                             style={{
                               width: `${Math.min(election.voteShare, 100)}%`,
-                              backgroundColor: election.winnerColor,
+                              backgroundColor: isDark
+                                ? "#FFFFFF"
+                                : election.winnerColor,
                             }}
                           />
                         </div>
@@ -280,7 +336,11 @@ export default function RecentElectionsCarousel({
                   </div>
                 </div>
 
-                <div className="mt-auto flex items-center gap-2 bg-brand-700 px-4 py-3 md:px-5 md:py-3.5">
+                <div
+                  className={`mt-auto flex items-center gap-2 px-4 py-3 md:px-5 md:py-3.5 ${
+                    isDark ? "bg-brand-900" : "bg-brand-700"
+                  }`}
+                >
                   <Timer1
                     size={14}
                     className="shrink-0 text-white"

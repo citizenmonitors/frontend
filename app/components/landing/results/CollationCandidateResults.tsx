@@ -107,7 +107,7 @@ export default function CollationCandidateResults({
 
       <Link
         href={detailHref}
-        className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl border border-brand-200 bg-brand-25 px-4 py-3.5 text-sm font-medium text-brand-700 transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.01] hover:border-brand-700 hover:bg-brand-700 hover:text-white hover:shadow-md"
+        className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-error-600 bg-error-50 px-4 py-3.5 text-sm font-bold text-error-600 transition-colors hover:bg-error-100"
       >
         <Eye size={18} variant="Bold" />
         View full Result

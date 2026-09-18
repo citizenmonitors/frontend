@@ -9,8 +9,8 @@ type CollationModeToggleProps = {
 };
 
 const modes: Array<{ value: CollationMode; label: string }> = [
-  { value: "raw", label: "IREV" },
-  { value: "verified", label: "Verified" },
+  { value: "raw", label: "Collation" },
+  { value: "verified", label: "Compliant Collation" },
 ];
 
 export default function CollationModeToggle({
@@ -19,7 +19,7 @@ export default function CollationModeToggle({
 }: CollationModeToggleProps) {
   return (
     <div
-      className="inline-flex rounded-lg border border-gray-200 bg-white p-1 shadow-sm"
+      className="inline-flex max-w-full flex-wrap rounded-lg border border-gray-200 bg-white p-1 shadow-sm"
       role="tablist"
       aria-label="Collation view"
     >
@@ -32,7 +32,7 @@ export default function CollationModeToggle({
             role="tab"
             aria-selected={active}
             onClick={() => onChange(item.value)}
-            className={`min-h-11 rounded-md px-4 py-2.5 text-sm font-semibold transition-colors ${
+            className={`min-h-11 rounded-md px-3 py-2.5 text-sm font-semibold transition-colors sm:px-4 ${
               active
                 ? "bg-brand-500 text-white"
                 : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"

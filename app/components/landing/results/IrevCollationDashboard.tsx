@@ -51,24 +51,21 @@ export default function IrevCollationDashboard({
                 {data.electionName}
               </h3>
               <p
-                className={`text-xs md:text-sm ${
-                  mode === "raw" ? "text-warning-700" : "text-success-700"
+                className={`text-sm leading-snug md:text-base ${
+                  mode === "raw" ? "text-error-600" : "text-success-700"
                 }`}
               >
                 {mode === "raw" ? (
-                  <>
-                    <span className="font-semibold">
-                      Unverified — Source: INEC IREV.
-                    </span>{" "}
-                    Showing all {formatNumber.commas(slice.resultsIncluded)}{" "}
-                    published results.
-                  </>
+                  <span className="font-bold">
+                    Showing a collation of raw collated data from the INEC IREV
+                    Portal
+                  </span>
                 ) : (
-                  <>
-                    <span className="font-semibold">Fully compliant only.</span>{" "}
+                  <span className="font-bold">
                     Showing {formatNumber.commas(slice.resultsIncluded)} results
-                    that passed every automatic check.
-                  </>
+                    that has been verified to be compliant with the Electoral
+                    Act 2026
+                  </span>
                 )}
               </p>
             </div>

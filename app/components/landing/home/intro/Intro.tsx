@@ -24,7 +24,7 @@ function Intro() {
                 size="large"
                 type="primary"
               >
-                <span>Become Electorally Powerful</span>
+                <span>Sign Up/Register Here</span>
                 <ArrowRight variant="Outline" size={16} />
               </Button>
             </Link>
@@ -34,7 +34,7 @@ function Intro() {
                 block
                 size="large"
               >
-                <span>Pulse</span>
+                <span>Share and View with Pulse</span>
               </Button>
             </Link>
           </div>

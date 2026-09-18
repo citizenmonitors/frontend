@@ -9,7 +9,7 @@ export default function ResultsPage() {
     <>
       <ResultsHero />
       <div className="mx-auto w-full min-w-0 max-w-[1120px] overflow-x-hidden px-5 sm:px-8 lg:max-w-[1180px] lg:px-10 xl:max-w-[1220px]">
-        <main className="pb-16 pt-10 lg:pb-24 lg:pt-14">
+        <main className="pb-16 pt-6 lg:pb-24 lg:pt-10">
           <IrevCollationDashboard />
         </main>
       </div>

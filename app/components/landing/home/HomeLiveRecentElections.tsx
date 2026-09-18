@@ -27,13 +27,13 @@ export default function HomeLiveRecentElections() {
           </div>
           <Link
             href="/results"
-            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border border-brand-200 px-4 text-sm font-semibold text-brand-700 transition-colors hover:border-brand-700 hover:bg-brand-700 hover:text-white"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border-2 border-error-600 bg-error-50 px-4 text-sm font-bold text-error-600 transition-colors hover:bg-error-100"
           >
-            View all results
+            View all Result
           </Link>
         </div>
 
-        <RecentElectionsCarousel hideHeader />
+        <RecentElectionsCarousel hideHeader variant="dark" />
       </div>
     </section>
   );

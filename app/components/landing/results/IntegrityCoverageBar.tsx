@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Timer1 } from "iconsax-react";
+import { ShieldTick } from "iconsax-react";
 import formatNumber from "@/app/utils/formatNumber";
 import { formatScorePercent } from "@/app/utils/validityIntegrityScore";
 
@@ -11,32 +11,39 @@ type IntegrityCoverageBarProps = {
   totalResultsPublished: number;
 };
 
-/** Slim single-tone banner — matches Dataphyte coverage bar style */
+/** Prominent Data Validity banner — brand accent #05A39C */
 export default function IntegrityCoverageBar({
   score,
   fullyCompliantResults,
   totalResultsPublished,
 }: IntegrityCoverageBarProps) {
   return (
-    <div className="flex min-h-9 w-full flex-col gap-1.5 rounded-md bg-brand-50 px-3 py-2 md:h-8 md:flex-row md:items-center md:justify-between md:gap-3 md:py-0 md:px-4">
-      <div className="flex min-w-0 items-center gap-2 text-brand-800">
-        <Timer1 size={14} className="shrink-0 text-brand-600" variant="Bold" />
-        <p className="text-xs leading-snug md:truncate">
-          <span className="md:hidden">Valid: </span>
-          <span className="hidden md:inline">Validity &amp; Integrity: </span>
-          <span className="font-semibold tabular-nums">
-            {formatNumber.commas(fullyCompliantResults)}
-          </span>{" "}
-          of{" "}
-          <span className="font-semibold tabular-nums">
-            {formatNumber.commas(totalResultsPublished)}
-          </span>{" "}
-          results
-        </p>
+    <div className="w-full rounded-xl border-2 border-brand-500 bg-brand-50 px-4 py-4 shadow-sm md:px-5 md:py-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="mt-0.5 grid h-10 w-10 shrink-0 place-content-center rounded-full bg-brand-500 text-white">
+            <ShieldTick size={22} variant="Bold" />
+          </span>
+          <div className="min-w-0 space-y-1">
+            <p className="text-base font-extrabold leading-snug text-brand-800 md:text-lg">
+              Data Validity{" "}
+              <span className="tabular-nums text-brand-500">
+                {formatScorePercent(score)}
+              </span>
+            </p>
+            <p className="text-sm font-bold leading-snug text-brand-800 md:text-[15px]">
+              (Results compliant with the Electoral Act 2026):{" "}
+              <span className="tabular-nums text-brand-900">
+                {formatNumber.commas(fullyCompliantResults)}
+              </span>{" "}
+              of{" "}
+              <span className="tabular-nums text-brand-900">
+                {formatNumber.commas(totalResultsPublished)}
+              </span>
+            </p>
+          </div>
+        </div>
       </div>
-      <p className="shrink-0 self-end text-xs font-semibold tabular-nums text-brand-700 md:self-auto">
-        {formatScorePercent(score)}
-      </p>
     </div>
   );
 }
