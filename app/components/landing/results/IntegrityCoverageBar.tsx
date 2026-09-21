@@ -9,13 +9,21 @@ type IntegrityCoverageBarProps = {
   score: number;
   fullyCompliantResults: number;
   totalResultsPublished: number;
+  /** e.g. "Data Validity" or "Result coverage" */
+  title?: string;
+  /** Extra context under the title; omit for a simpler coverage bar */
+  subtitle?: string | null;
+  unitLabel?: string;
 };
 
-/** Prominent Data Validity banner — brand accent #05A39C */
+/** Prominent Data Validity / coverage banner — brand accent #05A39C */
 export default function IntegrityCoverageBar({
   score,
   fullyCompliantResults,
   totalResultsPublished,
+  title = "Data Validity",
+  subtitle = "(Results compliant with the Electoral Act 2026)",
+  unitLabel,
 }: IntegrityCoverageBarProps) {
   return (
     <div className="w-full rounded-xl border-2 border-brand-500 bg-brand-50 px-4 py-4 shadow-sm md:px-5 md:py-5">
@@ -26,13 +34,13 @@ export default function IntegrityCoverageBar({
           </span>
           <div className="min-w-0 space-y-1">
             <p className="text-base font-extrabold leading-snug text-brand-800 md:text-lg">
-              Data Validity{" "}
+              {title}{" "}
               <span className="tabular-nums text-brand-500">
                 {formatScorePercent(score)}
               </span>
             </p>
             <p className="text-sm font-bold leading-snug text-brand-800 md:text-[15px]">
-              (Results compliant with the Electoral Act 2026):{" "}
+              {subtitle ? <>{subtitle}: </> : null}
               <span className="tabular-nums text-brand-900">
                 {formatNumber.commas(fullyCompliantResults)}
               </span>{" "}
@@ -40,6 +48,7 @@ export default function IntegrityCoverageBar({
               <span className="tabular-nums text-brand-900">
                 {formatNumber.commas(totalResultsPublished)}
               </span>
+              {unitLabel ? ` ${unitLabel}` : ""}
             </p>
           </div>
         </div>

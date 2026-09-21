@@ -3,7 +3,7 @@ import {
   ElectionChartSeriesItem,
   ElectionChartsPayload,
 } from "@/app/types/irevCollation";
-import { partyFullNames } from "@/app/data/mockElectionDetail";
+import { getPartyFullName } from "@/app/data/partyInfo";
 
 /**
  * Maps candidate totals into the chart payload shape a live API should return.
@@ -38,7 +38,7 @@ export function buildElectionChartsPayload(
     id: `${c.party}-${index}`,
     name: c.name,
     party: c.party,
-    partyName: partyFullNames[c.party] || c.party,
+    partyName: getPartyFullName(c.party),
     votes: c.votes,
     share: total > 0 ? (c.votes / total) * 100 : 0,
     color: c.color,

@@ -4,10 +4,14 @@ import { cookieData } from "@/app/data/cookieData";
 import { Button, Spin } from "antd";
 import { MessageText1 } from "iconsax-react";
 import Cookies from "js-cookie";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import { showAlert } from "@/app/redux/features/alertSlice";
-import { getPulsePosts, togglePulsePostLike } from "@/app/redux/features/pulseSlice";
+import {
+  getPulsePosts,
+  hydratePulseFeedFromCache,
+  togglePulsePostLike,
+} from "@/app/redux/features/pulseSlice";
 import { validateSession } from "@/app/redux/features/userSlice";
 import { PulsePost } from "@/app/redux/types";
 import {
@@ -18,7 +22,7 @@ import {
 import CreatePulsePostModal from "./CreatePulsePostModal";
 import PulseCommentsModal from "./PulseCommentsModal";
 import PulseComposer from "./PulseComposer";
-import PulseHowItWorks from "./PulseHowItWorks";
+import PulseIntroPost from "./PulseIntroPost";
 import PulseLocationTabs from "./PulseLocationTabs";
 import PulseLoginModal from "./PulseLoginModal";
 import PulsePostCard from "./PulsePostCard";
@@ -49,7 +53,9 @@ export default function PulseFeed() {
   const [locationFilter, setLocationFilter] =
     useState<PulseLocationFilter>("all");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    // Hydrate from localStorage first (guests included), then fetch only if stale
+    dispatch(hydratePulseFeedFromCache());
     dispatch(getPulsePosts());
   }, [dispatch]);
 
@@ -213,12 +219,12 @@ export default function PulseFeed() {
           userState={userDetails?.state}
         />
 
-        <PulseHowItWorks />
-
         <PulseComposer
           displayName={displayName}
           onOpenCompose={handleOpenCreate}
         />
+
+        <PulseIntroPost />
 
         {loading ? (
           <div className="grid place-content-center py-16">
@@ -242,9 +248,11 @@ export default function PulseFeed() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-4 px-4 py-12 text-center sm:px-6">
+          <div className="flex flex-col items-center gap-4 px-4 py-10 text-center sm:px-6">
             <p className="max-w-sm text-sm text-gray-500">
-              {getLocationFilterEmptyMessage(locationFilter, userLocation)}
+              {locationFilter === "all"
+                ? "Be the next voice after Ade — share what’s happening in your community."
+                : getLocationFilterEmptyMessage(locationFilter, userLocation)}
             </p>
             {locationFilter !== "all" && hasAnyPosts ? (
               <button

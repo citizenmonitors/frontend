@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Eye, Profile2User } from "iconsax-react";
 import formatNumber from "@/app/utils/formatNumber";
 import { CollationCandidate } from "@/app/types/irevCollation";
-import { OSUN_ELECTION_SLUG } from "@/app/data/mockElectionDetail";
+import { PRESIDENTIAL_2023_SLUG } from "@/app/data/mockElectionDetail";
+import { getPartyDisplayLabel } from "@/app/data/partyInfo";
 import CandidateAvatarPlaceholder from "./detail/CandidateAvatarPlaceholder";
 
 type CollationCandidateResultsProps = {
@@ -15,7 +16,7 @@ type CollationCandidateResultsProps = {
 
 export default function CollationCandidateResults({
   candidates,
-  detailHref = `/results/${OSUN_ELECTION_SLUG}`,
+  detailHref = `/collation/${PRESIDENTIAL_2023_SLUG}`,
 }: CollationCandidateResultsProps) {
   const totalVotes = useMemo(
     () => candidates.reduce((sum, c) => sum + c.votes, 0),
@@ -69,10 +70,10 @@ export default function CollationCandidateResults({
                     <p className="truncate text-[15px] font-semibold leading-snug text-gray-900">
                       {candidate.name}
                     </p>
-                    <p className="mt-0.5 text-xs text-gray-500">
+                    <p className="mt-0.5 truncate text-xs text-gray-500">
                       {candidate.isOthers
                         ? `${othersCount} Political Parties`
-                        : candidate.party}
+                        : getPartyDisplayLabel(candidate.party)}
                     </p>
                   </div>
                   <div className="shrink-0 text-right tabular-nums">

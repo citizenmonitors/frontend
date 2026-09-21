@@ -5,6 +5,7 @@ import { showAlert } from "@/app/redux/features/alertSlice";
 import {
   clearCreatePostStatus,
   createPulsePost,
+  getPulsePosts,
 } from "@/app/redux/features/pulseSlice";
 import { PulsePost } from "@/app/redux/types";
 import {
@@ -53,6 +54,7 @@ export default function PulseRepostModal({
         })
       );
       dispatch(clearCreatePostStatus());
+      dispatch(getPulsePosts({ force: true }));
       onClose();
     }
     if (createStatus === "rejected") {

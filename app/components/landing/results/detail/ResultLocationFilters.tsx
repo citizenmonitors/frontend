@@ -43,7 +43,7 @@ export default function ResultLocationFilters({
       year: nextYear,
     });
     setOpen(null);
-    if (slug) router.push(`/results/${slug}`);
+    if (slug) router.push(`/collation/${slug}`);
   }
 
   const chipClass =

@@ -197,11 +197,11 @@ export const pvcReportMetadata = {
 };
 
 export const resultsMetadata = {
-  title: "Results - Validity & Integrity Score | Citizen Monitors",
+  title: "Collation - Validity & Integrity Score | Citizen Monitors",
   description:
-    "Explore INEC IREV results with Citizen Monitors’ automatic Validity & Integrity Score. Compare raw published results with Electoral Act–valid verified collation.",
+    "Explore INEC IREV collation with Citizen Monitors’ automatic Validity & Integrity Score. Compare raw published results with Electoral Act–valid verified collation.",
   keywords: [
-    "election results",
+    "election collation",
     "IREV",
     "INEC",
     "validity score",
@@ -211,10 +211,10 @@ export const resultsMetadata = {
     "verified collation",
   ],
   openGraph: {
-    title: "Results - Validity & Integrity Score | Citizen Monitors",
+    title: "Collation - Validity & Integrity Score | Citizen Monitors",
     description:
       "See how many INEC-published results meet Electoral Act requirements — checked automatically, no manual review.",
-    url: `${process.env.METADATA_BASEURL!}/results`,
+    url: `${process.env.METADATA_BASEURL!}/collation`,
     siteName: "Citizen Monitors",
     type: "website",
     locale: "en_GB",

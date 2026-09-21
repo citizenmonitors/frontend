@@ -19,8 +19,9 @@ type ChartDatum = ElectionChartSeriesItem & { value: number };
 
 function formatCandidateLabel(item: ElectionChartSeriesItem) {
   if (item.name.includes("Others")) return item.name;
-  if (item.party && !item.name.includes(`(${item.party})`)) {
-    return `${item.name} (${item.party})`;
+  const partyLabel = item.partyName || item.party;
+  if (partyLabel && !item.name.includes(partyLabel) && !item.name.includes(`(${item.party})`)) {
+    return `${item.name} (${partyLabel})`;
   }
   return item.name;
 }
@@ -122,27 +123,33 @@ export default function CollationVoteShare({
       </div>
 
       <ul className="relative z-0 mt-2 grid gap-3.5">
-        {resolved.map((item) => (
-          <li
-            key={item.id}
-            className="flex items-start justify-between gap-3 text-sm"
-          >
-            <span className="flex min-w-0 items-start gap-2.5 text-[#374151]">
-              <span
-                className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
-                style={{ backgroundColor: item.color }}
-              />
-              <span className="min-w-0 break-words leading-snug">
-                {item.name.includes("Others")
-                  ? item.name
-                  : `${item.name} (${item.party})`}
+        {resolved.map((item, index) => {
+          const isLeading = index === 0 && !item.name.includes("Others");
+          return (
+            <li
+              key={item.id}
+              className="flex items-start justify-between gap-3 text-sm"
+            >
+              <span className="flex min-w-0 items-start gap-2.5 text-[#374151]">
+                <span
+                  className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span className="min-w-0 break-words leading-snug">
+                  {formatCandidateLabel(item)}
+                  {isLeading ? (
+                    <span className="ml-1.5 inline-flex align-middle text-xs font-semibold text-brand-600">
+                      is leading
+                    </span>
+                  ) : null}
+                </span>
               </span>
-            </span>
-            <span className="shrink-0 font-medium tabular-nums text-[#111827]">
-              {item.share.toFixed(1)}%
-            </span>
-          </li>
-        ))}
+              <span className="shrink-0 font-medium tabular-nums text-[#111827]">
+                {item.share.toFixed(1)}%
+              </span>
+            </li>
+          );
+        })}
       </ul>
     </aside>
   );

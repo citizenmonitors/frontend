@@ -197,7 +197,7 @@ export default function RecentElectionsCarousel({
         >
         {mockRecentElections.map((election) => {
           const score = getValidityIntegrityScore(election);
-          const href = `/results/${election.slug}`;
+          const href = `/collation/${election.slug}`;
 
           return (
             <Link

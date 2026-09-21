@@ -38,11 +38,11 @@ export default function ElectionResultEmptyState({
 
       <div className="mt-8 flex w-full justify-center">
         <Link
-          href="/results"
+          href="/collation"
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-brand-800"
         >
           <ArrowLeft2 size={16} />
-          Back to Results
+          Back to Collation
         </Link>
       </div>
     </div>

@@ -2,11 +2,14 @@
 
 import { PulsePost } from "@/app/redux/types";
 import {
+  formatPulseDateTime,
   formatPulseTimeAgo,
   getPulsePostLocationLabel,
   isPureRepost,
+  shouldTruncatePulseBody,
+  truncatePulseBody,
 } from "@/app/utils/pulseUtils";
-import { Image as AntImage } from "antd";
+import { Image as AntImage, Tooltip } from "antd";
 import {
   ArrowRotateLeft,
   Copy,
@@ -51,11 +54,18 @@ export default function PulsePostCard({
 }: PulsePostCardProps) {
   const displayName = post.author.displayName;
   const handle = toHandle(displayName);
-  const timeLabel = formatPulseTimeAgo(post.createdAt);
+  const timeAgo = formatPulseTimeAgo(post.createdAt);
+  const fullDateTime = formatPulseDateTime(post.createdAt);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [bodyExpanded, setBodyExpanded] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const pureRepost = isPureRepost(post);
   const quoted = post.quotedPost;
+  const bodyNeedsTruncate = shouldTruncatePulseBody(post.body);
+  const displayBody =
+    bodyExpanded || !bodyNeedsTruncate
+      ? post.body
+      : truncatePulseBody(post.body);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -100,8 +110,18 @@ export default function PulsePostCard({
                   />
                 ) : null}
                 <span className="truncate text-gray-500">{handle}</span>
-                <span className="text-gray-400">·</span>
-                <span className="shrink-0 text-gray-500">{timeLabel}</span>
+                {timeAgo ? (
+                  <>
+                    <span className="text-gray-400">·</span>
+                    <time
+                      className="shrink-0 text-gray-500"
+                      dateTime={post.createdAt}
+                      title={fullDateTime || undefined}
+                    >
+                      {timeAgo}
+                    </time>
+                  </>
+                ) : null}
               </div>
               <p className="mt-0.5 truncate text-xs text-brand-600">
                 {getPulsePostLocationLabel(post)}
@@ -157,9 +177,20 @@ export default function PulsePostCard({
           </div>
 
           {!pureRepost && post.body.trim() ? (
-            <p className="mt-2 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-gray-900">
-              {post.body}
-            </p>
+            <div className="mt-2">
+              <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-gray-900">
+                {displayBody}
+              </p>
+              {bodyNeedsTruncate ? (
+                <button
+                  type="button"
+                  onClick={() => setBodyExpanded((prev) => !prev)}
+                  className="mt-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
+                >
+                  {bodyExpanded ? "Show less" : "Read more"}
+                </button>
+              ) : null}
+            </div>
           ) : null}
 
           {!pureRepost && post.imageUrl ? (
@@ -191,9 +222,13 @@ export default function PulsePostCard({
                   {quoted.createdAt ? (
                     <>
                       <span className="text-gray-400">·</span>
-                      <span className="shrink-0 text-gray-500">
+                      <time
+                        className="shrink-0 text-gray-500"
+                        dateTime={quoted.createdAt}
+                        title={formatPulseDateTime(quoted.createdAt) || undefined}
+                      >
                         {formatPulseTimeAgo(quoted.createdAt)}
-                      </span>
+                      </time>
                     </>
                   ) : null}
                 </div>
@@ -219,48 +254,61 @@ export default function PulsePostCard({
           ) : null}
 
           <div className="mt-3 flex max-w-md items-center justify-between text-gray-500">
-            <button
-              type="button"
-              className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-brand-50 hover:text-brand-600"
-              onClick={() => onComment(post.id)}
-            >
-              <Message size={18} />
-              <span>{post.commentsCount || ""}</span>
-            </button>
+            <Tooltip title="Comment" placement="top">
+              <button
+                type="button"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-brand-50 hover:text-brand-600"
+                onClick={() => onComment(post.id)}
+                aria-label="Comment"
+              >
+                <Message size={18} />
+                <span>{post.commentsCount || ""}</span>
+              </button>
+            </Tooltip>
 
-            <button
-              type="button"
-              className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-success-50 hover:text-success-600"
-              onClick={() => onRepost(post)}
-              aria-label="Repost"
-            >
-              <ArrowRotateLeft size={18} />
-              <span>{post.repostsCount || ""}</span>
-            </button>
+            <Tooltip title="Repost" placement="top">
+              <button
+                type="button"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-success-50 hover:text-success-600"
+                onClick={() => onRepost(post)}
+                aria-label="Repost"
+              >
+                <ArrowRotateLeft size={18} />
+                <span>{post.repostsCount || ""}</span>
+              </button>
+            </Tooltip>
 
-            <button
-              type="button"
-              className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-error-50 hover:text-error-500 ${
-                post.isLikedByCurrentUser ? "text-error-500" : ""
-              }`}
-              onClick={() => onLike(post.id)}
-              disabled={liking}
+            <Tooltip
+              title={post.isLikedByCurrentUser ? "Unlike" : "Like"}
+              placement="top"
             >
-              <Like1
-                size={18}
-                variant={post.isLikedByCurrentUser ? "Bold" : "Linear"}
-              />
-              <span>{post.likesCount || ""}</span>
-            </button>
+              <button
+                type="button"
+                className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-error-50 hover:text-error-500 ${
+                  post.isLikedByCurrentUser ? "text-error-500" : ""
+                }`}
+                onClick={() => onLike(post.id)}
+                disabled={liking}
+                aria-label={post.isLikedByCurrentUser ? "Unlike" : "Like"}
+              >
+                <Like1
+                  size={18}
+                  variant={post.isLikedByCurrentUser ? "Bold" : "Linear"}
+                />
+                <span>{post.likesCount || ""}</span>
+              </button>
+            </Tooltip>
 
-            <button
-              type="button"
-              className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-brand-50 hover:text-brand-600"
-              onClick={() => onShare(post)}
-              aria-label="Share"
-            >
-              <Share size={18} />
-            </button>
+            <Tooltip title="Share" placement="top">
+              <button
+                type="button"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-brand-50 hover:text-brand-600"
+                onClick={() => onShare(post)}
+                aria-label="Share"
+              >
+                <Share size={18} />
+              </button>
+            </Tooltip>
           </div>
         </div>
       </div>

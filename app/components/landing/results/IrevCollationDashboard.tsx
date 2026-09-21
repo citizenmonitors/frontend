@@ -5,10 +5,13 @@ import moment from "moment";
 import formatNumber from "@/app/utils/formatNumber";
 import {
   getValidityIntegrityScore,
-  mockIrevCollation,
 } from "@/app/data/mockIrevCollation";
-import { OSUN_ELECTION_SLUG } from "@/app/data/mockElectionDetail";
-import { CollationMode } from "@/app/types/irevCollation";
+import {
+  OSUN_ELECTION_SLUG,
+  PRESIDENTIAL_2023_SLUG,
+} from "@/app/data/mockElectionDetail";
+import { mockPresidentialCollation } from "@/app/data/mockPresidential2023";
+import { CollationMode, IrevCollationData } from "@/app/types/irevCollation";
 import IntegrityCoverageBar from "./IntegrityCoverageBar";
 import CollationModeToggle from "./CollationModeToggle";
 import CollationSummaryStats from "./CollationSummaryStats";
@@ -18,32 +21,24 @@ import RecentElectionsCarousel from "./RecentElectionsCarousel";
 import BrowseElectionsByType from "./BrowseElectionsByType";
 
 type IrevCollationDashboardProps = {
-  data?: typeof mockIrevCollation;
+  data?: IrevCollationData;
 };
 
 export default function IrevCollationDashboard({
-  data = mockIrevCollation,
+  data = mockPresidentialCollation,
 }: IrevCollationDashboardProps) {
   const [mode, setMode] = useState<CollationMode>("raw");
   const score = useMemo(() => getValidityIntegrityScore(data), [data]);
   const slice = mode === "raw" ? data.raw : data.verified;
   const updatedLabel = moment(data.updatedAt).format("D MMMM YYYY - hh:mmA");
-  const detailHref = `/results/${OSUN_ELECTION_SLUG}`;
+  const isPresidential = data.electionType === "Presidential";
+  const detailHref = `/collation/${
+    isPresidential ? PRESIDENTIAL_2023_SLUG : OSUN_ELECTION_SLUG
+  }`;
 
   return (
     <div className="grid min-w-0 w-full gap-10 overflow-x-hidden md:gap-14">
-      <section id="explore-results" className="scroll-mt-24 grid gap-8 md:gap-10">
-        <header className="mx-auto mb-2 max-w-2xl space-y-3 text-center md:mb-4 md:space-y-4">
-          <h2 className="text-[28px] font-bold leading-tight tracking-tight text-gray-900 md:text-[40px]">
-            Explore Election Result
-          </h2>
-          <p className="text-sm leading-relaxed text-gray-500 md:text-base">
-            The following result displays the raw data obtained from INEC&apos;s
-            server, as well as the results after applying the criteria of the
-            Nigerian Electoral Act (as amended in 2026).
-          </p>
-        </header>
-
+      <section id="explore-collation" className="scroll-mt-24 grid gap-8 md:gap-10">
         <div className="overflow-x-hidden overflow-y-visible rounded-2xl border border-gray-200/80 bg-[#F7FAFC] p-4 shadow-sm md:p-6 lg:p-8">
           <div className="mb-6 flex flex-col gap-5 sm:mb-8 sm:flex-row sm:items-end sm:justify-between sm:gap-6 md:mb-10">
             <div className="min-w-0 space-y-3 md:space-y-4">
@@ -81,6 +76,13 @@ export default function IrevCollationDashboard({
             score={score}
             fullyCompliantResults={data.fullyCompliantResults}
             totalResultsPublished={data.totalResultsPublished}
+            title={isPresidential ? "Result coverage" : "Data Validity"}
+            subtitle={
+              isPresidential
+                ? null
+                : "(Results compliant with the Electoral Act 2026)"
+            }
+            unitLabel={isPresidential ? "states" : undefined}
           />
 
           <div
@@ -97,7 +99,14 @@ export default function IrevCollationDashboard({
                 />
               </div>
               <div className="relative z-10 min-w-0 lg:col-span-5 xl:col-span-4">
-                <CollationVoteShare candidates={slice.candidates} />
+                <CollationVoteShare
+                  candidates={slice.candidates}
+                  subtitle={
+                    isPresidential
+                      ? "All candidates across nation"
+                      : "All candidates"
+                  }
+                />
               </div>
             </div>
           </div>

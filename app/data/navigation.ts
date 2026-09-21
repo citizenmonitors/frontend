@@ -16,8 +16,8 @@ const primaryLinks: Array<Link> = [
     href: '/#about',
   },
   {
-    name: 'Results',
-    href: '/results',
+    name: 'Collation',
+    href: '/collation',
   },
   {
     name: 'Pulse',

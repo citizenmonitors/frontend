@@ -11,6 +11,7 @@ import {
 } from "iconsax-react";
 import formatNumber from "@/app/utils/formatNumber";
 import { AreaResultRow, ResultViewMode } from "@/app/types/irevCollation";
+import { getPartyDisplayLabel } from "@/app/data/partyInfo";
 import PollingUnitResultSheetModal from "./PollingUnitResultSheetModal";
 
 type AreaResultsTableProps = {
@@ -22,13 +23,13 @@ type AreaResultsTableProps = {
 const PAGE_SIZE = 10;
 
 const searchPlaceholders: Record<Exclude<ResultViewMode, "candidates">, string> = {
-  lgas: "Search LGAs",
+  lgas: "Search states / LGAs",
   ras: "Search Wards",
   pus: "Search Polling Units",
 };
 
 const nameHeaders: Record<Exclude<ResultViewMode, "candidates">, string> = {
-  lgas: "LGAs",
+  lgas: "Name",
   ras: "Wards",
   pus: "PUs",
 };
@@ -224,7 +225,7 @@ export default function AreaResultsTable({
                     </span>
                     <span className="text-right">
                       <span className="block font-bold text-gray-900">
-                        {place.party}
+                        {getPartyDisplayLabel(place.party)}
                       </span>
                       <span className="text-xs text-gray-500">
                         {formatNumber.commas(place.votes)} Votes
@@ -286,8 +287,8 @@ export default function AreaResultsTable({
                         <td key={label} className="px-4 py-4">
                           {place ? (
                             <>
-                              <p className="font-bold text-gray-900">
-                                {place.party}
+                              <p className="font-bold leading-snug text-gray-900">
+                                {getPartyDisplayLabel(place.party)}
                               </p>
                               <p className="mt-0.5 text-xs text-gray-500">
                                 {formatNumber.commas(place.votes)} Votes

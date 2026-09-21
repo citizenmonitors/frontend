@@ -5,6 +5,7 @@ import { showAlert } from "@/app/redux/features/alertSlice";
 import {
   clearCreatePostStatus,
   createPulsePost,
+  getPulsePosts,
 } from "@/app/redux/features/pulseSlice";
 import { generateAnonymousHandle, PULSE_BODY_MAX_LENGTH } from "@/app/utils/pulseUtils";
 import { Button, Input, Modal, Switch, Upload } from "antd";
@@ -40,6 +41,7 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
     if (pulseState.status.createPost === "fulfilled") {
       dispatch(showAlert({ message: "Your post was shared on Pulse.", type: "success" }));
       dispatch(clearCreatePostStatus());
+      dispatch(getPulsePosts({ force: true }));
       onClose();
     }
     if (pulseState.status.createPost === "rejected") {

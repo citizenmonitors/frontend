@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import { ExportSquare, SearchNormal1 } from "iconsax-react";
 import formatNumber from "@/app/utils/formatNumber";
 import { CandidateLeaderboardRow } from "@/app/types/irevCollation";
+import { getPartyDisplayLabel } from "@/app/data/partyInfo";
 import CandidateAvatarPlaceholder from "./CandidateAvatarPlaceholder";
 
 type CandidateLeaderboardProps = {
@@ -22,7 +23,8 @@ export default function CandidateLeaderboard({ rows }: CandidateLeaderboardProps
   const filtered = rows.filter(
     (r) =>
       r.name.toLowerCase().includes(query.toLowerCase()) ||
-      r.party.toLowerCase().includes(query.toLowerCase())
+      r.party.toLowerCase().includes(query.toLowerCase()) ||
+      (r.partyName || "").toLowerCase().includes(query.toLowerCase())
   );
 
   async function handleShare() {
@@ -94,7 +96,9 @@ export default function CandidateLeaderboard({ rows }: CandidateLeaderboardProps
                   <p className="truncate text-sm font-semibold text-gray-900">
                     {row.name}
                   </p>
-                  <p className="text-xs text-gray-500">{row.partyName}</p>
+                  <p className="truncate text-xs text-gray-500">
+                    {getPartyDisplayLabel(row.party)}
+                  </p>
                   <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-600">
                     <p>
                       PU Won:{" "}
@@ -166,9 +170,11 @@ export default function CandidateLeaderboard({ rows }: CandidateLeaderboardProps
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-3">
                       <CandidateAvatarPlaceholder size={40} />
-                      <div>
+                      <div className="min-w-0">
                         <p className="font-semibold text-gray-900">{row.name}</p>
-                        <p className="text-xs text-gray-500">{row.partyName}</p>
+                        <p className="truncate text-xs text-gray-500">
+                          {getPartyDisplayLabel(row.party)}
+                        </p>
                       </div>
                     </div>
                   </td>

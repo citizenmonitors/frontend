@@ -91,7 +91,7 @@ export default function BrowseElectionsByType() {
               {item.description}
             </p>
             <Link
-              href={`/results/${getLatestResultSlugByType(item.typeKey)}`}
+              href={`/collation/${getLatestResultSlugByType(item.typeKey)}`}
               className="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg border border-brand-200 bg-transparent px-4 py-2.5 text-sm font-semibold text-brand-700 transition-all duration-300 ease-out hover:border-brand-700 hover:bg-brand-700 hover:text-white hover:shadow-sm"
             >
               Explore

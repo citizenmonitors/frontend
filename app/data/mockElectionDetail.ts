@@ -5,8 +5,17 @@ import {
   MapRegion,
 } from "@/app/types/irevCollation";
 import { mockIrevCollation, mockRecentElections } from "./mockIrevCollation";
+import {
+  getPresidentialElectionDetail,
+  PRESIDENTIAL_2023_SLUG,
+} from "./mockPresidential2023";
+import {
+  ENUGU_NORTH_2026_SLUG,
+  getEnuguNorthElectionDetail,
+} from "./mockSenatorialEnuguNorth2026";
 
 export const OSUN_ELECTION_SLUG = "governorship-election-osun-2026";
+export { PRESIDENTIAL_2023_SLUG, ENUGU_NORTH_2026_SLUG };
 
 export const partyFullNames: Record<string, string> = {
   A: "Accord",
@@ -17,6 +26,16 @@ export const partyFullNames: Record<string, string> = {
   AA: "Action Alliance",
   AAC: "African Action Congress",
   APGA: "All Progressives Grand Alliance",
+  YPP: "Young Progressives Party",
+  APM: "Allied Peoples Movement",
+  SDP: "Social Democratic Party",
+  NNPP: "New Nigeria Peoples Party",
+  BP: "Boot Party",
+  APP: "Action Peoples Party",
+  PRP: "Peoples Redemption Party",
+  PDP: "Peoples Democratic Party",
+  LP: "Labour Party",
+  NDC: "Nigeria Democratic Congress",
   Others: "Others",
 };
 
@@ -767,6 +786,14 @@ export function getChartCandidates(): CollationCandidate[] {
 }
 
 export function getElectionDetailBySlug(slug: string) {
+  if (slug === PRESIDENTIAL_2023_SLUG) {
+    return getPresidentialElectionDetail();
+  }
+
+  if (slug === ENUGU_NORTH_2026_SLUG) {
+    return getEnuguNorthElectionDetail();
+  }
+
   if (slug !== OSUN_ELECTION_SLUG) return null;
 
   const state = "Osun";
@@ -813,6 +840,8 @@ export function getElectionDetailBySlug(slug: string) {
     mapRegions: mockMapRegions,
     mapLegend: mockMapLegend,
     chartCandidates: getChartCandidates(),
+    geographyLabel: "LGAs" as const,
+    coverageLabel: "Data Validity" as const,
   };
 }
 

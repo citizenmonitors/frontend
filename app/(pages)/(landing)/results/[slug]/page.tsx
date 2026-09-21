@@ -1,12 +1,10 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import ElectionDetailView from "@/app/components/landing/results/detail/ElectionDetailView";
-import React from "react";
-
-export default function ElectionDetailPage({
+/** Legacy /results/[slug] — redirects to /collation/[slug] */
+export default function ResultsSlugRedirectPage({
   params,
 }: {
   params: { slug: string };
 }) {
-  return <ElectionDetailView slug={params.slug} />;
+  redirect(`/collation/${params.slug}`);
 }

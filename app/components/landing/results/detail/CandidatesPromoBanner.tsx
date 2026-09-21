@@ -35,7 +35,7 @@ export default function CandidatesPromoBanner() {
           location.
         </p>
         <Link
-          href="/results"
+          href="/collation"
           className="inline-flex w-fit items-center justify-center rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
         >
           View Candidates

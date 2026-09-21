@@ -39,7 +39,7 @@ const detailTabs: Array<{ key: ElectionDetailTab; label: string }> = [
   { key: "post-incident", label: "Post incident" },
 ];
 
-const viewModes: Array<{ key: ResultViewMode; label: string }> = [
+const defaultViewModes: Array<{ key: ResultViewMode; label: string }> = [
   { key: "candidates", label: "Candidates" },
   { key: "lgas", label: "LGAs" },
   { key: "ras", label: "Wards" },
@@ -55,6 +55,25 @@ export default function ElectionDetailView({ slug }: ElectionDetailViewProps) {
   const [filterWardId, setFilterWardId] = useState<string | null>(null);
   const [traceRow, setTraceRow] = useState<AreaResultRow | null>(null);
   const [sheetRow, setSheetRow] = useState<AreaResultRow | null>(null);
+
+  const viewModes = useMemo(() => {
+    if (!detail) return defaultViewModes;
+    if (detail.geographyLabel === "States") {
+      return [
+        { key: "candidates" as const, label: "Candidates" },
+        { key: "lgas" as const, label: "States" },
+      ];
+    }
+    return defaultViewModes;
+  }, [detail]);
+
+  const usesResultCoverage = detail?.coverageLabel === "Result coverage";
+  const coverageUnitLabel =
+    detail && "unitLabel" in detail && typeof detail.unitLabel === "string"
+      ? detail.unitLabel
+      : usesResultCoverage
+        ? "states"
+        : undefined;
 
   const score = useMemo(
     () => (detail ? getValidityIntegrityScore(detail.election) : 0),
@@ -277,6 +296,15 @@ export default function ElectionDetailView({ slug }: ElectionDetailViewProps) {
                   score={score}
                   fullyCompliantResults={election.fullyCompliantResults}
                   totalResultsPublished={election.totalResultsPublished}
+                  title={
+                    usesResultCoverage ? "Result coverage" : "Data Validity"
+                  }
+                  subtitle={
+                    usesResultCoverage
+                      ? null
+                      : "(Results compliant with the Electoral Act 2026)"
+                  }
+                  unitLabel={coverageUnitLabel}
                 />
                 <CollationSummaryStats totals={slice.totals} />
 
@@ -304,7 +332,11 @@ export default function ElectionDetailView({ slug }: ElectionDetailViewProps) {
               <div className="relative z-10 min-w-0">
                 <CollationVoteShare
                   series={charts.series}
-                  subtitle="All candidates across nation"
+                  subtitle={
+                    detail.geographyLabel === "States"
+                      ? "All candidates across nation"
+                      : "All candidates"
+                  }
                 />
               </div>
             </div>
