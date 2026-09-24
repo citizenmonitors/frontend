@@ -157,35 +157,75 @@ export function getLocationFilterEmptyMessage(
   return `No posts near ${labels[filter]} yet. Share the first update for your area.`;
 }
 
+export type PulsePostScope = "state" | "lga" | "ward" | "polling-unit";
+
+type PulsePlace = {
+  state?: string;
+  lga?: string;
+  ward?: string;
+  pollingUnit?: string;
+} | null;
+
+export const PULSE_POST_SCOPES: Array<{
+  key: PulsePostScope;
+  label: string;
+}> = [
+  { key: "state", label: "State" },
+  { key: "lga", label: "LGA" },
+  { key: "ward", label: "Ward" },
+  { key: "polling-unit", label: "Polling Unit" },
+];
+
+export function getPlaceNameForScope(
+  location?: PulsePlace,
+  scope?: string | null
+) {
+  if (!location) return "";
+  if (scope === "state") return (location.state || "").trim();
+  if (scope === "lga") return (location.lga || "").trim();
+  if (scope === "ward") return (location.ward || "").trim();
+  if (scope === "polling-unit" || scope === "pollingUnit") {
+    return (location.pollingUnit || "").trim();
+  }
+  return "";
+}
+
+export function defaultPulsePostScope(location?: PulsePlace): PulsePostScope {
+  if (location?.ward) return "ward";
+  if (location?.lga) return "lga";
+  if (location?.pollingUnit) return "polling-unit";
+  return "state";
+}
+
 export function getVisibilityScopeLabel(scope: string) {
   switch (scope) {
     case "public":
     case "nationwide":
     case "national":
       return "Public";
+    case "state":
+      return "Post Within State";
     case "ward":
-      return "Post Within My Ward";
+      return "Post Within Ward";
     case "lga":
-      return "Post Within My LGA";
+      return "Post Within LGA";
     case "polling-unit":
+    case "pollingUnit":
       return "Post Within Polling Unit";
     default:
       return `Post Within ${scope.replace(/-/g, " ")}`;
   }
 }
 
-/** Prefer the post's place name: "Post Within Alimosho" */
+/** "Post Within {poster place name}" from the chosen scope */
 export function getPulsePostLocationLabel(post: {
   locationLabel?: string | null;
-  location?: {
-    state?: string;
-    lga?: string;
-    ward?: string;
-    pollingUnit?: string;
-  } | null;
+  location?: PulsePlace;
   visibilityScope?: string;
 }) {
-  const fromFields =
+  const scope = post.visibilityScope;
+  const scopedName = getPlaceNameForScope(post.location, scope);
+  const fallbackName =
     post.locationLabel?.trim() ||
     post.location?.pollingUnit?.trim() ||
     post.location?.ward?.trim() ||
@@ -193,11 +233,9 @@ export function getPulsePostLocationLabel(post: {
     post.location?.state?.trim() ||
     "";
 
-  if (fromFields) {
-    return `Post Within ${fromFields}`;
-  }
+  const place = scopedName || fallbackName;
+  if (place) return `Post Within ${place}`;
 
-  const scope = post.visibilityScope;
   if (scope && !["public", "nationwide", "national"].includes(scope)) {
     return getVisibilityScopeLabel(scope);
   }

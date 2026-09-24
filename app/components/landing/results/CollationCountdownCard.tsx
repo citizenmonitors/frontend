@@ -83,14 +83,15 @@ export default function CollationCountdownCard() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-300">
             Next election
           </p>
-          <h2 className="font-league text-xl font-bold leading-snug text-white sm:text-2xl">
+          <h2 className="font-league text-[26px] font-extrabold leading-tight tracking-tight text-white sm:text-[32px] sm:leading-none">
             Presidential Election – Nigeria 2027
           </h2>
-          <p className="text-sm text-white/55">16 January, 2027 · 8:00 AM WAT</p>
-          <p className="mt-1 max-w-sm text-xs leading-relaxed text-white/45 sm:text-[13px]">
+          <p className="text-sm font-medium text-white/85">
+            16 January, 2027 · 8:00 AM WAT
+          </p>
+          <p className="mt-1 max-w-sm text-sm leading-relaxed text-white/80">
             Track the countdown to Nigeria&apos;s next presidential cycle. Live
-            collation, coverage, and Pulse updates will open here when voting
-            begins.
+            collation and coverage will open here when voting begins.
           </p>
         </header>
 
@@ -112,10 +113,10 @@ export default function CollationCountdownCard() {
                 </span>
               ) : null}
               <div className="min-w-0 flex-1 text-center">
-                <p className="font-league text-[28px] font-bold tabular-nums leading-none tracking-tight text-white sm:text-[36px] md:text-[40px]">
+                <p className="font-league text-[24px] font-bold tabular-nums leading-none tracking-tight text-white sm:text-[36px] md:text-[40px]">
                   {unit.value}
                 </p>
-                <p className="mt-2 text-[10px] font-medium uppercase tracking-wide text-white/45 sm:text-xs sm:normal-case sm:tracking-normal">
+                <p className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-white/75 sm:text-xs sm:normal-case sm:tracking-normal">
                   {unit.label}
                 </p>
               </div>
@@ -132,7 +133,7 @@ export default function CollationCountdownCard() {
               <p className="truncate text-sm font-bold text-white sm:text-base">
                 {stat.value}
               </p>
-              <p className="mt-0.5 text-[10px] text-white/50 sm:text-xs">
+              <p className="mt-0.5 text-[10px] font-medium text-white/75 sm:text-xs">
                 {stat.label}
               </p>
             </div>
@@ -140,14 +141,14 @@ export default function CollationCountdownCard() {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-4">
-          <p className="text-[11px] text-white/40 sm:text-xs">
+          <p className="text-[11px] font-medium text-white/70 sm:text-xs">
             Based on the published INEC election timetable
           </p>
           <Link
-            href="/collation/presidential-election-2023"
+            href="/collation/governorship-election-osun-2026"
             className="text-xs font-semibold text-brand-300 transition-colors hover:text-brand-200"
           >
-            View 2023 sample →
+            View Osun 2026 sample →
           </Link>
         </div>
       </div>

@@ -56,24 +56,7 @@ export default function ElectionDetailView({ slug }: ElectionDetailViewProps) {
   const [traceRow, setTraceRow] = useState<AreaResultRow | null>(null);
   const [sheetRow, setSheetRow] = useState<AreaResultRow | null>(null);
 
-  const viewModes = useMemo(() => {
-    if (!detail) return defaultViewModes;
-    if (detail.geographyLabel === "States") {
-      return [
-        { key: "candidates" as const, label: "Candidates" },
-        { key: "lgas" as const, label: "States" },
-      ];
-    }
-    return defaultViewModes;
-  }, [detail]);
-
-  const usesResultCoverage = detail?.coverageLabel === "Result coverage";
-  const coverageUnitLabel =
-    detail && "unitLabel" in detail && typeof detail.unitLabel === "string"
-      ? detail.unitLabel
-      : usesResultCoverage
-        ? "states"
-        : undefined;
+  const viewModes = defaultViewModes;
 
   const score = useMemo(
     () => (detail ? getValidityIntegrityScore(detail.election) : 0),
@@ -296,15 +279,8 @@ export default function ElectionDetailView({ slug }: ElectionDetailViewProps) {
                   score={score}
                   fullyCompliantResults={election.fullyCompliantResults}
                   totalResultsPublished={election.totalResultsPublished}
-                  title={
-                    usesResultCoverage ? "Result coverage" : "Data Validity"
-                  }
-                  subtitle={
-                    usesResultCoverage
-                      ? null
-                      : "(Results compliant with the Electoral Act 2026)"
-                  }
-                  unitLabel={coverageUnitLabel}
+                  title="Data Validity"
+                  subtitle="(Results compliant with the Electoral Act 2026)"
                 />
                 <CollationSummaryStats totals={slice.totals} />
 
@@ -332,11 +308,7 @@ export default function ElectionDetailView({ slug }: ElectionDetailViewProps) {
               <div className="relative z-10 min-w-0">
                 <CollationVoteShare
                   series={charts.series}
-                  subtitle={
-                    detail.geographyLabel === "States"
-                      ? "All candidates across nation"
-                      : "All candidates"
-                  }
+                  subtitle="All candidates"
                 />
               </div>
             </div>

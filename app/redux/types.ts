@@ -410,6 +410,7 @@ export type Podcast = {
 export type PulseVisibilityScope =
   | "public"
   | "nationwide"
+  | "state"
   | "ward"
   | "lga"
   | "polling-unit"
@@ -477,6 +478,7 @@ export type CreatePulsePostPayload = {
   body: string;
   visibilityScope?: PulseVisibilityScope;
   useAnonymousDisplay: boolean;
+  locationLabel?: string;
   image?: File;
   /** Original post id for quote/repost (sent to API when supported) */
   quotePostId?: string;

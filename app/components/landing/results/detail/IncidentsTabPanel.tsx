@@ -9,10 +9,9 @@ import {
   DocumentUpload,
   Gallery,
   Location,
-  Profile,
   Video,
 } from "iconsax-react";
-import { Button, Input, Modal } from "antd";
+import { Button } from "antd";
 import Cookies from "js-cookie";
 import { cookieData } from "@/app/data/cookieData";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
@@ -165,9 +164,17 @@ export default function IncidentsTabPanel({
   const [activeIncident, setActiveIncident] = useState<IncidentItem | null>(
     null
   );
-  const [composeOpen, setComposeOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
-  const [pendingCompose, setPendingCompose] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
+
+  const userPollingUnit = [
+    userDetails?.pollingUnit,
+    userDetails?.ward,
+    userDetails?.lga,
+  ]
+    .map((part) => (part || "").trim())
+    .filter(Boolean)
+    .join(", ");
 
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
@@ -185,21 +192,31 @@ export default function IncidentsTabPanel({
   }, [dispatch, sessionStatus]);
 
   useEffect(() => {
-    if (userDetails && pendingCompose) {
-      setPendingCompose(false);
-      setComposeOpen(true);
+    if (userDetails && pendingSubmit) {
+      setPendingSubmit(false);
+      handleSubmitIncident();
     }
-  }, [userDetails, pendingCompose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userDetails, pendingSubmit]);
 
   useEffect(() => {
-    if (!composeOpen) {
-      setTitle("");
-      setLocation("");
-      setBody("");
-      setMediaPreview(null);
-      setMediaKind(null);
+    if (!userPollingUnit) return;
+    setLocation((current) => current.trim() || userPollingUnit);
+  }, [userPollingUnit]);
+
+  useEffect(() => {
+    if (!activeIncident) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setActiveIncident(null);
     }
-  }, [composeOpen]);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [activeIncident]);
 
   const pageItems = useMemo(() => {
     const start = ((page - 1) * PAGE_SIZE) % incidents.length;
@@ -212,9 +229,13 @@ export default function IncidentsTabPanel({
   }, [page, incidents]);
 
   const pageNumbers = useMemo(() => {
-    const maxButtons = Math.min(totalPages, 5);
-    return Array.from({ length: maxButtons }, (_, i) => i + 1);
-  }, [totalPages]);
+    const maxButtons = 5;
+    if (totalPages <= maxButtons) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const start = Math.max(1, Math.min(page - 2, totalPages - maxButtons + 1));
+    return Array.from({ length: maxButtons }, (_, i) => start + i);
+  }, [page, totalPages]);
 
   const displayName = userDetails
     ? `${userDetails.firstName || ""} ${userDetails.lastName || ""}`.trim() ||
@@ -224,19 +245,24 @@ export default function IncidentsTabPanel({
   function requireAuth() {
     if (userDetails) return true;
     if (Cookies.get(cookieData.login.name) && sessionStatus === "pending") {
+      setPendingSubmit(true);
       return false;
     }
     if (typeof window !== "undefined") {
       rememberAuthRedirect(window.location.pathname + window.location.search);
     }
-    setPendingCompose(true);
+    setPendingSubmit(true);
     setLoginOpen(true);
     return false;
   }
 
-  function openCompose() {
-    if (!requireAuth()) return;
-    setComposeOpen(true);
+  function resetCompose() {
+    setTitle("");
+    setLocation(userPollingUnit);
+    setBody("");
+    setMediaPreview(null);
+    setMediaKind(null);
+    if (fileRef.current) fileRef.current.value = "";
   }
 
   function handlePickMedia(file: File | undefined) {
@@ -253,7 +279,10 @@ export default function IncidentsTabPanel({
       return;
     }
     setMediaKind(isVideo ? "video" : "image");
-    setMediaPreview(URL.createObjectURL(file));
+    setMediaPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
   }
 
   function handleSubmitIncident() {
@@ -275,6 +304,16 @@ export default function IncidentsTabPanel({
       );
       return;
     }
+    if (!userPollingUnit) {
+      dispatch(
+        showAlert({
+          message:
+            "Your account needs a polling unit to post an incident for this election.",
+          type: "error",
+        })
+      );
+      return;
+    }
     if (body.trim().length > BODY_MAX) {
       dispatch(
         showAlert({
@@ -285,12 +324,7 @@ export default function IncidentsTabPanel({
       return;
     }
 
-    const place =
-      location.trim() ||
-      [userDetails.pollingUnit, userDetails.ward, userDetails.lga]
-        .filter(Boolean)
-        .join(", ") ||
-      "Reported location";
+    const place = userPollingUnit;
 
     const newIncident: IncidentItem = {
       id: `new-${Date.now()}`,
@@ -305,7 +339,7 @@ export default function IncidentsTabPanel({
     };
 
     setIncidents((prev) => [newIncident, ...prev]);
-    setComposeOpen(false);
+    resetCompose();
     setActiveIncident(newIncident);
     dispatch(
       showAlert({
@@ -317,49 +351,146 @@ export default function IncidentsTabPanel({
 
   return (
     <div className="grid gap-5 md:gap-6">
-      {/* Pulse-style composer + Post incident CTA */}
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <h3 className="text-base font-bold text-gray-900">
-              Report an incident
-            </h3>
-            <p className="mt-0.5 text-sm text-gray-500">
-              Share what you observed — text, photo, or video.
-            </p>
-          </div>
-          <Button
-            type="primary"
-            size="large"
-            className="!h-11 !rounded-lg !bg-brand-500 !px-5 !font-semibold hover:!bg-brand-600"
-            onClick={openCompose}
-          >
-            Post incident
-          </Button>
+        <div className="mb-4">
+          <h3 className="text-base font-bold text-gray-900">
+            Report an incident
+          </h3>
+          <p className="mt-0.5 text-sm text-gray-500">
+            Share what you observed — text, photo, or video.
+          </p>
         </div>
 
-        <button
-          type="button"
-          onClick={openCompose}
-          className="mt-4 flex w-full gap-3 rounded-xl border border-gray-100 bg-gray-50/80 px-3 py-3 text-left transition-colors hover:border-brand-200 hover:bg-brand-25/40 sm:px-4"
+        <form
+          className="grid gap-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!requireAuth()) return;
+            handleSubmitIncident();
+          }}
         >
-          <span className="grid h-10 w-10 shrink-0 place-content-center rounded-full border border-gray-200 bg-white text-brand-500">
-            <Profile size={20} variant="Bold" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[15px] text-gray-400">
-              What&apos;s happening
-              {displayName ? `, ${displayName.split(" ")[0]}` : ""}?
-            </span>
-            <span className="mt-2 flex items-center gap-3 text-brand-600">
-              <Gallery size={18} />
-              <Video size={18} />
-              <span className="text-xs font-medium text-gray-400">
-                Photo or video
-              </span>
-            </span>
-          </span>
-        </button>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Incident title (e.g. BVAS Malfunction)"
+            className="min-h-11 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none ring-brand-500/20 placeholder:text-gray-400 focus:border-brand-400 focus:ring-2"
+          />
+          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5">
+            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+              Location
+            </p>
+            {userPollingUnit ? (
+              <div className="flex flex-wrap items-center gap-2">
+                {userDetails?.pollingUnit ? (
+                  <span className="inline-flex min-w-0 max-w-full items-start gap-1.5 break-words rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-800">
+                    <Location size={14} className="mt-0.5 shrink-0" />
+                    <span className="min-w-0 break-words">
+                      {userDetails.pollingUnit}
+                    </span>
+                  </span>
+                ) : null}
+                {userDetails?.ward || userDetails?.lga || userDetails?.state ? (
+                  <span className="text-xs text-gray-500">
+                    {[userDetails?.ward, userDetails?.lga, userDetails?.state]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </span>
+                ) : null}
+              </div>
+            ) : (
+              <p className="inline-flex items-center gap-1.5 text-sm text-gray-500">
+                <Location size={14} />
+                Sign in to attach your polling unit. Incidents must match this
+                election&apos;s coverage.
+              </p>
+            )}
+          </div>
+          <textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder={
+              displayName
+                ? `What's happening, ${displayName.split(" ")[0]}?`
+                : "What's happening at this polling unit?"
+            }
+            rows={5}
+            maxLength={BODY_MAX}
+            className="w-full resize-y rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none ring-brand-500/20 placeholder:text-gray-400 focus:border-brand-400 focus:ring-2"
+          />
+          <p className="text-right text-xs text-gray-400">
+            {body.length}/{BODY_MAX}
+          </p>
+
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*,video/*"
+            className="sr-only"
+            onChange={(e) => {
+              handlePickMedia(e.target.files?.[0]);
+            }}
+          />
+
+          {mediaPreview ? (
+            <div className="relative overflow-hidden rounded-xl border border-gray-200">
+              {mediaKind === "video" ? (
+                <video
+                  src={mediaPreview}
+                  controls
+                  className="max-h-52 w-full bg-black object-contain"
+                />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={mediaPreview}
+                  alt="Attachment preview"
+                  className="max-h-52 w-full object-cover"
+                />
+              )}
+              <button
+                type="button"
+                className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-1 text-xs font-medium text-gray-700"
+                onClick={() => {
+                  setMediaPreview(null);
+                  setMediaKind(null);
+                  if (fileRef.current) fileRef.current.value = "";
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <label className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-brand-300 bg-brand-25 text-sm font-medium text-brand-700 hover:bg-brand-50">
+              <DocumentUpload size={18} />
+              Attach picture or video
+              <input
+                type="file"
+                accept="image/*,video/*"
+                className="sr-only"
+                onChange={(e) => {
+                  handlePickMedia(e.target.files?.[0]);
+                }}
+              />
+            </label>
+          )}
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="inline-flex items-center gap-2 text-xs text-gray-500">
+              <Gallery size={16} className="text-brand-600" />
+              <Video size={16} className="text-brand-600" />
+              Photo or video
+            </p>
+            <Button
+              type="primary"
+              htmlType="submit"
+              size="large"
+              className="!h-11 !rounded-lg !bg-brand-500 !px-5 !font-semibold hover:!bg-brand-600"
+            >
+              Post incident
+            </Button>
+          </div>
+        </form>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -380,9 +511,9 @@ export default function IncidentsTabPanel({
             <h3 className="text-base font-semibold text-gray-900">
               {incident.title}
             </h3>
-            <p className="mt-2 inline-flex items-start gap-1.5 text-xs uppercase tracking-wide text-gray-500">
+            <p className="mt-2 flex min-w-0 items-start gap-1.5 text-xs uppercase tracking-wide text-gray-500">
               <Location size={14} className="mt-0.5 shrink-0" />
-              {incident.location}
+              <span className="min-w-0 break-words">{incident.location}</span>
             </p>
             <p className="mt-3 flex-1 text-sm leading-relaxed text-gray-700 line-clamp-4">
               {incident.summary}
@@ -466,7 +597,7 @@ export default function IncidentsTabPanel({
                     size={16}
                     className="mt-0.5 shrink-0 text-gray-400"
                   />
-                  <span className="uppercase tracking-wide">
+                  <span className="min-w-0 break-words uppercase tracking-wide">
                     {activeIncident.location}
                   </span>
                 </p>
@@ -511,132 +642,21 @@ export default function IncidentsTabPanel({
         </div>
       ) : null}
 
-      {/* Create incident modal */}
-      <Modal
-        open={composeOpen}
-        onCancel={() => setComposeOpen(false)}
-        footer={null}
-        closable={false}
-        width={520}
-        centered
-        destroyOnClose
-        styles={{ body: { padding: 16 } }}
-      >
-        <div className="grid gap-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h3 className="font-league text-lg font-semibold text-gray-900">
-                Post incident
-              </h3>
-              <p className="mt-0.5 text-sm text-gray-500">
-                Describe what you saw and attach a photo or video.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setComposeOpen(false)}
-              className="grid h-11 w-11 place-content-center text-gray-400 hover:text-gray-600"
-              aria-label="Close"
-            >
-              <CloseCircle size={24} />
-            </button>
-          </div>
-
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Incident title (e.g. BVAS Malfunction)"
-            size="large"
-            className="!rounded-xl"
-          />
-          <Input
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="Location / polling unit (optional)"
-            size="large"
-            className="!rounded-xl"
-          />
-          <Input.TextArea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder="What's happening at this polling unit?"
-            rows={5}
-            maxLength={BODY_MAX}
-            showCount
-            className="!rounded-xl !border-gray-200 !bg-gray-50"
-          />
-
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*,video/*"
-            className="hidden"
-            onChange={(e) => {
-              handlePickMedia(e.target.files?.[0]);
-              e.target.value = "";
-            }}
-          />
-
-          {mediaPreview ? (
-            <div className="relative overflow-hidden rounded-xl border border-gray-200">
-              {mediaKind === "video" ? (
-                <video
-                  src={mediaPreview}
-                  controls
-                  className="max-h-52 w-full bg-black object-contain"
-                />
-              ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={mediaPreview}
-                  alt="Attachment preview"
-                  className="max-h-52 w-full object-cover"
-                />
-              )}
-              <button
-                type="button"
-                className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-1 text-xs font-medium text-gray-700"
-                onClick={() => {
-                  setMediaPreview(null);
-                  setMediaKind(null);
-                }}
-              >
-                Remove
-              </button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-brand-300 bg-brand-25 text-sm font-medium text-brand-700 hover:bg-brand-50"
-            >
-              <DocumentUpload size={18} />
-              Attach picture or video
-            </button>
-          )}
-
-          <Button
-            type="primary"
-            size="large"
-            block
-            className="!h-12 !rounded-xl !bg-brand-500 !font-semibold hover:!bg-brand-600"
-            onClick={handleSubmitIncident}
-          >
-            Post incident
-          </Button>
-        </div>
-      </Modal>
-
       <PulseLoginModal
         open={loginOpen}
         onClose={() => {
           setLoginOpen(false);
-          setPendingCompose(false);
+          setPendingSubmit(false);
         }}
         onSuccess={() => {
           setLoginOpen(false);
         }}
         contextMessage="Sign in to post an election incident."
+        redirectTo={
+          typeof window !== "undefined"
+            ? window.location.pathname + window.location.search
+            : "/collation"
+        }
       />
 
       <style jsx global>{`

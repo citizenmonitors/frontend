@@ -6,11 +6,8 @@ import formatNumber from "@/app/utils/formatNumber";
 import {
   getValidityIntegrityScore,
 } from "@/app/data/mockIrevCollation";
-import {
-  OSUN_ELECTION_SLUG,
-  PRESIDENTIAL_2023_SLUG,
-} from "@/app/data/mockElectionDetail";
-import { mockPresidentialCollation } from "@/app/data/mockPresidential2023";
+import { OSUN_ELECTION_SLUG } from "@/app/data/mockElectionDetail";
+import { mockIrevCollation } from "@/app/data/mockIrevCollation";
 import { CollationMode, IrevCollationData } from "@/app/types/irevCollation";
 import IntegrityCoverageBar from "./IntegrityCoverageBar";
 import CollationModeToggle from "./CollationModeToggle";
@@ -25,16 +22,13 @@ type IrevCollationDashboardProps = {
 };
 
 export default function IrevCollationDashboard({
-  data = mockPresidentialCollation,
+  data = mockIrevCollation,
 }: IrevCollationDashboardProps) {
   const [mode, setMode] = useState<CollationMode>("raw");
   const score = useMemo(() => getValidityIntegrityScore(data), [data]);
   const slice = mode === "raw" ? data.raw : data.verified;
   const updatedLabel = moment(data.updatedAt).format("D MMMM YYYY - hh:mmA");
-  const isPresidential = data.electionType === "Presidential";
-  const detailHref = `/collation/${
-    isPresidential ? PRESIDENTIAL_2023_SLUG : OSUN_ELECTION_SLUG
-  }`;
+  const detailHref = `/collation/${OSUN_ELECTION_SLUG}`;
 
   return (
     <div className="grid min-w-0 w-full gap-10 overflow-x-hidden md:gap-14">
@@ -76,13 +70,8 @@ export default function IrevCollationDashboard({
             score={score}
             fullyCompliantResults={data.fullyCompliantResults}
             totalResultsPublished={data.totalResultsPublished}
-            title={isPresidential ? "Result coverage" : "Data Validity"}
-            subtitle={
-              isPresidential
-                ? null
-                : "(Results compliant with the Electoral Act 2026)"
-            }
-            unitLabel={isPresidential ? "states" : undefined}
+            title="Data Validity"
+            subtitle="(Results compliant with the Electoral Act 2026)"
           />
 
           <div
@@ -101,11 +90,7 @@ export default function IrevCollationDashboard({
               <div className="relative z-10 min-w-0 lg:col-span-5 xl:col-span-4">
                 <CollationVoteShare
                   candidates={slice.candidates}
-                  subtitle={
-                    isPresidential
-                      ? "All candidates across nation"
-                      : "All candidates"
-                  }
+                  subtitle="All candidates"
                 />
               </div>
             </div>

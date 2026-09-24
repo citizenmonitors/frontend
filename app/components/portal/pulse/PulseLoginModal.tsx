@@ -29,6 +29,8 @@ type PulseLoginModalProps = {
   onSuccess: () => void;
   /** Shown above the form, e.g. "Please log in to like posts." */
   contextMessage?: string;
+  /** Where to return after signup / Google login. Defaults to Pulse. */
+  redirectTo?: string;
 };
 
 const PULSE_PATH = "/pulse";
@@ -38,6 +40,7 @@ export default function PulseLoginModal({
   onClose,
   onSuccess,
   contextMessage,
+  redirectTo = PULSE_PATH,
 }: PulseLoginModalProps) {
   const dispatch = useAppDispatch();
   const userState = useAppSelector((state) => state.user);
@@ -60,18 +63,18 @@ export default function PulseLoginModal({
     showGoogleError,
   } = useGoogleAuth({
     mode: "login",
-    successRedirect: PULSE_PATH,
+    successRedirect: redirectTo,
     onLoginSuccess: finishLogin,
   });
 
   useEffect(() => {
     if (!open) return;
-    rememberAuthRedirect(PULSE_PATH);
+    rememberAuthRedirect(redirectTo);
     setFormData({ email: "", password: "" });
     setShowPassword(false);
     setRememberMe(true);
     setSubmitting(false);
-  }, [open, setFormData]);
+  }, [open, redirectTo, setFormData]);
 
   async function handleFormSubmit() {
     if (!isEmail(formData.email)) {
@@ -128,7 +131,13 @@ export default function PulseLoginModal({
       centered
       destroyOnClose
       zIndex={1100}
-      styles={{ body: { padding: 20 } }}
+      styles={{
+        body: {
+          padding: 20,
+          maxHeight: "min(640px, 85dvh)",
+          overflowY: "auto",
+        },
+      }}
     >
       <div className="grid gap-4">
         <div className="flex items-start justify-between gap-3">
@@ -257,7 +266,7 @@ export default function PulseLoginModal({
         <p className="text-center text-xs font-medium text-gray-400 sm:text-sm">
           Are you new here?{" "}
           <Link
-            href={buildSignupHref(PULSE_PATH)}
+            href={buildSignupHref(redirectTo)}
             className="text-brand-400 hover:underline"
             onClick={onClose}
           >

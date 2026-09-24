@@ -17,7 +17,7 @@ function Intro() {
             Navalny.
           </p>
           <div className="intro-buttons flex flex-col gap-6 justify-center sm:flex-row sm:gap-5 mt-10 md:justify-start md:mt-6">
-            <Link href={"/auth/login"} tabIndex={-1} className="w-full sm:w-auto">
+            <Link href={"/auth/signup"} className="w-full sm:w-auto">
               <Button
                 className="flex items-center gap-[1ch] font-medium justify-center h-[48px] lg:h-[55px] lg:px-6"
                 block

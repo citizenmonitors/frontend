@@ -9,11 +9,15 @@ import {
 } from "@/app/redux/features/pulseSlice";
 import { PulsePost } from "@/app/redux/types";
 import {
+  defaultPulsePostScope,
   formatPulseTimeAgo,
   generateAnonymousHandle,
+  getPlaceNameForScope,
   PULSE_BODY_MAX_LENGTH,
+  PulsePostScope,
   toPulseQuotedPost,
 } from "@/app/utils/pulseUtils";
+import PulseScopePicker from "./PulseScopePicker";
 import { Button, Input, Modal, Switch } from "antd";
 import { CloseCircle, Profile } from "iconsax-react";
 import React, { useEffect, useMemo, useState } from "react";
@@ -36,17 +40,32 @@ export default function PulseRepostModal({
   const [body, setBody] = useState("");
   const [useAnonymousDisplay, setUseAnonymousDisplay] = useState(false);
   const anonymousHandle = useMemo(() => generateAnonymousHandle(), [open]);
+  const userLocation = userDetails
+    ? {
+        state: userDetails.state,
+        lga: userDetails.lga,
+        ward: userDetails.ward,
+        pollingUnit: userDetails.pollingUnit,
+      }
+    : null;
+  const [scope, setScope] = useState<PulsePostScope>(
+    defaultPulsePostScope(userLocation)
+  );
+  const submittedRef = React.useRef(false);
 
   useEffect(() => {
     if (!open) {
+      submittedRef.current = false;
       setBody("");
       setUseAnonymousDisplay(false);
+      setScope(defaultPulsePostScope(userLocation));
     }
   }, [open]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !submittedRef.current) return;
     if (createStatus === "fulfilled") {
+      submittedRef.current = false;
       dispatch(
         showAlert({
           message: "Posted to your coverage on Pulse.",
@@ -58,6 +77,7 @@ export default function PulseRepostModal({
       onClose();
     }
     if (createStatus === "rejected") {
+      submittedRef.current = false;
       dispatch(
         showAlert({
           message: createError || "Could not repost. Please try again.",
@@ -87,19 +107,23 @@ export default function PulseRepostModal({
     }
 
     const quotedPost = toPulseQuotedPost(post);
+    const location = {
+      state: userDetails.state,
+      lga: userDetails.lga,
+      ward: userDetails.ward,
+      pollingUnit: userDetails.pollingUnit,
+    };
+    const isIntro = post.id === "pulse-intro-ade";
+    submittedRef.current = true;
     dispatch(
       createPulsePost({
         body: body.trim(),
-        visibilityScope: "public",
+        visibilityScope: scope,
+        locationLabel: getPlaceNameForScope(location, scope) || undefined,
         useAnonymousDisplay,
-        quotePostId: post.id,
+        ...(isIntro ? {} : { quotePostId: post.id }),
         quotedPost,
-        location: {
-          state: userDetails.state,
-          lga: userDetails.lga,
-          ward: userDetails.ward,
-          pollingUnit: userDetails.pollingUnit,
-        },
+        location,
       })
     );
   }
@@ -117,7 +141,13 @@ export default function PulseRepostModal({
       width={520}
       centered
       destroyOnClose
-      styles={{ body: { padding: 16 } }}
+      styles={{
+        body: {
+          padding: 16,
+          maxHeight: "min(640px, 85dvh)",
+          overflowY: "auto",
+        },
+      }}
     >
       <div className="grid gap-4">
         <div className="flex items-start justify-between gap-3">
@@ -152,11 +182,11 @@ export default function PulseRepostModal({
         />
 
         <div className="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50/80 p-3">
-          <div className="flex items-center gap-2 text-sm">
-            <div className="grid h-8 w-8 place-content-center rounded-full border border-gray-200 bg-white">
+          <div className="flex min-w-0 items-center gap-2 text-sm">
+            <div className="grid h-8 w-8 shrink-0 place-content-center rounded-full border border-gray-200 bg-white">
               <Profile size={16} className="text-brand-500" variant="Bold" />
             </div>
-            <span className="truncate font-semibold text-gray-900">
+            <span className="min-w-0 flex-1 truncate font-semibold text-gray-900">
               {quotedAuthor}
             </span>
             <span className="text-gray-400">·</span>
@@ -170,6 +200,17 @@ export default function PulseRepostModal({
           {post.imageUrl ? (
             <p className="mt-1 text-xs text-gray-500">Contains an image</p>
           ) : null}
+        </div>
+
+        <div className="rounded-xl border border-gray-200 p-3">
+          <p className="mb-2 text-sm font-semibold text-gray-800">
+            Post within
+          </p>
+          <PulseScopePicker
+            value={scope}
+            onChange={setScope}
+            location={userLocation}
+          />
         </div>
 
         <div className="flex items-start justify-between gap-3 rounded-xl border border-gray-200 p-3">

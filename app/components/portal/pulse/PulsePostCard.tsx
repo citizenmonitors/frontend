@@ -9,7 +9,8 @@ import {
   shouldTruncatePulseBody,
   truncatePulseBody,
 } from "@/app/utils/pulseUtils";
-import { Image as AntImage, Tooltip } from "antd";
+import { Image as AntImage } from "antd";
+import PulseActionButton from "./PulseActionButton";
 import {
   ArrowRotateLeft,
   Copy,
@@ -254,61 +255,46 @@ export default function PulsePostCard({
           ) : null}
 
           <div className="mt-3 flex max-w-md items-center justify-between text-gray-500">
-            <Tooltip title="Comment" placement="top">
-              <button
-                type="button"
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-brand-50 hover:text-brand-600"
-                onClick={() => onComment(post.id)}
-                aria-label="Comment"
-              >
-                <Message size={18} />
-                <span>{post.commentsCount || ""}</span>
-              </button>
-            </Tooltip>
-
-            <Tooltip title="Repost" placement="top">
-              <button
-                type="button"
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-success-50 hover:text-success-600"
-                onClick={() => onRepost(post)}
-                aria-label="Repost"
-              >
-                <ArrowRotateLeft size={18} />
-                <span>{post.repostsCount || ""}</span>
-              </button>
-            </Tooltip>
-
-            <Tooltip
-              title={post.isLikedByCurrentUser ? "Unlike" : "Like"}
-              placement="top"
+            <PulseActionButton
+              label="Comment"
+              onClick={() => onComment(post.id)}
+              className="hover:bg-brand-50 hover:text-brand-600"
             >
-              <button
-                type="button"
-                className={`inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-error-50 hover:text-error-500 ${
-                  post.isLikedByCurrentUser ? "text-error-500" : ""
-                }`}
-                onClick={() => onLike(post.id)}
-                disabled={liking}
-                aria-label={post.isLikedByCurrentUser ? "Unlike" : "Like"}
-              >
-                <Like1
-                  size={18}
-                  variant={post.isLikedByCurrentUser ? "Bold" : "Linear"}
-                />
-                <span>{post.likesCount || ""}</span>
-              </button>
-            </Tooltip>
+              <Message size={18} />
+              <span>{post.commentsCount || ""}</span>
+            </PulseActionButton>
 
-            <Tooltip title="Share" placement="top">
-              <button
-                type="button"
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-brand-50 hover:text-brand-600"
-                onClick={() => onShare(post)}
-                aria-label="Share"
-              >
-                <Share size={18} />
-              </button>
-            </Tooltip>
+            <PulseActionButton
+              label="Repost"
+              onClick={() => onRepost(post)}
+              className="hover:bg-success-50 hover:text-success-600"
+            >
+              <ArrowRotateLeft size={18} />
+              <span>{post.repostsCount || ""}</span>
+            </PulseActionButton>
+
+            <PulseActionButton
+              label={post.isLikedByCurrentUser ? "Unlike" : "Like"}
+              onClick={() => onLike(post.id)}
+              disabled={liking}
+              className={`hover:bg-error-50 hover:text-error-500 ${
+                post.isLikedByCurrentUser ? "text-error-500" : ""
+              }`}
+            >
+              <Like1
+                size={18}
+                variant={post.isLikedByCurrentUser ? "Bold" : "Linear"}
+              />
+              <span>{post.likesCount || ""}</span>
+            </PulseActionButton>
+
+            <PulseActionButton
+              label="Share"
+              onClick={() => onShare(post)}
+              className="hover:bg-brand-50 hover:text-brand-600"
+            >
+              <Share size={18} />
+            </PulseActionButton>
           </div>
         </div>
       </div>

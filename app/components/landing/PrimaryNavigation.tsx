@@ -1,10 +1,9 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Hamburger from "@/public/assets/hamburger.svg";
 import HamburgerClose from "@/public/assets/hamburger-close.svg";
 import { primaryLinks, topLinks } from "@/app/data/navigation";
-import { v4 } from "uuid";
 import { Button, Dropdown } from "antd";
 import Link from "next/link";
 import { ArrowDown2 } from "iconsax-react";
@@ -21,6 +20,15 @@ function PrimaryNavigation() {
   const pathName = usePathname();
   const rootPathName = getRootPath(pathName);
   const { isAuthenticated, dashboardHref } = useSoftSession();
+
+  useEffect(() => {
+    if (!mobileNavigationOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [mobileNavigationOpen]);
 
   const lgLinks = new Set([0, 1, 2, 3, 4, 5, 6]);
   const mdLinks = new Set([0, 1, 2, 7]);
@@ -97,7 +105,7 @@ function PrimaryNavigation() {
           {primaryLinks.map((link, linkIndex) =>
             link.subMenu ? (
               <li
-                key={v4()}
+                key={link.name}
                 className={`${!lgLinks.has(linkIndex) ? "lg:hidden" : ""} ${
                   !mdLinks.has(linkIndex) ? "md:hidden lg:block" : ""
                 }`}
@@ -120,7 +128,7 @@ function PrimaryNavigation() {
                           </Button>
                         </Link>
                       ),
-                      key: v4(),
+                      key: item.href,
                     })),
                   }}
                   arrow
@@ -138,12 +146,12 @@ function PrimaryNavigation() {
               </li>
             ) : (
               <li
-                key={v4()}
+                key={link.name}
                 className={`${!lgLinks.has(linkIndex) ? "lg:hidden" : ""} ${
                   !mdLinks.has(linkIndex) ? "md:hidden lg:block" : ""
                 }`}
               >
-                <Link className="flex" href={link.href} tabIndex={-1}>
+                <Link className="flex" href={link.href}>
                   <Button
                     block
                     type="text"
@@ -189,8 +197,8 @@ function PrimaryNavigation() {
         >
           <nav
             id="primary-nav-mobile"
-            className={`h-full ml-auto w-1/2 min-w-[188px] p-4 md:hidden z-50 bg-white flex flex-col transition-transform ${
-              mobileNavigationOpen ? "translate-x-0" : "translate-x-1/2"
+            className={`ml-auto flex h-full min-h-0 w-[min(88vw,20rem)] flex-col overflow-y-auto overscroll-contain p-4 md:hidden z-50 bg-white transition-transform ${
+              mobileNavigationOpen ? "translate-x-0" : "translate-x-full"
             }`}
           >
             <Button
@@ -209,7 +217,7 @@ function PrimaryNavigation() {
             <ul className="flex flex-col gap-3 mb-4">
               {primaryLinks.map((link) =>
                 link.subMenu ? (
-                  <li key={v4()} className="flex py-2 last:hidden">
+                  <li key={link.name} className="flex py-2 last:hidden">
                     <Dropdown
                       trigger={["click"]}
                       menu={{
@@ -221,7 +229,7 @@ function PrimaryNavigation() {
                               </Button>
                             </Link>
                           ),
-                          key: v4(),
+                          key: item.href,
                         })),
                       }}
                       arrow
@@ -239,8 +247,8 @@ function PrimaryNavigation() {
                     </Dropdown>
                   </li>
                 ) : (
-                  <li key={v4()} className="last:hidden">
-                    <Link className="flex" href={link.href} tabIndex={-1}>
+                  <li key={link.name} className="last:hidden">
+                    <Link className="flex" href={link.href}>
                       <Button
                         block
                         size="large"

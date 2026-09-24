@@ -7,12 +7,17 @@ import {
   createPulsePost,
   getPulsePosts,
 } from "@/app/redux/features/pulseSlice";
-import { generateAnonymousHandle, PULSE_BODY_MAX_LENGTH } from "@/app/utils/pulseUtils";
-import { Button, Input, Modal, Switch, Upload } from "antd";
+import {
+  defaultPulsePostScope,
+  generateAnonymousHandle,
+  getPlaceNameForScope,
+  PULSE_BODY_MAX_LENGTH,
+  PulsePostScope,
+} from "@/app/utils/pulseUtils";
+import { Button, Modal, Switch } from "antd";
+import PulseScopePicker from "./PulseScopePicker";
 import { Camera, CloseCircle, InfoCircle } from "iconsax-react";
-import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
-import type { UploadFile } from "antd/es/upload";
 
 type CreatePulsePostModalProps = {
   open: boolean;
@@ -25,26 +30,53 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
   const pulseState = useAppSelector((state) => state.pulse);
   const [body, setBody] = useState("");
   const [useAnonymousDisplay, setUseAnonymousDisplay] = useState(false);
-  const [imageFile, setImageFile] = useState<UploadFile | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const submittedRef = React.useRef(false);
   const anonymousHandle = useMemo(() => generateAnonymousHandle(), [open]);
+  const userLocation = userDetails
+    ? {
+        state: userDetails.state,
+        lga: userDetails.lga,
+        ward: userDetails.ward,
+        pollingUnit: userDetails.pollingUnit,
+      }
+    : null;
+  const [scope, setScope] = useState<PulsePostScope>(
+    defaultPulsePostScope(userLocation)
+  );
 
   useEffect(() => {
     if (!open) {
+      submittedRef.current = false;
       setBody("");
       setUseAnonymousDisplay(false);
       setImageFile(null);
+      setImagePreview((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      setScope(defaultPulsePostScope(userLocation));
     }
   }, [open]);
 
   useEffect(() => {
-    if (!open) return;
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
+
+  useEffect(() => {
+    if (!open || !submittedRef.current) return;
     if (pulseState.status.createPost === "fulfilled") {
+      submittedRef.current = false;
       dispatch(showAlert({ message: "Your post was shared on Pulse.", type: "success" }));
       dispatch(clearCreatePostStatus());
       dispatch(getPulsePosts({ force: true }));
       onClose();
     }
     if (pulseState.status.createPost === "rejected") {
+      submittedRef.current = false;
       dispatch(
         showAlert({
           message: pulseState.error.message || "Could not submit your post.",
@@ -55,14 +87,32 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
     }
   }, [pulseState.status.createPost, pulseState.error.message, open, dispatch, onClose]);
 
+  function handlePickImage(file: File | undefined) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      dispatch(showAlert({ message: "Please select an image file.", type: "error" }));
+      return;
+    }
+    setImageFile(file);
+    setImagePreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
+  }
+
   function handleSubmit() {
     if (!userDetails) {
       dispatch(showAlert({ message: "Please log in to post on Pulse.", type: "warning" }));
       return;
     }
 
-    if (!body.trim()) {
-      dispatch(showAlert({ message: "Please write something before posting.", type: "error" }));
+    if (!body.trim() && !imageFile) {
+      dispatch(
+        showAlert({
+          message: "Please write something or attach an image.",
+          type: "error",
+        })
+      );
       return;
     }
 
@@ -76,19 +126,21 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
       return;
     }
 
-    const image = imageFile?.originFileObj;
+    const location = {
+      state: userDetails.state,
+      lga: userDetails.lga,
+      ward: userDetails.ward,
+      pollingUnit: userDetails.pollingUnit,
+    };
+    submittedRef.current = true;
     dispatch(
       createPulsePost({
-        body: body.trim(),
-        visibilityScope: "public",
+        body: body.trim() || " ",
+        visibilityScope: scope,
+        locationLabel: getPlaceNameForScope(location, scope) || undefined,
         useAnonymousDisplay,
-        location: {
-          state: userDetails.state,
-          lga: userDetails.lga,
-          ward: userDetails.ward,
-          pollingUnit: userDetails.pollingUnit,
-        },
-        ...(image instanceof File ? { image } : {}),
+        location,
+        ...(imageFile ? { image: imageFile } : {}),
       })
     );
   }
@@ -105,7 +157,11 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
       centered
       className="pulse-create-modal"
       styles={{
-        body: { padding: 16 },
+        body: {
+          padding: 16,
+          maxHeight: "min(640px, 85dvh)",
+          overflowY: "auto",
+        },
       }}
       destroyOnClose
     >
@@ -140,54 +196,67 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
           </p>
         </div>
 
-        <Input.TextArea
+        <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder="What's happening.."
           rows={4}
           maxLength={PULSE_BODY_MAX_LENGTH}
-          showCount
-          className="!border-gray-200 !bg-gray-50"
+          className="w-full resize-y rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none ring-brand-500/20 placeholder:text-gray-400 focus:border-brand-400 focus:ring-2"
         />
+        <p className="text-right text-xs text-gray-400">
+          {body.length}/{PULSE_BODY_MAX_LENGTH}
+        </p>
 
-        <Upload
-          accept="image/*"
-          maxCount={1}
-          showUploadList={false}
-          beforeUpload={(file) => {
-            setImageFile({ uid: file.uid, name: file.name, originFileObj: file });
-            return false;
-          }}
-        >
-          <Button
-            block
-            size="large"
-            className="!h-12 !border-brand-200 !bg-brand-25 font-medium !text-brand-600"
-            icon={<Camera size={18} />}
-          >
-            Attach image
-          </Button>
-        </Upload>
+        <label className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-brand-200 bg-brand-25 text-sm font-medium text-brand-600 hover:bg-brand-50">
+          <Camera size={18} />
+          Attach image
+          <input
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={(e) => {
+              handlePickImage(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
+        </label>
 
-        {imageFile?.originFileObj && (
+        {imagePreview ? (
           <div className="relative overflow-hidden rounded-xl">
-            <Image
-              src={URL.createObjectURL(imageFile.originFileObj)}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imagePreview}
               alt="Attachment preview"
-              width={480}
-              height={280}
               className="h-40 w-full object-cover sm:h-48"
             />
             <button
               type="button"
               className="absolute right-2 top-2 grid h-9 w-9 place-content-center rounded-full bg-white/90"
-              onClick={() => setImageFile(null)}
+              onClick={() => {
+                setImageFile(null);
+                setImagePreview((prev) => {
+                  if (prev) URL.revokeObjectURL(prev);
+                  return null;
+                });
+              }}
               aria-label="Remove image"
             >
               <CloseCircle size={18} className="text-gray-600" />
             </button>
           </div>
-        )}
+        ) : null}
+
+        <div className="rounded-xl border border-gray-200 p-3">
+          <p className="mb-2 text-sm font-semibold text-gray-800">
+            Post within
+          </p>
+          <PulseScopePicker
+            value={scope}
+            onChange={setScope}
+            location={userLocation}
+          />
+        </div>
 
         <div className="flex items-start justify-between gap-3 rounded-xl border border-gray-200 p-3 sm:gap-4 sm:p-4">
           <div className="min-w-0">

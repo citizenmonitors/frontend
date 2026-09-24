@@ -333,6 +333,14 @@ const pulseSlice = createSlice({
         ...action.payload,
         quotedPost: quoted || action.payload.quotedPost || null,
         location: action.payload.location || action.meta.arg.location || null,
+        visibilityScope:
+          action.payload.visibilityScope ||
+          action.meta.arg.visibilityScope ||
+          "public",
+        locationLabel:
+          action.payload.locationLabel ||
+          action.meta.arg.locationLabel ||
+          null,
       };
       state.posts = [nextPost, ...state.posts];
       state.total += 1;

@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import React, { useState } from "react";
-import { Tooltip } from "antd";
 import {
   ArrowRotateLeft,
   Like1,
@@ -10,8 +9,10 @@ import {
   Share,
   TickCircle,
 } from "iconsax-react";
+import PulseActionButton from "./PulseActionButton";
 import { useAppDispatch } from "@/app/hooks/redux";
 import { showAlert } from "@/app/redux/features/alertSlice";
+import { PulsePost } from "@/app/redux/types";
 import {
   formatPulseDateTime,
   formatPulseTimeAgo,
@@ -31,10 +32,43 @@ export const PULSE_INTRO_BODY = [
 
 const PULSE_INTRO_CREATED_AT = "2024-01-15T09:30:00+01:00";
 
+export function getPulseIntroPost(): PulsePost {
+  return {
+    id: "pulse-intro-ade",
+    body: PULSE_INTRO_BODY,
+    imageUrl: null,
+    visibilityScope: "public",
+    locationLabel: "Post Within Nigeria",
+    location: null,
+    author: {
+      id: "ade",
+      displayName: "Ade",
+      usedAnonymous: false,
+    },
+    likesCount: 128,
+    commentsCount: 0,
+    repostsCount: 0,
+    isLikedByCurrentUser: false,
+    createdAt: PULSE_INTRO_CREATED_AT,
+  };
+}
+
 /** Ade’s welcome — always the first post in the Pulse feed */
-export default function PulseIntroPost() {
+type PulseIntroPostProps = {
+  onComment?: () => void;
+  onRepost?: () => void;
+  onLike?: () => void;
+};
+
+export default function PulseIntroPost({
+  onComment,
+  onRepost,
+  onLike,
+}: PulseIntroPostProps) {
   const dispatch = useAppDispatch();
   const [expanded, setExpanded] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likes, setLikes] = useState(128);
   const needsTruncate = shouldTruncatePulseBody(PULSE_INTRO_BODY);
   const displayBody =
     expanded || !needsTruncate
@@ -111,40 +145,41 @@ export default function PulseIntroPost() {
           </div>
 
           <div className="mt-3 flex max-w-md items-center justify-between text-gray-500">
-            <Tooltip title="Comment" placement="top">
-              <span
-                className="inline-flex min-h-10 cursor-default items-center gap-1.5 rounded-full px-2 text-sm"
-                aria-label="Comment"
-              >
-                <Message size={18} />
-              </span>
-            </Tooltip>
-            <Tooltip title="Repost" placement="top">
-              <span
-                className="inline-flex min-h-10 cursor-default items-center gap-1.5 rounded-full px-2 text-sm"
-                aria-label="Repost"
-              >
-                <ArrowRotateLeft size={18} />
-              </span>
-            </Tooltip>
-            <Tooltip title="Like" placement="top">
-              <span
-                className="inline-flex min-h-10 cursor-default items-center gap-1.5 rounded-full px-2 text-sm"
-                aria-label="Like"
-              >
-                <Like1 size={18} />
-              </span>
-            </Tooltip>
-            <Tooltip title="Share" placement="top">
-              <button
-                type="button"
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-sm transition-colors hover:bg-brand-50 hover:text-brand-600"
-                onClick={handleShare}
-                aria-label="Share"
-              >
-                <Share size={18} />
-              </button>
-            </Tooltip>
+            <PulseActionButton
+              label="Comment"
+              onClick={() => onComment?.()}
+              className="hover:bg-brand-50 hover:text-brand-600"
+            >
+              <Message size={18} />
+            </PulseActionButton>
+            <PulseActionButton
+              label="Repost"
+              onClick={() => onRepost?.()}
+              className="hover:bg-success-50 hover:text-success-600"
+            >
+              <ArrowRotateLeft size={18} />
+            </PulseActionButton>
+            <PulseActionButton
+              label={liked ? "Unlike" : "Like"}
+              onClick={() => {
+                setLiked((prev) => !prev);
+                setLikes((prev) => (liked ? prev - 1 : prev + 1));
+                onLike?.();
+              }}
+              className={`hover:bg-error-50 hover:text-error-500 ${
+                liked ? "text-error-500" : ""
+              }`}
+            >
+              <Like1 size={18} variant={liked ? "Bold" : "Linear"} />
+              <span>{likes}</span>
+            </PulseActionButton>
+            <PulseActionButton
+              label="Share"
+              onClick={handleShare}
+              className="hover:bg-brand-50 hover:text-brand-600"
+            >
+              <Share size={18} />
+            </PulseActionButton>
           </div>
         </div>
       </div>

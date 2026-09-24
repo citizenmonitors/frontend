@@ -204,6 +204,9 @@ export async function createPulsePost(
   formData.append("body", bodyText);
   formData.append("visibilityScope", payload.visibilityScope ?? "public");
   formData.append("useAnonymousDisplay", String(payload.useAnonymousDisplay));
+  if (payload.locationLabel) {
+    formData.append("locationLabel", payload.locationLabel);
+  }
 
   if (payload.quotePostId) {
     formData.append("quotePostId", payload.quotePostId);
@@ -237,6 +240,11 @@ export async function createPulsePost(
           : normalized.body,
     quotedPost: normalized.quotedPost || payload.quotedPost || null,
     location: normalized.location || payload.location || null,
+    visibilityScope: payload.visibilityScope || normalized.visibilityScope,
+    locationLabel:
+      payload.locationLabel ||
+      normalized.locationLabel ||
+      null,
   };
 }
 

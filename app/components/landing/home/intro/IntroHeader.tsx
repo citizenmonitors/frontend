@@ -4,7 +4,7 @@ import { TypeAnimation } from "react-type-animation";
 
 function IntroHeader() {
   return (
-    <h1 className="text-[42px] md:text-display-xl lg:text-display-xxl font-league font-bold text-gray-700 leading-[1] text-center md:text-left">
+    <h1 className="text-[32px] sm:text-[42px] md:text-display-xl lg:text-display-xxl font-league font-bold text-gray-700 leading-[1.05] text-center md:text-left break-words">
       Crowdsourcing <br className="hidden lg:block" /> Electoral Data <span className="sr-only">for Public Good.</span>
       <br />
       <TypeAnimation

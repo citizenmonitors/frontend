@@ -22,7 +22,7 @@ import {
 import CreatePulsePostModal from "./CreatePulsePostModal";
 import PulseCommentsModal from "./PulseCommentsModal";
 import PulseComposer from "./PulseComposer";
-import PulseIntroPost from "./PulseIntroPost";
+import PulseIntroPost, { getPulseIntroPost } from "./PulseIntroPost";
 import PulseLocationTabs from "./PulseLocationTabs";
 import PulseLoginModal from "./PulseLoginModal";
 import PulsePostCard from "./PulsePostCard";
@@ -76,6 +76,7 @@ export default function PulseFeed() {
       return;
     }
     if (action.type === "like") {
+      if (action.postId === "pulse-intro-ade") return;
       dispatch(togglePulsePostLike(action.postId));
       return;
     }
@@ -203,7 +204,7 @@ export default function PulseFeed() {
 
   return (
     <div className="relative min-w-0">
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-visible rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div className="border-b border-gray-200 px-4 py-3 sm:px-5">
           <h1 className="font-league text-xl font-bold text-gray-900 sm:text-2xl">
             Pulse
@@ -217,14 +218,22 @@ export default function PulseFeed() {
           value={locationFilter}
           onChange={handleLocationFilterChange}
           userState={userDetails?.state}
+          userLga={userDetails?.lga}
+          userWard={userDetails?.ward}
+          userPollingUnit={userDetails?.pollingUnit}
         />
 
         <PulseComposer
           displayName={displayName}
-          onOpenCompose={handleOpenCreate}
+          requireAuth={() =>
+            requireAuth("post on Pulse", { type: "create" })
+          }
         />
 
-        <PulseIntroPost />
+        <PulseIntroPost
+          onComment={() => handleOpenCreate()}
+          onRepost={() => handleRepost(getPulseIntroPost())}
+        />
 
         {loading ? (
           <div className="grid place-content-center py-16">
@@ -243,7 +252,7 @@ export default function PulseFeed() {
                 onCopyText={handleCopyText}
                 onCopyLink={handleCopyLink}
                 onReport={handleReport}
-                liking={pulseState.status.likePost === "pending"}
+                liking={false}
               />
             ))}
           </div>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Eye, Profile2User } from "iconsax-react";
 import formatNumber from "@/app/utils/formatNumber";
 import { CollationCandidate } from "@/app/types/irevCollation";
-import { PRESIDENTIAL_2023_SLUG } from "@/app/data/mockElectionDetail";
+import { OSUN_ELECTION_SLUG } from "@/app/data/mockElectionDetail";
 import { getPartyDisplayLabel } from "@/app/data/partyInfo";
 import CandidateAvatarPlaceholder from "./detail/CandidateAvatarPlaceholder";
 
@@ -16,7 +16,7 @@ type CollationCandidateResultsProps = {
 
 export default function CollationCandidateResults({
   candidates,
-  detailHref = `/collation/${PRESIDENTIAL_2023_SLUG}`,
+  detailHref = `/collation/${OSUN_ELECTION_SLUG}`,
 }: CollationCandidateResultsProps) {
   const totalVotes = useMemo(
     () => candidates.reduce((sum, c) => sum + c.votes, 0),
