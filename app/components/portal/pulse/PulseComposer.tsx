@@ -7,13 +7,22 @@ import {
   createPulsePost,
 } from "@/app/redux/features/pulseSlice";
 import {
+  countPulseChars,
   defaultPulsePostScope,
   getPlaceNameForScope,
   PULSE_BODY_MAX_LENGTH,
   PulsePostScope,
 } from "@/app/utils/pulseUtils";
+import {
+  fileFromClipboard,
+  fileFromDrop,
+  insertTextAtCursor,
+  isPulseImageFile,
+  PULSE_IMAGE_ACCEPT,
+} from "@/app/utils/pulseMedia";
 import { CloseCircle, Gallery, Profile } from "iconsax-react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import PulseEmojiStickerPicker from "./PulseEmojiStickerPicker";
 import PulseScopePicker from "./PulseScopePicker";
 
 type PulseComposerProps = {
@@ -32,6 +41,7 @@ export default function PulseComposer({
   const [body, setBody] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const userLocation = useMemo(
     () =>
       userDetails
@@ -81,9 +91,12 @@ export default function PulseComposer({
 
   function handlePickImage(file: File | undefined) {
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
+    if (!isPulseImageFile(file)) {
       dispatch(
-        showAlert({ message: "Please select an image file.", type: "error" })
+        showAlert({
+          message: "Please select an image or sticker file.",
+          type: "error",
+        })
       );
       return;
     }
@@ -91,6 +104,19 @@ export default function PulseComposer({
     setImagePreview((prev) => {
       if (prev) URL.revokeObjectURL(prev);
       return URL.createObjectURL(file);
+    });
+  }
+
+  function handleInsertEmoji(emoji: string) {
+    const node = textareaRef.current;
+    const start = node?.selectionStart ?? body.length;
+    const end = node?.selectionEnd ?? start;
+    const { next, caret } = insertTextAtCursor(body, emoji, start, end);
+    if (countPulseChars(next) > PULSE_BODY_MAX_LENGTH) return;
+    setBody(next);
+    requestAnimationFrame(() => {
+      node?.focus();
+      node?.setSelectionRange(caret, caret);
     });
   }
 
@@ -107,7 +133,7 @@ export default function PulseComposer({
       return;
     }
 
-    if (body.trim().length > PULSE_BODY_MAX_LENGTH) {
+    if (countPulseChars(body) > PULSE_BODY_MAX_LENGTH) {
       dispatch(
         showAlert({
           message: `Post must be ${PULSE_BODY_MAX_LENGTH} characters or fewer.`,
@@ -146,16 +172,34 @@ export default function PulseComposer({
         </div>
         <div className="min-w-0 flex-1">
           <textarea
+            ref={textareaRef}
             value={body}
-            onChange={(e) => setBody(e.target.value)}
+            onChange={(e) => {
+              if (countPulseChars(e.target.value) > PULSE_BODY_MAX_LENGTH) return;
+              setBody(e.target.value);
+            }}
+            onPaste={(e) => {
+              const file = fileFromClipboard(e);
+              if (!file) return;
+              e.preventDefault();
+              handlePickImage(file);
+            }}
+            onDrop={(e) => {
+              const file = fileFromDrop(e);
+              if (!file) return;
+              e.preventDefault();
+              handlePickImage(file);
+            }}
+            onDragOver={(e) => {
+              if (e.dataTransfer.types.includes("Files")) e.preventDefault();
+            }}
             placeholder={
               displayName
                 ? `What's happening, ${displayName.split(" ")[0]}?`
                 : "What's happening?"
             }
             rows={3}
-            maxLength={PULSE_BODY_MAX_LENGTH}
-            className="w-full resize-none bg-transparent text-lg text-gray-900 outline-none placeholder:text-gray-400"
+            className="w-full resize-none bg-transparent text-lg text-gray-900 outline-none placeholder:text-gray-400 [font-family:inherit,'Apple_Color_Emoji','Segoe_UI_Emoji','Noto_Color_Emoji']"
           />
 
           {imagePreview ? (
@@ -164,7 +208,7 @@ export default function PulseComposer({
               <img
                 src={imagePreview}
                 alt="Attachment preview"
-                className="max-h-64 w-full object-cover"
+                className="max-h-64 w-full object-contain bg-gray-50"
               />
               <button
                 type="button"
@@ -192,7 +236,7 @@ export default function PulseComposer({
               <span className="text-xs font-medium">Image</span>
               <input
                 type="file"
-                accept="image/*"
+                accept={PULSE_IMAGE_ACCEPT}
                 className="sr-only"
                 onChange={(e) => {
                   handlePickImage(e.target.files?.[0]);
@@ -200,6 +244,10 @@ export default function PulseComposer({
                 }}
               />
             </label>
+            <PulseEmojiStickerPicker
+              onInsertEmoji={handleInsertEmoji}
+              onPickSticker={handlePickImage}
+            />
             <PulseScopePicker
               compact
               value={scope}

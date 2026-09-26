@@ -245,19 +245,39 @@ export function getPulsePostLocationLabel(post: {
 
 export const PULSE_BODY_MAX_LENGTH = 5000;
 
+/** Count visible characters so emoji / stickers count as one each. */
+export function getPulseGraphemes(text: string) {
+  const value = text || "";
+  if (typeof Intl !== "undefined" && "Segmenter" in Intl) {
+    return [
+      ...new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(
+        value
+      ),
+    ].map((part) => part.segment);
+  }
+  return Array.from(value);
+}
+
+export function countPulseChars(text: string) {
+  return getPulseGraphemes(text).length;
+}
+
 /** Collapse long Pulse bodies in the feed; expand in-place with Read more */
 export const PULSE_FEED_PREVIEW_LENGTH = 280;
 
 export function shouldTruncatePulseBody(body: string, limit = PULSE_FEED_PREVIEW_LENGTH) {
-  return (body || "").trim().length > limit;
+  return countPulseChars((body || "").trim()) > limit;
 }
 
 export function truncatePulseBody(body: string, limit = PULSE_FEED_PREVIEW_LENGTH) {
   const text = (body || "").trim();
-  if (text.length <= limit) return text;
-  const slice = text.slice(0, limit);
-  const lastSpace = slice.lastIndexOf(" ");
-  const cut = lastSpace > limit * 0.6 ? slice.slice(0, lastSpace) : slice;
+  const graphemes = getPulseGraphemes(text);
+  if (graphemes.length <= limit) return text;
+  const slice = graphemes.slice(0, limit);
+  const joined = slice.join("");
+  const lastSpace = joined.lastIndexOf(" ");
+  const cut =
+    lastSpace > limit * 0.6 ? joined.slice(0, lastSpace) : joined;
   return `${cut.trim()}…`;
 }
 

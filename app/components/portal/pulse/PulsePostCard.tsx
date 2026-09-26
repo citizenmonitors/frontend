@@ -179,7 +179,7 @@ export default function PulsePostCard({
 
           {!pureRepost && post.body.trim() ? (
             <div className="mt-2">
-              <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-gray-900">
+              <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-gray-900 [font-family:inherit,'Apple_Color_Emoji','Segoe_UI_Emoji','Noto_Color_Emoji']">
                 {displayBody}
               </p>
               {bodyNeedsTruncate ? (
@@ -199,7 +199,7 @@ export default function PulsePostCard({
               <AntImage
                 src={post.imageUrl}
                 alt="Post attachment"
-                className="!max-h-[320px] !w-full !object-cover"
+                className="!max-h-[320px] !w-full !object-contain !bg-gray-50"
                 wrapperClassName="block w-full"
                 style={{ cursor: "zoom-in" }}
               />

@@ -9,9 +9,11 @@ import {
   togglePulseCommentLike,
 } from "@/app/redux/features/pulseSlice";
 import { formatPulseTimeAgo } from "@/app/utils/pulseUtils";
+import { insertTextAtCursor } from "@/app/utils/pulseMedia";
 import { Button, Input, Modal, Spin } from "antd";
 import { CloseCircle, Like1, Message, Profile } from "iconsax-react";
 import React, { useEffect, useState } from "react";
+import PulseEmojiStickerPicker from "./PulseEmojiStickerPicker";
 
 type PulseCommentsModalProps = {
   postId: string | null;
@@ -126,7 +128,9 @@ export default function PulseCommentsModal({
                   </span>
                 </div>
 
-                <p className="pl-12 text-sm leading-relaxed text-gray-600">{item.body}</p>
+                <p className="pl-12 whitespace-pre-wrap break-words text-sm leading-relaxed text-gray-600 [font-family:inherit,'Apple_Color_Emoji','Segoe_UI_Emoji','Noto_Color_Emoji']">
+                  {item.body}
+                </p>
 
                 <div className="flex items-center justify-between pl-12">
                   <span className="text-xs text-gray-500">{item.likesCount} Likes</span>
@@ -151,14 +155,23 @@ export default function PulseCommentsModal({
         </div>
 
         <div className="grid gap-3 border-t border-gray-200 pt-4">
-          <div className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3">
-            <Message size={20} className="mt-1 shrink-0 text-gray-400" />
-            <Input.TextArea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              placeholder="Leave Comment, @ To Mention"
-              autoSize={{ minRows: 2, maxRows: 4 }}
-              className="!border-0 !bg-transparent !shadow-none"
+          <div className="grid gap-2 rounded-xl border border-gray-200 bg-gray-50 p-3">
+            <div className="flex items-start gap-3">
+              <Message size={20} className="mt-1 shrink-0 text-gray-400" />
+              <Input.TextArea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder="Leave Comment, @ To Mention"
+                autoSize={{ minRows: 2, maxRows: 4 }}
+                className="!border-0 !bg-transparent !shadow-none [font-family:inherit,'Apple_Color_Emoji','Segoe_UI_Emoji','Noto_Color_Emoji']"
+              />
+            </div>
+            <PulseEmojiStickerPicker
+              placement="up"
+              onInsertEmoji={(emoji) => {
+                const { next } = insertTextAtCursor(body, emoji);
+                setBody(next);
+              }}
             />
           </div>
           <Button

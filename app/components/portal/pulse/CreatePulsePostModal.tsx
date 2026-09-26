@@ -8,16 +8,25 @@ import {
   getPulsePosts,
 } from "@/app/redux/features/pulseSlice";
 import {
+  countPulseChars,
   defaultPulsePostScope,
   generateAnonymousHandle,
   getPlaceNameForScope,
   PULSE_BODY_MAX_LENGTH,
   PulsePostScope,
 } from "@/app/utils/pulseUtils";
+import {
+  fileFromClipboard,
+  fileFromDrop,
+  insertTextAtCursor,
+  isPulseImageFile,
+  PULSE_IMAGE_ACCEPT,
+} from "@/app/utils/pulseMedia";
 import { Button, Modal, Switch } from "antd";
+import PulseEmojiStickerPicker from "./PulseEmojiStickerPicker";
 import PulseScopePicker from "./PulseScopePicker";
 import { Camera, CloseCircle, InfoCircle } from "iconsax-react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 type CreatePulsePostModalProps = {
   open: boolean;
@@ -33,6 +42,7 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const submittedRef = React.useRef(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const anonymousHandle = useMemo(() => generateAnonymousHandle(), [open]);
   const userLocation = userDetails
     ? {
@@ -89,14 +99,32 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
 
   function handlePickImage(file: File | undefined) {
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      dispatch(showAlert({ message: "Please select an image file.", type: "error" }));
+    if (!isPulseImageFile(file)) {
+      dispatch(
+        showAlert({
+          message: "Please select an image or sticker file.",
+          type: "error",
+        })
+      );
       return;
     }
     setImageFile(file);
     setImagePreview((prev) => {
       if (prev) URL.revokeObjectURL(prev);
       return URL.createObjectURL(file);
+    });
+  }
+
+  function handleInsertEmoji(emoji: string) {
+    const node = textareaRef.current;
+    const start = node?.selectionStart ?? body.length;
+    const end = node?.selectionEnd ?? start;
+    const { next, caret } = insertTextAtCursor(body, emoji, start, end);
+    if (countPulseChars(next) > PULSE_BODY_MAX_LENGTH) return;
+    setBody(next);
+    requestAnimationFrame(() => {
+      node?.focus();
+      node?.setSelectionRange(caret, caret);
     });
   }
 
@@ -116,7 +144,7 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
       return;
     }
 
-    if (body.trim().length > PULSE_BODY_MAX_LENGTH) {
+    if (countPulseChars(body) > PULSE_BODY_MAX_LENGTH) {
       dispatch(
         showAlert({
           message: `Post must be ${PULSE_BODY_MAX_LENGTH} characters or fewer.`,
@@ -197,23 +225,47 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
         </div>
 
         <textarea
+          ref={textareaRef}
           value={body}
-          onChange={(e) => setBody(e.target.value)}
+          onChange={(e) => {
+            if (countPulseChars(e.target.value) > PULSE_BODY_MAX_LENGTH) return;
+            setBody(e.target.value);
+          }}
+          onPaste={(e) => {
+            const file = fileFromClipboard(e);
+            if (!file) return;
+            e.preventDefault();
+            handlePickImage(file);
+          }}
+          onDrop={(e) => {
+            const file = fileFromDrop(e);
+            if (!file) return;
+            e.preventDefault();
+            handlePickImage(file);
+          }}
+          onDragOver={(e) => {
+            if (e.dataTransfer.types.includes("Files")) e.preventDefault();
+          }}
           placeholder="What's happening.."
           rows={4}
-          maxLength={PULSE_BODY_MAX_LENGTH}
-          className="w-full resize-y rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none ring-brand-500/20 placeholder:text-gray-400 focus:border-brand-400 focus:ring-2"
+          className="w-full resize-y rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none ring-brand-500/20 placeholder:text-gray-400 focus:border-brand-400 focus:ring-2 [font-family:inherit,'Apple_Color_Emoji','Segoe_UI_Emoji','Noto_Color_Emoji']"
         />
-        <p className="text-right text-xs text-gray-400">
-          {body.length}/{PULSE_BODY_MAX_LENGTH}
-        </p>
+        <div className="flex items-center justify-between gap-2">
+          <PulseEmojiStickerPicker
+            onInsertEmoji={handleInsertEmoji}
+            onPickSticker={handlePickImage}
+          />
+          <p className="text-right text-xs text-gray-400">
+            {countPulseChars(body)}/{PULSE_BODY_MAX_LENGTH}
+          </p>
+        </div>
 
         <label className="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-brand-200 bg-brand-25 text-sm font-medium text-brand-600 hover:bg-brand-50">
           <Camera size={18} />
-          Attach image
+          Attach image or sticker
           <input
             type="file"
-            accept="image/*"
+            accept={PULSE_IMAGE_ACCEPT}
             className="sr-only"
             onChange={(e) => {
               handlePickImage(e.target.files?.[0]);
@@ -228,7 +280,7 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
             <img
               src={imagePreview}
               alt="Attachment preview"
-              className="h-40 w-full object-cover sm:h-48"
+              className="h-40 w-full bg-gray-50 object-contain sm:h-48"
             />
             <button
               type="button"
