@@ -120,7 +120,7 @@ export default function PulseCommentsModal({
                       <Profile size={18} className="text-brand-500" variant="Bold" />
                     </div>
                     <p className="truncate font-semibold text-gray-800">
-                      {item.author.displayName}
+                      {item.author?.displayName || "Citizen"}
                     </p>
                   </div>
                   <span className="shrink-0 text-xs text-gray-400">

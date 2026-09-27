@@ -108,7 +108,17 @@ const userSlice = createSlice({
     });
     builder.addCase(validateSession.fulfilled, (state, action) => {
       state.status.validateSession = 'fulfilled';
-      state.details = action.payload.user.user || {};
+      const payload = action.payload as {
+        user?: { user?: typeof state.details } & typeof state.details;
+      };
+      const user =
+        payload?.user &&
+        typeof payload.user === "object" &&
+        "user" in payload.user &&
+        payload.user.user
+          ? payload.user.user
+          : payload?.user || null;
+      state.details = user && typeof user === "object" ? user : null;
     });
     builder.addCase(validateSession.rejected, (state) => {
       state.status.validateSession = 'rejected';

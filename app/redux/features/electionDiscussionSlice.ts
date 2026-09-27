@@ -89,10 +89,13 @@ const electionDiscussionSlice = createSlice({
     builder.addCase(getElectionDiscussionPosts.fulfilled, (state, action) => {
       state.status.getPosts = "fulfilled";
       state.activeElectionId = action.meta.arg.activeElectionId;
-      state.posts = action.payload.posts;
-      state.total = action.payload.total;
-      state.page = action.payload.page;
-      state.limit = action.payload.limit;
+      const incoming = Array.isArray(action.payload?.posts)
+        ? action.payload.posts
+        : [];
+      state.posts = incoming;
+      state.total = Number(action.payload?.total ?? incoming.length);
+      state.page = Number(action.payload?.page ?? 1);
+      state.limit = Number(action.payload?.limit ?? 20);
     });
     builder.addCase(getElectionDiscussionPosts.rejected, (state, action: any) => {
       state.status.getPosts = "rejected";

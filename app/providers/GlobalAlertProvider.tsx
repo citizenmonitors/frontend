@@ -19,7 +19,7 @@ function GlobalAlertProvider({ children }: any) {
   });
 
   useEffect(() => {
-    if (alertState.message) {
+    if (typeof alertState.message === "string" && alertState.message) {
       const alertTimeout = Math.min(7000, Math.max(2000, alertState.message.length * 50));
 
       setVisible(false);

@@ -18,10 +18,22 @@ const DashboardProfile = () => {
   const router = useRouter();
   const logout = useLogout();
   const userState = useAppSelector((state) => state.user);
-  const userDetails = userState.details!;
+  const userDetails = userState.details;
   const inboxState = useAppSelector((state) => state.inbox);
-  const isUnreadMessages = inboxState.podcasts.some((m) => !m.read);
-  const unreadCount = inboxState.podcasts.filter((m) => !m.read).length;
+  const podcasts = Array.isArray(inboxState.podcasts) ? inboxState.podcasts : [];
+  const isUnreadMessages = podcasts.some((m) => !m.read);
+  const unreadCount = podcasts.filter((m) => !m.read).length;
+  const dispatch = useAppDispatch();
+  const [_, token] = useToken();
+
+  useEffect(() => {
+    dispatch(getPodcasts());
+  }, [dispatch]);
+
+  if (!userDetails) return null;
+  if (!userDetails.email && !userDetails.firstName && !userDetails._id) {
+    return null;
+  }
 
   const isAdmin = ["admin", "super-admin"].includes(userDetails.role);
   const baseURL = isAdmin ? "/admin" : "/portal";
@@ -71,7 +83,6 @@ const DashboardProfile = () => {
     },
   ];
 
-  const [_, token] = useToken();
   const contentStyle: React.CSSProperties = {
     backgroundColor: token.colorBgElevated,
     borderRadius: token.borderRadiusLG,
@@ -82,12 +93,6 @@ const DashboardProfile = () => {
   const menuStyle: React.CSSProperties = {
     boxShadow: "none",
   };
-
-  const dispatch = useAppDispatch();
-  useEffect(() => {
-    dispatch(getPodcasts());
-  }, []);
-
 
   return (
     <>
@@ -140,7 +145,7 @@ const DashboardProfile = () => {
             {userDetails.profileImage ? (
               <Image
                 src={userDetails.profileImage.url}
-                alt={userDetails.firstName[0] + userDetails.lastName[0]}
+                alt={`${userDetails.firstName?.[0] || ""}${userDetails.lastName?.[0] || ""}`}
                 width={44}
                 height={44}
                 className="rounded-full w-full h-full"

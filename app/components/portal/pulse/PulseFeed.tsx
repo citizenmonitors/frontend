@@ -187,8 +187,11 @@ export default function PulseFeed() {
 
   const filteredPosts = useMemo(
     () =>
-      pulseState.posts.filter((post) =>
-        postMatchesLocationFilter(post, locationFilter, userLocation)
+      pulseState.posts.filter(
+        (post) =>
+          post &&
+          post.id &&
+          postMatchesLocationFilter(post, locationFilter, userLocation)
       ),
     [pulseState.posts, locationFilter, userLocation]
   );
@@ -234,6 +237,13 @@ export default function PulseFeed() {
           onComment={() => handleOpenCreate()}
           onRepost={() => handleRepost(getPulseIntroPost())}
         />
+
+        {pulseState.status.getPosts === "rejected" && !hasAnyPosts ? (
+          <div className="px-4 py-3 text-center text-sm text-gray-500 sm:px-5">
+            {pulseState.error.message ||
+              "Couldn't load Pulse right now. You can still post an update."}
+          </div>
+        ) : null}
 
         {loading ? (
           <div className="grid place-content-center py-16">

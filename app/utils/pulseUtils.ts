@@ -198,7 +198,8 @@ export function defaultPulsePostScope(location?: PulsePlace): PulsePostScope {
 }
 
 export function getVisibilityScopeLabel(scope: string) {
-  switch (scope) {
+  const value = String(scope || "");
+  switch (value) {
     case "public":
     case "nationwide":
     case "national":
@@ -213,7 +214,7 @@ export function getVisibilityScopeLabel(scope: string) {
     case "pollingUnit":
       return "Post Within Polling Unit";
     default:
-      return `Post Within ${scope.replace(/-/g, " ")}`;
+      return `Post Within ${value.replace(/-/g, " ") || "Nigeria"}`;
   }
 }
 

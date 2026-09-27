@@ -292,7 +292,9 @@ const pulseSlice = createSlice({
       pulsePostsInFlight = false;
       state.status.getPosts = "fulfilled";
 
-      const incoming = action.payload.posts;
+      const incoming = Array.isArray(action.payload?.posts)
+        ? action.payload.posts.filter((post) => post && post.id)
+        : [];
       // Keep just-created posts that the list API has not returned yet (≤60s)
       const missingLocal = state.posts.filter((local) => {
         if (!local.id || incoming.some((p) => p.id === local.id)) return false;

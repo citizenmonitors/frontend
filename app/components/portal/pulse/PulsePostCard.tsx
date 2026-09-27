@@ -37,8 +37,8 @@ type PulsePostCardProps = {
   liking?: boolean;
 };
 
-function toHandle(name: string) {
-  const cleaned = name.replace(/[^a-zA-Z0-9]/g, "").slice(0, 14);
+function toHandle(name?: string | null) {
+  const cleaned = String(name || "").replace(/[^a-zA-Z0-9]/g, "").slice(0, 14);
   return `@${cleaned || "citizen"}`;
 }
 
@@ -53,7 +53,7 @@ export default function PulsePostCard({
   onReport,
   liking = false,
 }: PulsePostCardProps) {
-  const displayName = post.author.displayName;
+  const displayName = post.author?.displayName || "Citizen";
   const handle = toHandle(displayName);
   const timeAgo = formatPulseTimeAgo(post.createdAt);
   const fullDateTime = formatPulseDateTime(post.createdAt);
@@ -103,7 +103,7 @@ export default function PulsePostCard({
                 <span className="truncate font-bold text-gray-900">
                   {displayName}
                 </span>
-                {!post.author.usedAnonymous ? (
+                {!post.author?.usedAnonymous ? (
                   <TickCircle
                     size={16}
                     className="shrink-0 text-brand-500"
@@ -177,7 +177,7 @@ export default function PulsePostCard({
             </div>
           </div>
 
-          {!pureRepost && post.body.trim() ? (
+          {!pureRepost && (post.body || "").trim() ? (
             <div className="mt-2">
               <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-gray-900 [font-family:inherit,'Apple_Color_Emoji','Segoe_UI_Emoji','Noto_Color_Emoji']">
                 {displayBody}
@@ -215,10 +215,10 @@ export default function PulsePostCard({
               <div className="p-3">
                 <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm">
                   <span className="truncate font-semibold text-gray-900">
-                    {quoted.author.displayName}
+                    {quoted.author?.displayName || "Citizen"}
                   </span>
                   <span className="truncate text-gray-500">
-                    {toHandle(quoted.author.displayName)}
+                    {toHandle(quoted.author?.displayName)}
                   </span>
                   {quoted.createdAt ? (
                     <>

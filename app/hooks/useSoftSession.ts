@@ -27,7 +27,9 @@ export default function useSoftSession() {
 
   return {
     user: details,
-    isAuthenticated: Boolean(details),
+    isAuthenticated: Boolean(
+      details && (details._id || details.email || details.firstName)
+    ),
     isSessionPending:
       hasCookie && (status === "pending" || status === "not started"),
     dashboardHref: isAdmin ? "/admin/dashboard" : "/portal/dashboard",
