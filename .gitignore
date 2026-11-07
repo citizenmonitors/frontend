@@ -37,3 +37,7 @@ next-env.d.ts
 
 # todos
 todos/
+# env files (never commit secrets)
+.env
+.env*.local
+!.env.example

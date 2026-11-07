@@ -417,9 +417,11 @@ export type PulseVisibilityScope =
   | string;
 
 export type PulseAuthor = {
-  id: string;
+  /** null on anonymous content. Never use it to decide ownership. */
+  id: string | null;
   displayName: string;
   usedAnonymous: boolean;
+  avatarUrl?: string | null;
 };
 
 /** Nested original post when this item is a quote/repost */
@@ -430,6 +432,10 @@ export type PulseQuotedPost = {
   author: PulseAuthor;
   locationLabel?: string | null;
   createdAt?: string;
+  isQuote?: boolean;
+  /** The original was deleted: show "This post is unavailable". */
+  unavailable?: boolean;
+  isOwnedByCurrentUser?: boolean;
 };
 
 export type PulsePost = {
@@ -449,11 +455,19 @@ export type PulsePost = {
   likesCount: number;
   commentsCount: number;
   repostsCount?: number;
+  quoteCount?: number;
   isLikedByCurrentUser: boolean;
+  isOwnedByCurrentUser?: boolean;
+  isRepostedByCurrentUser?: boolean;
+  /** Plain repost or quote */
+  isRepost?: boolean;
+  isQuote?: boolean;
   /** Present when this post quotes / reposts another */
   quotedPost?: PulseQuotedPost | null;
   createdAt?: string;
   updatedAt?: string;
+  /** Set only when the text or image was edited */
+  editedAt?: string | null;
 };
 
 export type PulseComment = {
@@ -463,8 +477,25 @@ export type PulseComment = {
   author: PulseAuthor;
   likesCount: number;
   isLikedByCurrentUser: boolean;
+  isOwnedByCurrentUser?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  editedAt?: string | null;
+};
+
+export type PulseReportReason =
+  | "spam"
+  | "harassment"
+  | "hate"
+  | "violence"
+  | "sexual"
+  | "misinformation"
+  | "other";
+
+export type PulseBlock = {
+  id: string;
+  displayName: string;
+  blockedAt?: string;
 };
 
 export type PulsePostsPage = {

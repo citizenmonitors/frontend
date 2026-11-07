@@ -5,16 +5,21 @@ import {
   formatPulseDateTime,
   formatPulseTimeAgo,
   getPulsePostLocationLabel,
+  getPulseRepostTotal,
   isPureRepost,
   shouldTruncatePulseBody,
   truncatePulseBody,
 } from "@/app/utils/pulseUtils";
-import { Image as AntImage } from "antd";
+import { Image as AntImage, Dropdown } from "antd";
 import PulseActionButton from "./PulseActionButton";
 import {
   ArrowRotateLeft,
   Copy,
+  Edit2,
   Flag,
+  MessageEdit,
+  Slash,
+  Trash,
   Like1,
   Link21,
   Message,
@@ -29,13 +34,30 @@ type PulsePostCardProps = {
   post: PulsePost;
   onLike: (postId: string) => void;
   onComment: (postId: string) => void;
-  onRepost: (post: PulsePost) => void;
+  /** Plain repost of `targetId` (the original when this is a plain repost) */
+  onRepost: (targetId: string) => void;
+  onUndoRepost?: (targetId: string) => void;
+  /** Quote `target` (the original when this is a plain repost) */
+  onQuote: (target: PulsePost) => void;
   onShare: (post: PulsePost) => void;
   onCopyLink?: (post: PulsePost) => void;
   onCopyText?: (post: PulsePost) => void;
   onReport?: (post: PulsePost) => void;
+  onBlock?: (post: PulsePost) => void;
+  onEdit?: (post: PulsePost) => void;
+  onDelete?: (post: PulsePost) => void;
+  /** Feed lookup so a plain repost can show the original's repost state */
+  findPost?: (postId: string) => PulsePost | undefined;
   liking?: boolean;
 };
+
+function Avatar({ url, size }: { url?: string | null; size: number }) {
+  if (url) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={url} alt="" className="h-full w-full object-cover" />;
+  }
+  return <Profile size={size} className="text-brand-500" variant="Bold" />;
+}
 
 function toHandle(name?: string | null) {
   const cleaned = String(name || "").replace(/[^a-zA-Z0-9]/g, "").slice(0, 14);
@@ -47,10 +69,16 @@ export default function PulsePostCard({
   onLike,
   onComment,
   onRepost,
+  onUndoRepost,
+  onQuote,
   onShare,
   onCopyLink,
   onCopyText,
   onReport,
+  onBlock,
+  onEdit,
+  onDelete,
+  findPost,
   liking = false,
 }: PulsePostCardProps) {
   const displayName = post.author?.displayName || "Citizen";
@@ -62,6 +90,31 @@ export default function PulsePostCard({
   const menuRef = useRef<HTMLDivElement>(null);
   const pureRepost = isPureRepost(post);
   const quoted = post.quotedPost;
+  const isOwner = Boolean(post.isOwnedByCurrentUser);
+  // Reposting a plain repost reposts its original
+  const repostTarget: PulsePost =
+    pureRepost && quoted && !quoted.unavailable
+      ? findPost?.(quoted.id) ?? {
+          ...post,
+          id: quoted.id,
+          body: quoted.body,
+          imageUrl: quoted.imageUrl,
+          author: quoted.author,
+          createdAt: quoted.createdAt,
+          locationLabel: quoted.locationLabel,
+          quotedPost: null,
+          isRepost: false,
+          isQuote: Boolean(quoted.isQuote),
+          isOwnedByCurrentUser: quoted.isOwnedByCurrentUser,
+        }
+      : post;
+  const reposted = Boolean(
+    repostTarget.isRepostedByCurrentUser || (pureRepost && isOwner)
+  );
+  const originalIsMine = Boolean(quoted?.isOwnedByCurrentUser);
+  // Hide Report/Block on your own content, including reposts of your own post
+  const canReport = !isOwner && !(pureRepost && originalIsMine);
+  const repostTotal = getPulseRepostTotal(repostTarget);
   const bodyNeedsTruncate = shouldTruncatePulseBody(post.body);
   const displayBody =
     bodyExpanded || !bodyNeedsTruncate
@@ -93,7 +146,7 @@ export default function PulsePostCard({
 
       <div className="flex gap-3">
         <div className="grid h-10 w-10 shrink-0 place-content-center overflow-hidden rounded-full border border-gray-200 bg-brand-25 sm:h-11 sm:w-11">
-          <Profile size={20} className="text-brand-500" variant="Bold" />
+          <Avatar url={(pureRepost ? quoted?.author : post.author)?.avatarUrl} size={20} />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -122,6 +175,11 @@ export default function PulsePostCard({
                       {timeAgo}
                     </time>
                   </>
+                ) : null}
+                {post.editedAt && !pureRepost ? (
+                  <span className="text-xs text-gray-400" title={formatPulseDateTime(post.editedAt) || undefined}>
+                    · Edited
+                  </span>
                 ) : null}
               </div>
               <p className="mt-0.5 truncate text-xs text-brand-600">
@@ -164,14 +222,59 @@ export default function PulsePostCard({
                     <Share size={16} />
                     Share post
                   </button>
-                  <button
-                    type="button"
-                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-error-600 hover:bg-error-50"
-                    onClick={() => runMenuAction(onReport)}
-                  >
-                    <Flag size={16} />
-                    Report post
-                  </button>
+                  {isOwner && !pureRepost && onEdit ? (
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => runMenuAction(onEdit)}
+                    >
+                      <Edit2 size={16} />
+                      Edit post
+                    </button>
+                  ) : null}
+                  {isOwner && pureRepost && quoted && onUndoRepost ? (
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50"
+                      onClick={() => {
+                        onUndoRepost(quoted.id);
+                        setMenuOpen(false);
+                      }}
+                    >
+                      <ArrowRotateLeft size={16} />
+                      Undo repost
+                    </button>
+                  ) : null}
+                  {isOwner && !pureRepost && onDelete ? (
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-error-600 hover:bg-error-50"
+                      onClick={() => runMenuAction(onDelete)}
+                    >
+                      <Trash size={16} />
+                      Delete post
+                    </button>
+                  ) : null}
+                  {canReport && onReport ? (
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-error-600 hover:bg-error-50"
+                      onClick={() => runMenuAction(onReport)}
+                    >
+                      <Flag size={16} />
+                      Report post
+                    </button>
+                  ) : null}
+                  {canReport && onBlock ? (
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-error-600 hover:bg-error-50"
+                      onClick={() => runMenuAction(onBlock)}
+                    >
+                      <Slash size={16} />
+                      Block author
+                    </button>
+                  ) : null}
                 </div>
               ) : null}
             </div>
@@ -206,7 +309,11 @@ export default function PulsePostCard({
             </div>
           ) : null}
 
-          {quoted ? (
+          {quoted?.unavailable ? (
+            <div className="mt-3 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-4 text-sm text-gray-500">
+              This post is unavailable.
+            </div>
+          ) : quoted ? (
             <div
               className={`overflow-hidden rounded-2xl border border-gray-200 bg-white ${
                 pureRepost ? "mt-2" : "mt-3"
@@ -264,14 +371,48 @@ export default function PulsePostCard({
               <span>{post.commentsCount || ""}</span>
             </PulseActionButton>
 
-            <PulseActionButton
-              label="Repost"
-              onClick={() => onRepost(post)}
-              className="hover:bg-success-50 hover:text-success-600"
-            >
-              <ArrowRotateLeft size={18} />
-              <span>{post.repostsCount || ""}</span>
-            </PulseActionButton>
+            {quoted?.unavailable && pureRepost ? (
+              <span className="w-10" />
+            ) : (
+              <Dropdown
+                trigger={["click"]}
+                menu={{
+                  items: [
+                    reposted
+                      ? {
+                          key: "undo",
+                          icon: <ArrowRotateLeft size={16} />,
+                          label: "Undo repost",
+                          onClick: () => onUndoRepost?.(repostTarget.id),
+                        }
+                      : {
+                          key: "repost",
+                          icon: <ArrowRotateLeft size={16} />,
+                          label: "Repost",
+                          onClick: () => onRepost(repostTarget.id),
+                        },
+                    {
+                      key: "quote",
+                      icon: <MessageEdit size={16} />,
+                      label: "Quote",
+                      onClick: () => onQuote(repostTarget),
+                    },
+                  ],
+                }}
+              >
+                <span>
+                  <PulseActionButton
+                    label={reposted ? "Reposted" : "Repost"}
+                    className={`hover:bg-success-50 hover:text-success-600 ${
+                      reposted ? "text-success-600" : ""
+                    }`}
+                  >
+                    <ArrowRotateLeft size={18} />
+                    <span>{repostTotal || ""}</span>
+                  </PulseActionButton>
+                </span>
+              </Dropdown>
+            )}
 
             <PulseActionButton
               label={post.isLikedByCurrentUser ? "Unlike" : "Like"}

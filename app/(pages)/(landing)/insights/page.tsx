@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import insights from "@/app/data/insights/index";
 import InsightCard from "@/app/components/landing/insights/InsightCard";
+import NewsInsightList from "@/app/components/landing/insights/NewsInsightList";
 import { Insight } from "@/app/data/insights/types";
 
 export default function Insights() {
@@ -22,6 +23,11 @@ export default function Insights() {
         </h2>
       </header>
 
+      <NewsInsightList />
+
+      <h2 className="mb-6 font-league text-display-xs font-bold text-gray-700 lg:text-display-sm">
+        Case Studies
+      </h2>
       <div className="grid place-items-center grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-24 xxl:gap-32 mb-16 lg:mb-32">
         {currentInsights.map((insight) => (
           <InsightCard key={insight.id} insight={insight} />

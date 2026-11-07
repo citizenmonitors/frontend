@@ -1,4 +1,4 @@
-import { Calendar, CalendarEdit, DocumentUpload, Flag, HomeHashtag, Icon, Messages1, Notepad2, Profile2User, Setting, Task, UserOctagon, Verify, Warning2 } from "iconsax-react";
+import { Calendar, CalendarEdit, DocumentUpload, Flag, HomeHashtag, Icon, Messages1, Notepad2, Profile2User, Setting, ShieldCross, Sms, Task, UserOctagon, Verify, Warning2 } from "iconsax-react";
 
 export type Route = {
   title: string,
@@ -57,6 +57,17 @@ const adminRoutes: Array<Route> = [
     title: "Outbox",
     icon: Messages1,
     href: "/admin/outbox",
+  },
+  {
+    title: "Newsletter",
+    icon: Sms,
+    href: "/admin/newsletter",
+  },
+  // News & Insight (/admin/news-insights) is hidden from the menu for now; the page still exists.
+  {
+    title: "Pulse Reports",
+    icon: ShieldCross,
+    href: "/admin/pulse-reports",
   },
   {
     title: "Activity Log",

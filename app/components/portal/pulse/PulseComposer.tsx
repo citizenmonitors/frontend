@@ -20,7 +20,8 @@ import {
   isPulseImageFile,
   PULSE_IMAGE_ACCEPT,
 } from "@/app/utils/pulseMedia";
-import { CloseCircle, Gallery, Profile } from "iconsax-react";
+import { Checkbox } from "antd";
+import { CloseCircle, Gallery, Profile, SecurityUser } from "iconsax-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import PulseEmojiStickerPicker from "./PulseEmojiStickerPicker";
 import PulseScopePicker from "./PulseScopePicker";
@@ -37,8 +38,11 @@ export default function PulseComposer({
   const dispatch = useAppDispatch();
   const userDetails = useAppSelector((state) => state.user.details);
   const createStatus = useAppSelector((state) => state.pulse.status.createPost);
+  const createWarning = useAppSelector((state) => state.pulse.lastCreateWarning);
   const createError = useAppSelector((state) => state.pulse.error.message);
   const [body, setBody] = useState("");
+  // Kept between posts so people who prefer anonymity don't have to re-toggle
+  const [useAnonymousDisplay, setUseAnonymousDisplay] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -64,6 +68,9 @@ export default function PulseComposer({
 
   useEffect(() => {
     if (createStatus === "fulfilled") {
+      if (createWarning) {
+        dispatch(showAlert({ message: createWarning, type: "warning" }));
+      }
       setBody("");
       setImageFile(null);
       setImagePreview((prev) => {
@@ -81,7 +88,7 @@ export default function PulseComposer({
       );
       dispatch(clearCreatePostStatus());
     }
-  }, [createStatus, createError, dispatch]);
+  }, [createStatus, createError, createWarning, dispatch]);
 
   useEffect(() => {
     return () => {
@@ -157,7 +164,7 @@ export default function PulseComposer({
         body: body.trim() || " ",
         visibilityScope: scope,
         locationLabel: getPlaceNameForScope(location, scope) || undefined,
-        useAnonymousDisplay: false,
+        useAnonymousDisplay,
         location,
         ...(imageFile ? { image: imageFile } : {}),
       })
@@ -167,8 +174,18 @@ export default function PulseComposer({
   return (
     <div className="border-b border-gray-200 px-4 py-3 sm:px-5 sm:py-4">
       <div className="flex gap-3">
-        <div className="grid h-10 w-10 shrink-0 place-content-center rounded-full border border-gray-200 bg-brand-25 text-brand-500 sm:h-11 sm:w-11">
-          <Profile size={20} variant="Bold" />
+        <div
+          className={`grid h-10 w-10 shrink-0 place-content-center rounded-full border sm:h-11 sm:w-11 ${
+            useAnonymousDisplay
+              ? "border-gray-300 bg-gray-100 text-gray-500"
+              : "border-gray-200 bg-brand-25 text-brand-500"
+          }`}
+        >
+          {useAnonymousDisplay ? (
+            <SecurityUser size={20} variant="Bold" />
+          ) : (
+            <Profile size={20} variant="Bold" />
+          )}
         </div>
         <div className="min-w-0 flex-1">
           <textarea
@@ -227,7 +244,7 @@ export default function PulseComposer({
             </div>
           ) : null}
 
-          <div className="mt-2 flex items-center gap-2 border-t border-gray-100 pt-3">
+          <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3">
             <label
               className="inline-flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-2 py-1.5 text-brand-600 hover:bg-brand-50"
               title="Select image"
@@ -254,6 +271,23 @@ export default function PulseComposer({
               onChange={setScope}
               location={userLocation}
             />
+            <div className="flex min-w-0 flex-col items-start leading-tight">
+              <Checkbox
+                checked={useAnonymousDisplay}
+                onChange={(e) => setUseAnonymousDisplay(e.target.checked)}
+              >
+                <span className="whitespace-nowrap text-xs font-medium text-gray-700 sm:text-sm">Post anonymously</span>
+              </Checkbox>
+              <span className="max-w-[180px] truncate pl-6 text-[11px] text-gray-500">
+                {useAnonymousDisplay
+                  ? userDetails?.anonymousUsername
+                    ? `Shown as “${userDetails.anonymousUsername}”`
+                    : "Your name won't be shown"
+                  : displayName
+                    ? `Posting as ${displayName}`
+                    : null}
+              </span>
+            </div>
             <button
               type="button"
               onClick={handleSubmit}

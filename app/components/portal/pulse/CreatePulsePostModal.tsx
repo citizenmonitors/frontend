@@ -43,7 +43,10 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const submittedRef = React.useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const anonymousHandle = useMemo(() => generateAnonymousHandle(), [open]);
+  const anonymousHandle = useMemo(
+    () => userDetails?.anonymousUsername || generateAnonymousHandle(),
+    [open, userDetails?.anonymousUsername]
+  );
   const userLocation = userDetails
     ? {
         state: userDetails.state,
@@ -80,7 +83,15 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
     if (!open || !submittedRef.current) return;
     if (pulseState.status.createPost === "fulfilled") {
       submittedRef.current = false;
-      dispatch(showAlert({ message: "Your post was shared on Pulse.", type: "success" }));
+      // Image upload failed but the post is live: show the server's warning, don't resend
+      const warning = pulseState.lastCreateWarning;
+      dispatch(
+        showAlert(
+          warning
+            ? { message: warning, type: "warning" }
+            : { message: "Your post was shared on Pulse.", type: "success" }
+        )
+      );
       dispatch(clearCreatePostStatus());
       dispatch(getPulsePosts({ force: true }));
       onClose();
@@ -95,7 +106,7 @@ export default function CreatePulsePostModal({ open, onClose }: CreatePulsePostM
       );
       dispatch(clearCreatePostStatus());
     }
-  }, [pulseState.status.createPost, pulseState.error.message, open, dispatch, onClose]);
+  }, [pulseState.status.createPost, pulseState.error.message, pulseState.lastCreateWarning, open, dispatch, onClose]);
 
   function handlePickImage(file: File | undefined) {
     if (!file) return;

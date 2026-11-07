@@ -4,7 +4,8 @@ import React from "react";
 
 type PulseActionButtonProps = {
   label: string;
-  onClick: () => void;
+  /** Omit to let the click reach a wrapping trigger (e.g. a Dropdown). */
+  onClick?: () => void;
   disabled?: boolean;
   className?: string;
   children: React.ReactNode;
@@ -25,6 +26,7 @@ export default function PulseActionButton({
       aria-label={label}
       disabled={disabled}
       onClick={(e) => {
+        if (!onClick) return;
         e.preventDefault();
         e.stopPropagation();
         if (disabled) return;

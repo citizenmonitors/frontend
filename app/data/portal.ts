@@ -117,6 +117,10 @@ const settingsRoutes: SettingsRouteItem[] = [
     name: "Password",
   },
   {
+    route: `${settingsPath}/blocked-users`,
+    name: "Blocked Users",
+  },
+  {
     route: `${settingsPath}/polling-unit-locator`,
     name: "Polling Unit Locator",
   },

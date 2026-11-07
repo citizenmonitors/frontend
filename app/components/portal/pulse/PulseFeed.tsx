@@ -1,19 +1,25 @@
 "use client";
 
 import { cookieData } from "@/app/data/cookieData";
-import { Button, Spin } from "antd";
+import { Button, Modal, Spin } from "antd";
 import { MessageText1 } from "iconsax-react";
 import Cookies from "js-cookie";
 import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import { showAlert } from "@/app/redux/features/alertSlice";
 import {
+  blockPulseAuthorOf,
+  deletePulsePost,
   getPulsePosts,
   hydratePulseFeedFromCache,
+  reportPulsePost,
+  repostPulsePost,
   togglePulsePostLike,
+  undoPulseRepost,
 } from "@/app/redux/features/pulseSlice";
+import { fetchPulsePost } from "@/app/data/pulseApi";
 import { validateSession } from "@/app/redux/features/userSlice";
-import { PulsePost } from "@/app/redux/types";
+import { PulsePost, PulseReportReason } from "@/app/redux/types";
 import {
   getLocationFilterEmptyMessage,
   postMatchesLocationFilter,
@@ -27,13 +33,21 @@ import PulseLocationTabs from "./PulseLocationTabs";
 import PulseLoginModal from "./PulseLoginModal";
 import PulsePostCard from "./PulsePostCard";
 import PulseRepostModal from "./PulseRepostModal";
+import PulseEditPostModal from "./PulseEditPostModal";
+import PulseReportModal from "./PulseReportModal";
 
 type PendingAuthAction =
   | { type: "create" }
   | { type: "like"; postId: string }
   | { type: "comment"; postId: string }
   | { type: "repost"; postId: string }
+  | { type: "quote"; post: PulsePost }
   | { type: "generic" };
+
+function errorMessage(error: unknown, fallback: string) {
+  const message = (error as { message?: unknown })?.message;
+  return typeof message === "string" && message ? message : fallback;
+}
 
 export default function PulseFeed() {
   const dispatch = useAppDispatch();
@@ -52,6 +66,34 @@ export default function PulseFeed() {
   );
   const [locationFilter, setLocationFilter] =
     useState<PulseLocationFilter>("all");
+  const [editPost, setEditPost] = useState<PulsePost | null>(null);
+  const [reportPost, setReportPost] = useState<PulsePost | null>(null);
+  /** Post opened from a shared /pulse?post=<id> link */
+  const [sharedPostId, setSharedPostId] = useState<string | null>(null);
+  const [sharedPost, setSharedPost] = useState<PulsePost | null>(null);
+
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("post");
+    if (id) setSharedPostId(id);
+  }, []);
+
+  useEffect(() => {
+    if (!sharedPostId) return;
+    let cancelled = false;
+    fetchPulsePost(sharedPostId)
+      .then((post) => {
+        if (!cancelled) setSharedPost(post);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setSharedPostId(null);
+        dispatch(showAlert({ message: "This post is unavailable.", type: "info" }));
+      });
+    return () => {
+      cancelled = true;
+    };
+    // Refetch when the user signs in so ownership/like flags are right
+  }, [sharedPostId, userDetails?.email, dispatch]);
 
   useLayoutEffect(() => {
     // Hydrate from localStorage first (guests included), then fetch only if stale
@@ -85,8 +127,11 @@ export default function PulseFeed() {
       return;
     }
     if (action.type === "repost") {
-      const target = pulseState.posts.find((p) => p.id === action.postId);
-      if (target) setRepostPost(target);
+      runRepost(action.postId);
+      return;
+    }
+    if (action.type === "quote") {
+      setRepostPost(action.post);
     }
   }, [userDetails, pendingAction, dispatch, pulseState.posts]);
 
@@ -115,7 +160,21 @@ export default function PulseFeed() {
 
   function handleLike(postId: string) {
     if (!requireAuth("like posts", { type: "like", postId })) return;
-    dispatch(togglePulsePostLike(postId));
+    dispatch(togglePulsePostLike(postId))
+      .unwrap()
+      .then((update) =>
+        // The shared post may not be in the loaded feed; keep its card in sync
+        setSharedPost((current) =>
+          current && current.id === update.postId
+            ? {
+                ...current,
+                likesCount: update.likesCount,
+                isLikedByCurrentUser: update.isLikedByCurrentUser,
+              }
+            : current
+        )
+      )
+      .catch(() => undefined);
   }
 
   function handleOpenCreate() {
@@ -127,11 +186,99 @@ export default function PulseFeed() {
     setCommentsPostId(postId);
   }
 
-  function handleRepost(post: PulsePost) {
-    if (!requireAuth("repost on Pulse", { type: "repost", postId: post.id })) {
-      return;
-    }
+  function runRepost(targetId: string) {
+    dispatch(repostPulsePost(targetId))
+      .unwrap()
+      .then(() => dispatch(showAlert({ message: "Reposted.", type: "success" })))
+      .catch((error) =>
+        dispatch(
+          showAlert({ message: errorMessage(error, "Could not repost."), type: "error" })
+        )
+      );
+  }
+
+  function handleRepost(targetId: string) {
+    if (!requireAuth("repost on Pulse", { type: "repost", postId: targetId })) return;
+    runRepost(targetId);
+  }
+
+  function handleUndoRepost(targetId: string) {
+    if (!requireAuth("repost on Pulse")) return;
+    dispatch(undoPulseRepost(targetId))
+      .unwrap()
+      .catch((error) =>
+        dispatch(
+          showAlert({ message: errorMessage(error, "Could not undo repost."), type: "error" })
+        )
+      );
+  }
+
+  function handleQuote(post: PulsePost) {
+    if (!requireAuth("quote posts on Pulse", { type: "quote", post })) return;
     setRepostPost(post);
+  }
+
+  function handleEdit(post: PulsePost) {
+    setEditPost(post);
+  }
+
+  function handleDelete(post: PulsePost) {
+    Modal.confirm({
+      title: "Delete this post?",
+      content: "Its comments and plain reposts will be removed too. This can't be undone.",
+      okText: "Delete",
+      okButtonProps: { danger: true },
+      onOk: () =>
+        dispatch(deletePulsePost(post.id))
+          .unwrap()
+          .then(() => {
+            if (sharedPost?.id === post.id) setSharedPost(null);
+            dispatch(showAlert({ message: "Post deleted.", type: "success" }));
+          })
+          .catch((error) =>
+            dispatch(
+              showAlert({ message: errorMessage(error, "Could not delete post."), type: "error" })
+            )
+          ),
+    });
+  }
+
+  function handleBlock(post: PulsePost) {
+    if (!requireAuth("block users")) return;
+    Modal.confirm({
+      title: `Block ${post.author.displayName || "this user"}?`,
+      content:
+        "You won't see each other's posts, reposts or comments, and they can't interact with you. You can unblock them in Settings.",
+      okText: "Block",
+      okButtonProps: { danger: true },
+      onOk: () =>
+        dispatch(blockPulseAuthorOf({ postId: post.id }))
+          .unwrap()
+          .then(() => {
+            if (sharedPost?.id === post.id) setSharedPost(null);
+            dispatch(showAlert({ message: "User blocked.", type: "success" }));
+            dispatch(getPulsePosts({ force: true }));
+          })
+          .catch((error) =>
+            dispatch(
+              showAlert({ message: errorMessage(error, "Could not block user."), type: "error" })
+            )
+          ),
+    });
+  }
+
+  async function submitReport(reason: PulseReportReason, details?: string) {
+    if (!reportPost) return;
+    try {
+      await dispatch(reportPulsePost({ postId: reportPost.id, reason, details })).unwrap();
+      if (sharedPost?.id === reportPost.id) setSharedPost(null);
+      dispatch(showAlert({ message: "Thanks. Our team will review this post.", type: "success" }));
+      setReportPost(null);
+    } catch (error) {
+      dispatch(
+        showAlert({ message: errorMessage(error, "Could not send report."), type: "error" })
+      );
+    }
   }
 
   function handleShare(post: PulsePost) {
@@ -158,13 +305,9 @@ export default function PulseFeed() {
     dispatch(showAlert({ message: "Post link copied.", type: "success" }));
   }
 
-  function handleReport() {
-    dispatch(
-      showAlert({
-        message: "Thanks. Our team will review this post.",
-        type: "success",
-      })
-    );
+  function handleReport(post: PulsePost) {
+    if (!requireAuth("report posts")) return;
+    setReportPost(post);
   }
 
   function handleLoginSuccess() {
@@ -205,6 +348,29 @@ export default function PulseFeed() {
       userDetails.anonymousUsername
     : undefined;
 
+  function renderPost(post: PulsePost) {
+    return (
+      <PulsePostCard
+        key={post.id}
+        post={post}
+        onLike={handleLike}
+        onComment={handleOpenComments}
+        onRepost={handleRepost}
+        onUndoRepost={handleUndoRepost}
+        onQuote={handleQuote}
+        onShare={handleShare}
+        onCopyText={handleCopyText}
+        onCopyLink={handleCopyLink}
+        onReport={handleReport}
+        onBlock={handleBlock}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        findPost={(id) => pulseState.posts.find((p) => p.id === id)}
+        liking={false}
+      />
+    );
+  }
+
   return (
     <div className="relative min-w-0">
       <div className="overflow-visible rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -233,9 +399,28 @@ export default function PulseFeed() {
           }
         />
 
+        {sharedPost ? (
+          <div className="border-b-4 border-brand-50">
+            <div className="flex items-center justify-between px-4 pt-3 text-xs font-semibold uppercase tracking-wide text-brand-600 sm:px-5">
+              Shared post
+              <button
+                type="button"
+                className="text-gray-400 hover:text-gray-600"
+                onClick={() => {
+                  setSharedPost(null);
+                  setSharedPostId(null);
+                }}
+              >
+                Close
+              </button>
+            </div>
+            {renderPost(pulseState.posts.find((p) => p.id === sharedPost.id) ?? sharedPost)}
+          </div>
+        ) : null}
+
         <PulseIntroPost
           onComment={() => handleOpenCreate()}
-          onRepost={() => handleRepost(getPulseIntroPost())}
+          onRepost={() => handleQuote(getPulseIntroPost())}
         />
 
         {pulseState.status.getPosts === "rejected" && !hasAnyPosts ? (
@@ -251,20 +436,7 @@ export default function PulseFeed() {
           </div>
         ) : hasFilteredPosts ? (
           <div className="pb-6 sm:pb-4">
-            {filteredPosts.map((post) => (
-              <PulsePostCard
-                key={post.id}
-                post={post}
-                onLike={handleLike}
-                onComment={handleOpenComments}
-                onRepost={handleRepost}
-                onShare={handleShare}
-                onCopyText={handleCopyText}
-                onCopyLink={handleCopyLink}
-                onReport={handleReport}
-                liking={false}
-              />
-            ))}
+            {filteredPosts.map((post) => renderPost(post))}
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4 px-4 py-10 text-center sm:px-6">
@@ -306,6 +478,13 @@ export default function PulseFeed() {
           onClose={() => setRepostPost(null)}
         />
       ) : null}
+      <PulseEditPostModal post={editPost} onClose={() => setEditPost(null)} />
+      <PulseReportModal
+        open={Boolean(reportPost)}
+        kind="post"
+        onClose={() => setReportPost(null)}
+        onSubmit={submitReport}
+      />
       <PulseCommentsModal
         postId={commentsPostId}
         open={!!commentsPostId}

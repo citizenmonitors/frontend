@@ -1,6 +1,6 @@
 import axios from "axios";
 import backendAxiosConfig from "./axiosConfig";
-import { backendRoutes } from "./backend";
+import backendURL, { backendRoutes } from "./backend";
 
 const api = () => axios.create(backendAxiosConfig());
 
@@ -140,8 +140,7 @@ export async function getEventBookings(eventId: string): Promise<EventBookingsRe
 }
 
 export function getEventExportUrl(eventId: string): string {
-  const base = (process.env.NEXT_PUBLIC_BACKEND_API_URL ?? "").trim();
-  return `${base}/${backendRoutes.admin.speakerSlots.eventExport(eventId)}?format=csv`;
+  return `${backendURL}/${backendRoutes.admin.speakerSlots.eventExport(eventId)}?format=csv`;
 }
 
 export async function exportEventCsv(eventId: string): Promise<Blob> {

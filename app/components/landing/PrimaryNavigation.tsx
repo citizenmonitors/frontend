@@ -44,12 +44,12 @@ function PrimaryNavigation() {
     </div>
   ) : (
     <>
-      <Link href={"/auth/login"} className="w-full max-w-[200px] mx-auto">
+      <Link href={"/auth/login"} className="shrink-0">
         <Button size="large" className="lg:h-[55px] lg:px-6">
           Login
         </Button>
       </Link>
-      <Link href={"/auth/signup"} className="w-full max-w-[200px] mx-auto">
+      <Link href={"/auth/signup"} className="shrink-0">
         <Button size="large" className="lg:h-[55px] lg:px-6" type="primary">
           Sign up
         </Button>
@@ -89,7 +89,8 @@ function PrimaryNavigation() {
       style={{ background: mobileNavigationOpen ? "white" : undefined }}
     >
       <nav className="container py-6 md:py-3 flex items-center">
-        <Link href={"/"} className="mr-4">
+        {/* Logo and auth sides share equal width so the menu sits in the true centre */}
+        <Link href={"/"} className="mr-4 md:flex md:flex-1 md:basis-0">
           <div className="logo-container md:hidden">
             <Logo size={40} />
           </div>
@@ -101,7 +102,7 @@ function PrimaryNavigation() {
           </div>
         </Link>
 
-        <ul className="hidden md:flex">
+        <ul className="hidden md:flex md:shrink-0 md:justify-center">
           {primaryLinks.map((link, linkIndex) =>
             link.subMenu ? (
               <li
@@ -170,7 +171,9 @@ function PrimaryNavigation() {
             )
           )}
         </ul>
-        <div className="auth-buttons hidden md:flex gap-4 ml-auto">{authActions}</div>
+        <div className="auth-buttons hidden md:flex md:flex-1 md:basis-0 md:justify-end gap-4 ml-auto md:ml-4">
+          {authActions}
+        </div>
 
         {/* Mobile Navigation */}
         <button

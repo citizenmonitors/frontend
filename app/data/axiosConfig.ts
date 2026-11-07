@@ -5,23 +5,17 @@ import { cookieData } from "./cookieData";
 
 /**
  * Must match backend `API_ACCESS_TOKEN` / `INHOUSE_API_ACCESS_TOKEN`.
- * Set `INHOUSE_API_ACCESS_TOKEN` in `frontend/.env` (exposed via `next.config.mjs`).
+ * Server-only: in the browser this is empty, and middleware.ts adds the
+ * header when it forwards /api/backend/* to the backend.
  */
 function getApiAccessToken(): string {
-  return (
-    process.env.INHOUSE_API_ACCESS_TOKEN ??
-    process.env.NEXT_PUBLIC_INHOUSE_API_ACCESS_TOKEN ??
-    process.env.NEXT_PUBLIC_API_ACCESS_TOKEN ??
-    process.env.NEXT_PUBLIC_INHOUSE_ACCESS_TOKEN ??
-    ""
-  ).trim();
+  if (typeof window !== "undefined") return "";
+  return (process.env.INHOUSE_API_ACCESS_TOKEN ?? "").trim();
 }
 
-/** Header the API middleware reads (override with NEXT_PUBLIC_API_ACCESS_HEADER). */
+/** Header the backend reads (override with API_ACCESS_HEADER). */
 function getApiAccessHeaderName(): string {
-  return (
-    process.env.NEXT_PUBLIC_API_ACCESS_HEADER ?? "X-Inhouse-Access-Token"
-  ).trim();
+  return (process.env.API_ACCESS_HEADER ?? "X-Inhouse-Access-Token").trim();
 }
 
 export function getBackendApiAccessHeaders(): Record<string, string> {

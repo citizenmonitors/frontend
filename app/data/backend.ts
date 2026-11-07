@@ -1,5 +1,19 @@
-const backendURL = (process.env.NEXT_PUBLIC_BACKEND_API_URL ?? "").trim();
-export const backendDomain = backendURL.replace("/api", "");
+/** Real backend URL. Only server code (and middleware.ts) talks to it directly. */
+export const upstreamBackendURL = (
+  process.env.BACKEND_API_URL ??
+  process.env.NEXT_PUBLIC_BACKEND_API_URL ??
+  ""
+)
+  .trim()
+  .replace(/\/$/, "");
+
+/** Same-origin path that middleware.ts forwards to the backend with the access token. */
+export const BACKEND_PROXY_PATH = "/api/backend";
+
+// Browsers go through the proxy so the access token never reaches them.
+const backendURL =
+  typeof window === "undefined" ? upstreamBackendURL : BACKEND_PROXY_PATH;
+export const backendDomain = upstreamBackendURL.replace("/api", "");
 
 export const backendRoutes = {
   auth: {
@@ -177,6 +191,39 @@ export const backendRoutes = {
     createComment: (postId: string) => `pulse/posts/${postId}/comments`,
     likeComment: (postId: string, commentId: string) =>
       `pulse/posts/${postId}/comments/${commentId}/like`,
+    /** GET one post, PATCH to edit, DELETE to remove */
+    post: (postId: string) => `pulse/posts/${postId}`,
+    /** POST = repost (or quote when a body is sent), DELETE = undo repost */
+    repost: (postId: string) => `pulse/posts/${postId}/repost`,
+    reportPost: (postId: string) => `pulse/posts/${postId}/report`,
+    /** PATCH to edit, DELETE to remove */
+    comment: (postId: string, commentId: string) =>
+      `pulse/posts/${postId}/comments/${commentId}`,
+    reportComment: (postId: string, commentId: string) =>
+      `pulse/posts/${postId}/comments/${commentId}/report`,
+    blocks: 'pulse/blocks',
+    block: (blockId: string) => `pulse/blocks/${blockId}`,
+    adminReports: 'admin/pulse/reports',
+    adminReport: (reportId: string) => `admin/pulse/reports/${reportId}`,
+  },
+  newsInsights: {
+    list: 'mobile/news-insights',
+    bySlug: (slug: string) => `mobile/news-insights/${encodeURIComponent(slug)}`,
+    like: (articleId: string) => `mobile/news-insights/articles/${articleId}/like`,
+    comments: (articleId: string) => `mobile/news-insights/articles/${articleId}/comments`,
+    likeComment: (articleId: string, commentId: string) =>
+      `mobile/news-insights/articles/${articleId}/comments/${commentId}/like`,
+    /** PATCH to edit (author only), DELETE to remove (author or admin) */
+    comment: (articleId: string, commentId: string) =>
+      `mobile/news-insights/articles/${articleId}/comments/${commentId}`,
+    adminList: 'admin/news-insights',
+    adminCreate: 'admin/news-insights',
+    adminById: (id: string) => `admin/news-insights/${id}`,
+  },
+  newsletter: {
+    preview: 'admin/newsletter/preview',
+    send: 'admin/newsletter',
+    active: 'admin/newsletter/active',
   },
   speakerInvite: {
     get: (token: string) => `speaker-invite/${token}`,

@@ -37,9 +37,13 @@ export default function PulseRepostModal({
   const userDetails = useAppSelector((state) => state.user.details);
   const createStatus = useAppSelector((state) => state.pulse.status.createPost);
   const createError = useAppSelector((state) => state.pulse.error.message);
+  const createWarning = useAppSelector((state) => state.pulse.lastCreateWarning);
   const [body, setBody] = useState("");
   const [useAnonymousDisplay, setUseAnonymousDisplay] = useState(false);
-  const anonymousHandle = useMemo(() => generateAnonymousHandle(), [open]);
+  const anonymousHandle = useMemo(
+    () => userDetails?.anonymousUsername || generateAnonymousHandle(),
+    [open, userDetails?.anonymousUsername]
+  );
   const userLocation = userDetails
     ? {
         state: userDetails.state,
@@ -67,10 +71,11 @@ export default function PulseRepostModal({
     if (createStatus === "fulfilled") {
       submittedRef.current = false;
       dispatch(
-        showAlert({
-          message: "Posted to your coverage on Pulse.",
-          type: "success",
-        })
+        showAlert(
+          createWarning
+            ? { message: createWarning, type: "warning" }
+            : { message: "Quote posted on Pulse.", type: "success" }
+        )
       );
       dispatch(clearCreatePostStatus());
       dispatch(getPulsePosts({ force: true }));
@@ -80,19 +85,25 @@ export default function PulseRepostModal({
       submittedRef.current = false;
       dispatch(
         showAlert({
-          message: createError || "Could not repost. Please try again.",
+          message: createError || "Could not post your quote. Please try again.",
           type: "error",
         })
       );
       dispatch(clearCreatePostStatus());
     }
-  }, [createStatus, open, createError, dispatch, onClose]);
+  }, [createStatus, open, createError, createWarning, dispatch, onClose]);
 
   function handleSubmit() {
     if (!userDetails || !post) {
       dispatch(
         showAlert({ message: "Please log in to repost on Pulse.", type: "warning" })
       );
+      return;
+    }
+
+    // The API rejects a quote without text
+    if (!body.trim()) {
+      dispatch(showAlert({ message: "Add some text to quote this post.", type: "error" }));
       return;
     }
 
@@ -157,7 +168,7 @@ export default function PulseRepostModal({
               {userDetails.lastName?.[0]}
             </div>
             <h3 className="font-league text-base font-semibold text-gray-800 sm:text-lg">
-              {body.trim() ? "Quote post" : "Repost"}
+              Quote post
             </h3>
           </div>
           <button
@@ -173,7 +184,7 @@ export default function PulseRepostModal({
         <Input.TextArea
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder="Add a comment (optional)"
+          placeholder="Add your comment"
           rows={3}
           maxLength={PULSE_BODY_MAX_LENGTH}
           showCount
@@ -239,8 +250,9 @@ export default function PulseRepostModal({
           className="!h-12"
           loading={createStatus === "pending"}
           onClick={handleSubmit}
+          disabled={!body.trim()}
         >
-          {body.trim() ? "Post quote" : "Repost"}
+          Post quote
         </Button>
       </div>
     </Modal>

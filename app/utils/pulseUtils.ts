@@ -287,7 +287,7 @@ export function toPulseQuotedPost(post: {
   id: string;
   body: string;
   imageUrl?: string | null;
-  author: { id: string; displayName: string; usedAnonymous: boolean };
+  author: { id: string | null; displayName: string; usedAnonymous: boolean; avatarUrl?: string | null };
   locationLabel?: string | null;
   location?: {
     state?: string;
@@ -315,6 +315,18 @@ export function toPulseQuotedPost(post: {
   };
 }
 
-export function isPureRepost(post: { body?: string; quotedPost?: unknown }) {
-  return Boolean(post.quotedPost) && !(post.body || "").trim();
+export function isPureRepost(post: {
+  body?: string;
+  quotedPost?: unknown;
+  isRepost?: boolean;
+  isQuote?: boolean;
+}) {
+  if (!post.quotedPost) return false;
+  if (post.isRepost) return !post.isQuote;
+  return !(post.body || "").trim();
+}
+
+/** Total shown on the repost button (plain reposts + quotes). */
+export function getPulseRepostTotal(post: { repostsCount?: number; quoteCount?: number }) {
+  return (post.repostsCount || 0) + (post.quoteCount || 0);
 }
