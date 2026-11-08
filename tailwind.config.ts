@@ -212,7 +212,17 @@ const config: Config = {
       fontFamily: {
         inter: ['var(--font-inter)'],
         league: ['var(--font-league)'],
-      }
+      },
+      keyframes: {
+        // Soft red glow that grows and shrinks around a still dot
+        bubble: {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(240, 68, 56, 0.55)' },
+          '50%': { boxShadow: '0 0 0 5px rgba(240, 68, 56, 0.2)' },
+        },
+      },
+      animation: {
+        bubble: 'bubble 1.6s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

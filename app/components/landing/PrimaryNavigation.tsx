@@ -21,7 +21,7 @@ function LinkLabel({ name, isNew }: { name: string; isNew?: boolean }) {
     <span className="relative inline-flex">
       {name}
       <span
-        className="absolute -right-2.5 -top-0.5 h-2 w-2 animate-bounce rounded-full bg-error-500 ring-2 ring-white motion-reduce:animate-none"
+        className="absolute -right-2.5 -top-0.5 h-2 w-2 animate-bubble rounded-full bg-error-500 motion-reduce:animate-none"
         aria-hidden="true"
       />
       <span className="sr-only"> (new)</span>
