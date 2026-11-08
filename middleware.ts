@@ -8,6 +8,9 @@ import { COLLATION_PATHS, collationEnabled } from "./app/utils/features";
  */
 const PROXY_PREFIX = "/api/backend";
 
+/** Backend routes that exist only under /api/v1 on the deployed API. */
+const V1_ONLY_PREFIXES = ["/mobile/news-insights"];
+
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
@@ -37,7 +40,13 @@ export function middleware(req: NextRequest) {
   }
 
   const path = req.nextUrl.pathname.slice(PROXY_PREFIX.length);
-  const target = new URL(`${upstream}${path}${req.nextUrl.search}`);
+  // The backend serves News & Insight only under /api/v1 (not /api), so
+  // route those calls to v1 when the configured URL ends in /api.
+  const base =
+    /\/api$/.test(upstream) && V1_ONLY_PREFIXES.some((p) => path.startsWith(p))
+      ? `${upstream}/v1`
+      : upstream;
+  const target = new URL(`${base}${path}${req.nextUrl.search}`);
 
   const headers = new Headers(req.headers);
   // Never trust a token sent by the client; always use the server's.
