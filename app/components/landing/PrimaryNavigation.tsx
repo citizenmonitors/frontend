@@ -14,6 +14,21 @@ import getRootPath from "@/app/utils/getRootPath";
 import useSoftSession from "@/app/hooks/useSoftSession";
 import DashboardProfile from "@/app/components/portal/layout/DashboardProfile";
 
+/** Link label with a small brand-colour dot for newly rolled-out features */
+function LinkLabel({ name, isNew }: { name: string; isNew?: boolean }) {
+  if (!isNew) return <>{name}</>;
+  return (
+    <span className="relative inline-flex">
+      {name}
+      <span
+        className="absolute -right-2.5 -top-0.5 h-2 w-2 rounded-full bg-brand-500 ring-2 ring-white"
+        aria-hidden="true"
+      />
+      <span className="sr-only"> (new)</span>
+    </span>
+  );
+}
+
 function PrimaryNavigation() {
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
   const toggleMobileNavigation = () => setMobileNavigationOpen((prev) => !prev);
@@ -125,7 +140,7 @@ function PrimaryNavigation() {
                               item.highlight ? "text-brand-500" : "hover:!text-brand-500"
                             }
                           >
-                            {item.name}
+                            <LinkLabel name={item.name} isNew={item.isNew} />
                           </Button>
                         </Link>
                       ),
@@ -164,7 +179,7 @@ function PrimaryNavigation() {
                     }`}
                     disabled={link.comingSoon}
                   >
-                    {link.name}
+                    <LinkLabel name={link.name} isNew={link.isNew} />
                   </Button>
                 </Link>
               </li>
@@ -228,7 +243,7 @@ function PrimaryNavigation() {
                           label: (
                             <Link href={item.href}>
                               <Button size="large" block type="text">
-                                {item.name}
+                                <LinkLabel name={item.name} isNew={item.isNew} />
                               </Button>
                             </Link>
                           ),
@@ -264,7 +279,7 @@ function PrimaryNavigation() {
                         }`}
                         disabled={link.comingSoon}
                       >
-                        {link.name}
+                        <LinkLabel name={link.name} isNew={link.isNew} />
                       </Button>
                     </Link>
                   </li>

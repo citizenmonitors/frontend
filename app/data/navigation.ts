@@ -3,6 +3,8 @@ type Link = {
   href: string;
   highlight?: boolean;
   comingSoon?: boolean;
+  /** Shows a brand-colour dot to flag a newly rolled-out feature */
+  isNew?: boolean;
   subMenu?: Array<Link>;
 }
 
@@ -22,6 +24,7 @@ const primaryLinks: Array<Link> = [
   {
     name: 'Pulse',
     href: '/pulse',
+    isNew: true,
   },
   {
     name: 'Insights',
