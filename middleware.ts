@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { COLLATION_PATHS, collationEnabled } from "./app/utils/features";
 
 /**
  * Forwards /api/backend/* to the real backend and adds the in-house access
@@ -8,6 +9,19 @@ import { NextRequest, NextResponse } from "next/server";
 const PROXY_PREFIX = "/api/backend";
 
 export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Results/Collation is switched off: send its pages to the homepage
+  if (!pathname.startsWith(PROXY_PREFIX)) {
+    const isCollation = COLLATION_PATHS.some(
+      (base) => pathname === base || pathname.startsWith(`${base}/`)
+    );
+    if (isCollation && !collationEnabled) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+    return NextResponse.next();
+  }
+
   const upstream = (
     process.env.BACKEND_API_URL ??
     process.env.NEXT_PUBLIC_BACKEND_API_URL ??
@@ -40,5 +54,10 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: "/api/backend/:path*",
+  matcher: [
+    "/api/backend/:path*",
+    "/collation/:path*",
+    "/results/:path*",
+    "/elections/:path*",
+  ],
 };

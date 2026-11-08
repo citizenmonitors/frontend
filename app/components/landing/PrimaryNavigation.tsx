@@ -119,7 +119,7 @@ function PrimaryNavigation() {
 
         <ul className="hidden md:flex md:shrink-0 md:justify-center">
           {primaryLinks.map((link, linkIndex) =>
-            link.subMenu ? (
+            link.hidden ? null : link.subMenu ? (
               <li
                 key={link.name}
                 className={`${!lgLinks.has(linkIndex) ? "lg:hidden" : ""} ${
@@ -234,7 +234,7 @@ function PrimaryNavigation() {
             </div>
             <ul className="flex flex-col gap-3 mb-4">
               {primaryLinks.map((link) =>
-                link.subMenu ? (
+                link.hidden ? null : link.subMenu ? (
                   <li key={link.name} className="flex py-2 last:hidden">
                     <Dropdown
                       trigger={["click"]}

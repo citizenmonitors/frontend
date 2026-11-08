@@ -1,3 +1,5 @@
+import { collationEnabled } from "@/app/utils/features";
+
 type Link = {
   name: string;
   href: string;
@@ -5,6 +7,8 @@ type Link = {
   comingSoon?: boolean;
   /** Shows a brand-colour dot to flag a newly rolled-out feature */
   isNew?: boolean;
+  /** Not rendered (kept in the list so the responsive index rules stay the same) */
+  hidden?: boolean;
   subMenu?: Array<Link>;
 }
 
@@ -20,6 +24,7 @@ const primaryLinks: Array<Link> = [
   {
     name: 'Collation',
     href: '/collation',
+    hidden: !collationEnabled,
   },
   {
     name: 'Pulse',

@@ -3,9 +3,11 @@
 import React from "react";
 import Link from "next/link";
 import RecentElectionsCarousel from "@/app/components/landing/results/RecentElectionsCarousel";
+import { collationEnabled } from "@/app/utils/features";
 
 /** Homepage snippet of live + recent elections, placed above About Us */
 export default function HomeLiveRecentElections() {
+  if (!collationEnabled) return null;
   return (
     <section
       id="live-elections"

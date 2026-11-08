@@ -17,6 +17,10 @@ module.exports = {
     '/opengraph-image.png',
     '/twitter-image.png',
     '/auth/signup/*',
+    // Results/Collation is off unless NEXT_PUBLIC_FEATURE_COLLATION=true
+    ...(process.env.NEXT_PUBLIC_FEATURE_COLLATION === 'true'
+      ? []
+      : ['/collation', '/collation/*', '/results', '/results/*', '/elections']),
   ],
   transform: async (config, path) => {
     const priorityMap = {
