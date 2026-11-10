@@ -2,7 +2,7 @@
 
 import AuthDivider from "@/app/components/auth/ui/AuthDivider";
 import GoogleAuthButton from "@/app/components/auth/ui/GoogleAuthButton";
-import { cookieData } from "@/app/data/cookieData";
+import { cookieData, removeLoginCookie, setLoginCookie } from "@/app/data/cookieData";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/redux";
 import useFormHandler from "@/app/hooks/useFormHandler";
 import useGoogleAuth from "@/app/hooks/useGoogleAuth";
@@ -97,9 +97,7 @@ export default function PulseLoginModal({
         loginUser({ ...formData, rememberMe })
       ).unwrap();
 
-      Cookies.set(cookieData.login.name, result.token, {
-        expires: rememberMe ? cookieData.login.expiration : undefined,
-      });
+      setLoginCookie(result.token, rememberMe ? cookieData.login.expiration : undefined);
 
       await dispatch(validateSession()).unwrap();
       dispatch(showAlert({ message: "Login successful.", type: "success" }));

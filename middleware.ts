@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { COLLATION_PATHS, collationEnabled } from "./app/utils/features";
+import { COLLATION_PATHS, collationEnabled, pulseHost } from "./app/utils/features";
 
 /**
  * Forwards /api/backend/* to the real backend and adds the in-house access
@@ -14,8 +14,11 @@ const V1_ONLY_PREFIXES = ["/mobile/news-insights"];
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Results/Collation is switched off: send its pages to the homepage
   if (!pathname.startsWith(PROXY_PREFIX)) {
+    const pulseRoute = routePulseHost(req);
+    if (pulseRoute) return pulseRoute;
+
+    // Results/Collation is switched off: send its pages to the homepage
     const isCollation = COLLATION_PATHS.some(
       (base) => pathname === base || pathname.startsWith(`${base}/`)
     );
@@ -62,8 +65,45 @@ export function middleware(req: NextRequest) {
   return NextResponse.rewrite(target, { request: { headers } });
 }
 
+/**
+ * Pulse lives at the root of its own host (e.g. pulse.citizenmonitors.com).
+ * On that host "/" shows Pulse; elsewhere /pulse redirects there.
+ */
+function routePulseHost(req: NextRequest): NextResponse | null {
+  if (!pulseHost) return null;
+  const { pathname, search } = req.nextUrl;
+  const host = (req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "").toLowerCase();
+  const isPulsePath = pathname === "/pulse" || pathname.startsWith("/pulse/");
+
+  const pulseRoot = `${req.nextUrl.protocol || "https:"}//${pulseHost}/${search}`;
+
+  if (host === pulseHost) {
+    if (pathname === "/") return NextResponse.rewrite(new URL(`/pulse${search}`, req.url));
+    if (isPulsePath) return NextResponse.redirect(pulseRoot);
+    // The Newsletter page stands alone on the main site, not on the Pulse host
+    if (pathname === "/newsletter" || pathname.startsWith("/newsletter/")) {
+      return NextResponse.redirect(`${mainSiteOrigin(req)}${pathname}${search}`);
+    }
+    return null;
+  }
+  return isPulsePath ? NextResponse.redirect(pulseRoot) : null;
+}
+
+/** Main site origin, e.g. https://www.citizenmonitors.com */
+function mainSiteOrigin(req: NextRequest): string {
+  const configured = (process.env.METADATA_BASEURL ?? "").trim().replace(/\/$/, "");
+  if (configured) return configured;
+  const proto = req.nextUrl.protocol || "https:";
+  return `${proto}//${pulseHost.replace(/^pulse\./, "www.")}`;
+}
+
 export const config = {
   matcher: [
+    "/",
+    "/pulse",
+    "/pulse/:path*",
+    "/newsletter",
+    "/newsletter/:path*",
     "/api/backend/:path*",
     "/collation/:path*",
     "/results/:path*",

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import backendAxiosConfig, { backendMultipartAxiosConfig } from "./axiosConfig";
 import { backendRoutes } from "./backend";
 import { NewsInsightArticle, normalizeArticle } from "./newsInsightsApi";
@@ -103,6 +103,32 @@ export async function resolvePulseReport(
   );
 }
 
+// ---------- Newsletter vs dashboard ----------
+
+/** Same-origin route that Newsletter uses instead of the user's own admin login. */
+const NEWSLETTER_BACKEND_PATH = "/api/newsletter/backend";
+
+function onNewsletterPage() {
+  if (typeof window === "undefined") return false;
+  const path = window.location.pathname;
+  return path === "/newsletter" || path.startsWith("/newsletter/");
+}
+
+/**
+ * Newsletter and News & Insight calls: on the standalone /newsletter page they go through its
+ * proxy (its session cookie is checked on the server); in the admin
+ * dashboard they use the signed-in admin's token as before.
+ */
+function contentConfig(multipart = false): AxiosRequestConfig {
+  if (!onNewsletterPage()) return multipart ? backendMultipartAxiosConfig() : backendAxiosConfig();
+  return {
+    baseURL: NEWSLETTER_BACKEND_PATH,
+    withCredentials: true,
+    // Let axios set the multipart boundary itself
+    headers: multipart ? {} : { "Content-Type": "application/json" },
+  };
+}
+
 // ---------- News & Insight (admin) ----------
 
 export async function fetchAdminNewsInsights(
@@ -110,7 +136,7 @@ export async function fetchAdminNewsInsights(
   limit = 30
 ): Promise<{ items: NewsInsightArticle[]; total: number }> {
   const { data } = await axios.get(backendRoutes.newsInsights.adminList, {
-    ...backendAxiosConfig(),
+    ...contentConfig(),
     params: { page, limit },
   });
   const list = Array.isArray(data?.items)
@@ -157,7 +183,7 @@ export async function createNewsInsight(input: CreateNewsInsightInput): Promise<
     const { data } = await axios.post(
       backendRoutes.newsInsights.adminCreate,
       form,
-      backendMultipartAxiosConfig()
+      contentConfig(true)
     );
     return normalizeArticle(data?.article ?? data);
   }
@@ -173,7 +199,7 @@ export async function createNewsInsight(input: CreateNewsInsightInput): Promise<
       ...(input.thumbnailUrl ? { thumbnailURLUrl: input.thumbnailUrl.trim() } : {}),
       ...(input.heroImageUrl ? { heroImageURL: input.heroImageUrl.trim() } : {}),
     },
-    backendAxiosConfig()
+    contentConfig()
   );
   return normalizeArticle(data?.article ?? data);
 }
@@ -196,7 +222,7 @@ export type NewsletterPreview = {
 };
 
 export async function previewNewsletter(draft: NewsletterDraft): Promise<NewsletterPreview> {
-  const { data } = await axios.post(backendRoutes.newsletter.preview, draft, backendAxiosConfig());
+  const { data } = await axios.post(backendRoutes.newsletter.preview, draft, contentConfig());
   const ni = data?.newsInsight ?? {};
   return {
     title: String(data?.title ?? ""),
@@ -251,7 +277,7 @@ export async function sendNewsletter(
   const { data } = await axios.post(
     backendRoutes.newsletter.send,
     { ...draft, ...options },
-    { ...backendAxiosConfig(), timeout: 0 }
+    { ...contentConfig(), timeout: 0 }
   );
   return {
     message: String(data?.message ?? "Done"),

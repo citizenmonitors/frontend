@@ -8,7 +8,7 @@ import { RcFile } from "antd/es/upload";
 import handleStateError from "../helpers/handleStateError";
 import fetchInThunk from "../helpers/fetchInThunk";
 import Cookies from "js-cookie";
-import { cookieData } from '@/app/data/cookieData';
+import { cookieData, removeLoginCookie, setLoginCookie } from '@/app/data/cookieData';
 
 type InitialSignupState = {
   error: { message: string | null },
@@ -105,11 +105,7 @@ const signupSlice = createSlice({
 
       const selectedRole = action.meta.arg.user.role;
       if (selectedRole === 'volunteer') {
-        Cookies.set(
-          cookieData.login.name,
-          action.payload.token,
-          { expires: cookieData.login.expiration }
-        );
+        setLoginCookie(action.payload.token);
       }
     });
 
@@ -124,11 +120,7 @@ const signupSlice = createSlice({
     builder.addCase(submitRole.fulfilled, (state, action) => {
       state.status.roleSubmission = 'fulfilled';
 
-      const _cookie = Cookies.set(
-        cookieData.login.name,
-        action.payload.token,
-        { expires: cookieData.login.expiration }
-      );
+      setLoginCookie(action.payload.token);
     });
   }
 });

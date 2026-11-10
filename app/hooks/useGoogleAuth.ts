@@ -1,4 +1,4 @@
-import { cookieData } from "@/app/data/cookieData";
+import { cookieData, removeLoginCookie, setLoginCookie } from "@/app/data/cookieData";
 import {
   authenticateWithGoogleIdToken,
   decodeGoogleIdTokenEmail,
@@ -63,9 +63,7 @@ export default function useGoogleAuth(options: UseGoogleAuthOptions = {}) {
 
       try {
         const response = await authenticateWithGoogleIdToken(idToken, { mode });
-        Cookies.set(cookieData.login.name, response.token, {
-          expires: cookieData.login.expiration,
-        });
+        setLoginCookie(response.token);
 
         const email =
           response.user?.email || decodeGoogleIdTokenEmail(idToken) || undefined;

@@ -8,7 +8,7 @@ import OTPInput from "react-otp-input";
 import VerifyCounter from "../../../../(pages)/auth/signup/(step-1)/verify/components/VerifyCounter";
 import { SignupUserContext } from "../../../../(pages)/auth/signup/SignupUserProvider";
 import { readSignupDraft, saveSignupDraft, setSignupNextPath } from "@/app/data/signupDraft";
-import { cookieData } from "@/app/data/cookieData";
+import { cookieData, removeLoginCookie, setLoginCookie } from "@/app/data/cookieData";
 import Cookies from "js-cookie";
 
 export default function VerifyOTPForm() {
@@ -47,9 +47,7 @@ export default function VerifyOTPForm() {
       ).unwrap();
 
       if (result?.token) {
-        Cookies.set(cookieData.login.name, result.token, {
-          expires: cookieData.login.expiration,
-        });
+        setLoginCookie(result.token);
       }
 
       saveSignupDraft({

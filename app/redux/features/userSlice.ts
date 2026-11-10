@@ -6,7 +6,7 @@ import backendAxiosConfig from "@/app/data/axiosConfig";
 import { backendRoutes } from "@/app/data/backend";
 import handleStateError from "../helpers/handleStateError";
 import fetchInThunk from "../helpers/fetchInThunk";
-import { cookieData } from '@/app/data/cookieData';
+import { cookieData, removeLoginCookie, setLoginCookie } from '@/app/data/cookieData';
 
 type InitialUserState = {
   details: User | null,
@@ -74,7 +74,7 @@ const userSlice = createSlice({
       state.isAdmin = null;
 
       // Clear user token
-      Cookies.remove(cookieData.login.name);
+      removeLoginCookie();
     },
     refreshUser(state) {
       state.details = initialState.details;
@@ -134,11 +134,7 @@ const userSlice = createSlice({
       state.isAdmin = ["admin", "super-admin"].includes(action.payload.user.role);
 
       if (action.meta.arg.rememberMe) {
-        Cookies.set(
-          cookieData.login.name,
-          action.payload.token,
-          { expires: cookieData.login.expiration }
-        );
+        setLoginCookie(action.payload.token);
       }
     });
     builder.addCase(loginUser.rejected, (state, action: any) => {
@@ -200,9 +196,7 @@ const userSlice = createSlice({
     builder.addCase(upgradeToVolunteer.fulfilled, (state, action) => {
       state.details = action.payload.user;
       state.status.upgradeToVolunteer = 'fulfilled';
-      Cookies.set(cookieData.login.name, action.payload.token, {
-        expires: cookieData.login.expiration,
-      });
+      setLoginCookie(action.payload.token);
     });
     builder.addCase(upgradeToVolunteer.rejected, (state, action: any) => {
       state.status.upgradeToVolunteer = 'rejected';

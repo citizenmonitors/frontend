@@ -1,4 +1,5 @@
 import React from "react";
+import { pulseHref } from "@/app/utils/features";
 import IntroHeader from "./IntroHeader";
 import { Button } from "antd";
 import Link from "next/link";
@@ -28,7 +29,7 @@ function Intro() {
                 <ArrowRight variant="Outline" size={16} />
               </Button>
             </Link>
-            <Link href={"/pulse"} tabIndex={-1} className="w-full sm:w-auto">
+            <Link href={pulseHref()} tabIndex={-1} className="w-full sm:w-auto">
               <Button
                 className="flex items-center gap-[.5ch] font-medium justify-center h-[48px] lg:h-[55px] lg:px-6"
                 block

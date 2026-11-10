@@ -237,7 +237,9 @@ export const pulseMetadata = {
     title: "Pulse | Citizen Monitors",
     description:
       "Open citizen discussions on governance and community issues across Nigeria.",
-    url: `${process.env.METADATA_BASEURL!}/pulse`,
+    url: process.env.NEXT_PUBLIC_PULSE_HOST
+      ? `https://${process.env.NEXT_PUBLIC_PULSE_HOST}`
+      : `${process.env.METADATA_BASEURL!}/pulse`,
     siteName: "Citizen Monitors",
     type: "website",
     locale: "en_GB",

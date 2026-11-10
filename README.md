@@ -93,6 +93,12 @@ Key files:
 | `observer`      | Accredited monitor for a polling unit; uploads data           |
 | admin           | Uses the `/admin` panel                                       |
 
+## Pulse subdomain and Newsletter
+
+**Pulse at pulse.citizenmonitors.com.** Set `NEXT_PUBLIC_PULSE_HOST=pulse.citizenmonitors.com` (Production only) and `NEXT_PUBLIC_COOKIE_DOMAIN=.citizenmonitors.com`, add the domain to the Vercel project, and add a DNS `CNAME pulse -> cname.vercel-dns.com`. `middleware.ts` then shows Pulse at the root of that host and redirects `/pulse` on the main site there. The shared cookie keeps people logged in on both.
+
+**Newsletter page at citizenmonitors.com/newsletter.** A standalone page (not on the Pulse subdomain) for sending newsletters and posting News & Insight, outside the admin dashboard. It has its own login (`NEWSLETTER_USERNAME` / `NEWSLETTER_PASSWORD`, sessions signed with `NEWSLETTER_SESSION_SECRET`). Its requests go through `app/api/newsletter/backend`, which checks its session and calls the backend as the service admin account in `NEWSLETTER_BACKEND_EMAIL` / `NEWSLETTER_BACKEND_PASSWORD`. Only `admin/newsletter*` and `admin/news-insights*` routes are allowed. Image uploads from this page are limited to about 4 MB by Vercel.
+
 ## Deployment
 
 Deployed on Vercel. Pushing to `main` runs [`.github/workflows/vercel-trigger.yml`](.github/workflows/vercel-trigger.yml), which adds an empty commit as the `citizenmonitors` account so Vercel deploys. That is why the history has many `chore: trigger vercel deployment` commits.

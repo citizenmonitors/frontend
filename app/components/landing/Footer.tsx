@@ -6,13 +6,13 @@ import PlayStoreDownload from "@/public/assets/play-store-download.svg";
 import { email, socials } from "@/app/data/links";
 import Logo from "../shared/svg/Logo";
 import { topLinks } from "@/app/data/navigation";
-import { collationEnabled } from "@/app/utils/features";
+import { collationEnabled, pulseHref } from "@/app/utils/features";
 
 const exploreLinks = [
   { name: "Home", href: "/#home" },
   { name: "About", href: "/#about" },
   ...(collationEnabled ? [{ name: "Collation", href: "/collation" }] : []),
-  { name: "Pulse", href: "/pulse" },
+  { name: "Pulse", href: pulseHref() },
 ];
 
 const learnLinks = [

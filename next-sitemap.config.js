@@ -11,6 +11,8 @@ module.exports = {
     '/auth/reset-password',
     '/admin',
     '/portal',
+    '/newsletter',
+    '/newsletter/*',
     '/manifest.webmanifest',
     '/apple-icon*.png',
     '/icon*.png',
@@ -47,7 +49,7 @@ module.exports = {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin/*', '/portal/*'],
+        disallow: ['/admin/*', '/portal/*', '/newsletter', '/newsletter/*'],
       },
     ],
   },

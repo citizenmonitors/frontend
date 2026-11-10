@@ -1,4 +1,5 @@
 "use client";
+import { pulseHref } from "@/app/utils/features";
 
 import { cookieData } from "@/app/data/cookieData";
 import { Button, Modal, Spin } from "antd";
@@ -297,10 +298,12 @@ export default function PulseFeed() {
   }
 
   function handleCopyLink(post: PulsePost) {
+    const query = `?post=${encodeURIComponent(post.id)}`;
+    const href = pulseHref(query);
     const url =
-      typeof window !== "undefined"
-        ? `${window.location.origin}/pulse?post=${encodeURIComponent(post.id)}`
-        : `/pulse?post=${post.id}`;
+      href.startsWith("/") && typeof window !== "undefined"
+        ? `${window.location.origin}${href}`
+        : href;
     navigator.clipboard?.writeText(url);
     dispatch(showAlert({ message: "Post link copied.", type: "success" }));
   }

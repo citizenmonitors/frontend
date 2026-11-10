@@ -1,4 +1,4 @@
-import { collationEnabled } from "@/app/utils/features";
+import { collationEnabled, pulseHref } from "@/app/utils/features";
 
 type Link = {
   name: string;
@@ -28,7 +28,7 @@ const primaryLinks: Array<Link> = [
   },
   {
     name: 'Pulse',
-    href: '/pulse',
+    href: pulseHref(),
     isNew: true,
   },
   {
