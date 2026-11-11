@@ -1,11 +1,16 @@
 /**
  * Server-only: the Newsletter page talks to the backend as one service admin account
- * (NEWSLETTER_BACKEND_EMAIL / NEWSLETTER_BACKEND_PASSWORD), so its users never
+ * (NEWSLETTER_BACKEND_EMAIL / NEWSLETTER_BACKEND_PASS), so its users never
  * see or need backend admin credentials.
  */
 
 let cachedToken: { value: string; at: number } | null = null;
 const TOKEN_MAX_AGE_MS = 6 * 3600_000;
+
+/** Name as set in Vercel (the older name still works) */
+function backendPassword(): string {
+  return process.env.NEWSLETTER_BACKEND_PASS || process.env.NEWSLETTER_BACKEND_PASSWORD || "";
+}
 
 export function upstreamBase(): string {
   return (process.env.BACKEND_API_URL ?? process.env.NEXT_PUBLIC_BACKEND_API_URL ?? "")
@@ -23,7 +28,7 @@ export function newsletterBackendConfigured(): boolean {
   return Boolean(
     upstreamBase() &&
       (process.env.NEWSLETTER_BACKEND_EMAIL ?? "").trim() &&
-      (process.env.NEWSLETTER_BACKEND_PASSWORD ?? "").trim()
+      backendPassword().trim()
   );
 }
 
@@ -37,7 +42,7 @@ export async function getServiceToken(force = false): Promise<string> {
     headers: { "Content-Type": "application/json", ...accessHeaders() },
     body: JSON.stringify({
       email: (process.env.NEWSLETTER_BACKEND_EMAIL ?? "").trim(),
-      password: process.env.NEWSLETTER_BACKEND_PASSWORD ?? "",
+      password: backendPassword(),
       rememberMe: true,
     }),
     cache: "no-store",

@@ -15,8 +15,12 @@ function env(name: string): string {
   return (process.env[name] ?? "").trim();
 }
 
+// Names as set in Vercel (older names still work)
+const loginPassword = () => env("NEWSLETTER_PASS") || env("NEWSLETTER_PASSWORD");
+const sessionSecret = () => env("NEWSLETTER_SESSION") || env("NEWSLETTER_SESSION_SECRET");
+
 export function newsletterConfigured(): boolean {
-  return Boolean(env("NEWSLETTER_USERNAME") && env("NEWSLETTER_PASSWORD") && env("NEWSLETTER_SESSION_SECRET"));
+  return Boolean(env("NEWSLETTER_USERNAME") && loginPassword() && sessionSecret());
 }
 
 function toBase64Url(bytes: ArrayBuffer | Uint8Array): string {
@@ -34,7 +38,7 @@ function fromBase64Url(text: string): string {
 async function hmac(data: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
-    encoder.encode(env("NEWSLETTER_SESSION_SECRET")),
+    encoder.encode(sessionSecret()),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"]
@@ -59,7 +63,7 @@ export async function checkNewsletterCredentials(username: string, password: str
   if (!newsletterConfigured()) return false;
   const [userOk, passOk] = await Promise.all([
     safeEqual(username.trim().toLowerCase(), env("NEWSLETTER_USERNAME").toLowerCase()),
-    safeEqual(password, env("NEWSLETTER_PASSWORD")),
+    safeEqual(password, loginPassword()),
   ]);
   return userOk && passOk;
 }
