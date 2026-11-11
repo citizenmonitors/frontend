@@ -1,4 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
+import { friendlyServerMessage } from "@/app/utils/friendlyError";
 
 function readMessage(value: unknown): string | null {
   if (typeof value === "string" && value.trim()) return value.trim();
@@ -31,7 +32,7 @@ function handleStateError<T extends { error: { message: string | null } }>(
     error = "Couldn't load this data. Please refresh or sign in again.";
   }
 
-  state.error.message = error;
+  state.error.message = friendlyServerMessage(error, "Something went wrong. Please try again.");
 }
 
 export default handleStateError;

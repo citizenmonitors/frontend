@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import SiteLink from "@/app/components/shared/SiteLink";
 import React from "react";
 import AppStoreDownload from "@/public/assets/app-store-download.svg";
 import PlayStoreDownload from "@/public/assets/play-store-download.svg";
@@ -30,9 +30,9 @@ function Footer() {
       <footer className="mx-auto w-full max-w-[1180px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
         <div className="grid gap-10 md:grid-cols-12 md:gap-8 lg:gap-12">
           <header className="md:col-span-5 lg:col-span-4">
-            <Link href="/" className="inline-flex items-center">
+            <SiteLink href="/" className="inline-flex items-center">
               <Logo size={48} mode="light" />
-            </Link>
+            </SiteLink>
             <h2 className="mt-4 font-league text-xl font-semibold leading-snug md:text-2xl">
               Crowdsourcing Electoral Data For Public Good.
             </h2>
@@ -53,12 +53,12 @@ function Footer() {
               <ul className="grid gap-2">
                 {exploreLinks.map((link) => (
                   <li key={link.name}>
-                    <Link
+                    <SiteLink
                       href={link.href}
                       className="text-sm text-white/80 transition-colors hover:text-white"
                     >
                       {link.name}
-                    </Link>
+                    </SiteLink>
                   </li>
                 ))}
               </ul>
@@ -70,12 +70,12 @@ function Footer() {
               <ul className="grid gap-2">
                 {learnLinks.map((link) => (
                   <li key={link.name}>
-                    <Link
+                    <SiteLink
                       href={link.href}
                       className="text-sm text-white/80 transition-colors hover:text-white"
                     >
                       {link.name}
-                    </Link>
+                    </SiteLink>
                   </li>
                 ))}
               </ul>
@@ -87,12 +87,12 @@ function Footer() {
               <ul className="grid gap-2">
                 {topLinks.map((link) => (
                   <li key={link.name}>
-                    <Link
+                    <SiteLink
                       href={link.href}
                       className="text-sm text-white/80 transition-colors hover:text-white"
                     >
                       {link.name}
-                    </Link>
+                    </SiteLink>
                   </li>
                 ))}
               </ul>
@@ -105,14 +105,14 @@ function Footer() {
             </p>
             <p className="mt-3 text-sm text-white/80">
               Reach us at{" "}
-              <Link
+              <SiteLink
                 href={`mailto:${email}`}
                 className="font-medium text-brand-200 underline underline-offset-2 hover:text-white"
               >
                 {emailName}
                 <span>@</span>
                 {emailDomain}
-              </Link>
+              </SiteLink>
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Image src={AppStoreDownload} alt="Download on the App Store" />
@@ -125,13 +125,13 @@ function Footer() {
           <ul className="flex gap-2">
             {socials.map((social) => (
               <li key={social.name}>
-                <Link
+                <SiteLink
                   href={social.href}
                   className="grid h-9 w-9 place-items-center rounded-full bg-brand-900 transition-colors hover:bg-brand-700"
                   aria-label={social.name}
                 >
                   <Image src={social.icon} alt="" />
-                </Link>
+                </SiteLink>
               </li>
             ))}
           </ul>

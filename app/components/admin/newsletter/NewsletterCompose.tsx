@@ -27,14 +27,8 @@ import {
 } from "antd";
 import { Dayjs } from "dayjs";
 import Link from "next/link";
+import RichTextEditor from "@/app/components/shared/RichTextEditor";
 import React, { useState } from "react";
-
-const PASTE_EXAMPLE = `Subject: Can INEC Conduct Credible Elections in 2027?
-Dear Citizen Monitors,
-Every election comes with promises of change...
-
-Warm regards,
-Citizen Monitors.`;
 
 const RECIPIENT_OPTIONS: Array<{ value: NewsletterRecipient; label: string }> = [
   { value: "all", label: "Everyone" },
@@ -51,7 +45,9 @@ export default function NewsletterCompose() {
   const dispatch = useAppDispatch();
   const adminEmail = useAppSelector((state) => state.user.details?.email);
   const [step, setStep] = useState(0);
-  const [paste, setPaste] = useState("");
+  const [subject, setSubject] = useState("");
+  /** HTML from the editor */
+  const [body, setBody] = useState("");
   const [preview, setPreview] = useState<NewsletterPreview | null>(null);
   const [previewedPaste, setPreviewedPaste] = useState("");
   const [loadingPreview, setLoadingPreview] = useState(false);
@@ -70,11 +66,13 @@ export default function NewsletterCompose() {
   const [sending, setSending] = useState<"test" | "live" | null>(null);
   const [result, setResult] = useState<(SendNewsletterResult & { isTest: boolean }) | null>(null);
 
-  const hasSubject = /^\s*subject:/i.test(paste);
-  const draft = { paste };
+  // Used to spot edits made after the preview
+  const paste = `${subject.trim()}\n${body}`;
+  const hasDraft = Boolean(subject.trim() && body.trim());
+  const draft = { title: subject.trim(), content: body };
 
   async function handlePreview() {
-    if (!paste.trim()) return;
+    if (!hasDraft) return;
     setLoadingPreview(true);
     try {
       const data = await previewNewsletter(draft);
@@ -157,7 +155,8 @@ export default function NewsletterCompose() {
 
   function startOver() {
     setStep(0);
-    setPaste("");
+    setSubject("");
+    setBody("");
     setPreview(null);
     setPreviewedPaste("");
     setResult(null);
@@ -203,27 +202,39 @@ export default function NewsletterCompose() {
         onChange={(next) => {
           if (next < step) setStep(next);
         }}
-        items={[{ title: "Paste draft" }, { title: "Preview" }, { title: "Send" }]}
+        items={[{ title: "Write" }, { title: "Preview" }, { title: "Send" }]}
       />
 
       {step === 0 ? (
         <div className="grid gap-4">
-          <p className="text-sm text-gray-600">
-            Paste the whole draft. Put the subject on the first line as{" "}
-            <code className="rounded bg-gray-100 px-1">Subject: …</code>. The sign-off is
-            removed automatically; the email footer adds it back.
-          </p>
-          <Input.TextArea
-            value={paste}
-            onChange={(e) => setPaste(e.target.value)}
-            placeholder={PASTE_EXAMPLE}
-            autoSize={{ minRows: 14, maxRows: 30 }}
-          />
-          {paste.trim() && !hasSubject ? (
-            <Alert type="warning" showIcon message="The first line should start with “Subject:”. Without it the preview will fail." />
-          ) : null}
+          <div className="grid gap-1">
+            <label className="text-sm font-medium text-gray-700">
+              Subject <span className="text-error-500">*</span>
+            </label>
+            <Input
+              size="large"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="e.g. Can INEC Conduct Credible Elections in 2027?"
+            />
+          </div>
+          <div className="grid gap-1">
+            <label className="text-sm font-medium text-gray-700">
+              Message <span className="text-error-500">*</span>
+            </label>
+            <p className="text-xs text-gray-500">
+              Write here or paste from Google Docs/Word; formatting is kept. The email footer
+              adds the sign-off.
+            </p>
+            <RichTextEditor
+              value={body}
+              onChange={setBody}
+              placeholder="Dear Citizen Monitors, …"
+              minHeight={320}
+            />
+          </div>
           <div className="flex justify-end">
-            <Button type="primary" size="large" disabled={!paste.trim()} loading={loadingPreview} onClick={handlePreview}>
+            <Button type="primary" size="large" disabled={!hasDraft} loading={loadingPreview} onClick={handlePreview}>
               Preview
             </Button>
           </div>

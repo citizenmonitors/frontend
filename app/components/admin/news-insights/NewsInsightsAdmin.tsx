@@ -25,6 +25,7 @@ import type { ColumnsType } from "antd/es/table";
 import dayjs, { Dayjs } from "dayjs";
 import { Add } from "iconsax-react";
 import Link from "next/link";
+import RichTextEditor from "@/app/components/shared/RichTextEditor";
 import React, { useCallback, useEffect, useState } from "react";
 
 const PAGE_SIZE = 30;
@@ -301,14 +302,12 @@ export default function NewsInsightsAdmin() {
             </div>
             <div className="grid gap-1">
               <label className="text-sm font-medium text-gray-700">
-                Content (HTML) <span className="text-error-500">*</span>
+                Content <span className="text-error-500">*</span>
               </label>
-              <Input.TextArea
+              <RichTextEditor
                 value={form.content}
-                onChange={(e) => update("content", e.target.value)}
-                autoSize={{ minRows: 10, maxRows: 24 }}
-                className="font-mono !text-xs"
-                placeholder="<p>Write the article as HTML…</p>"
+                onChange={(html) => update("content", html)}
+                placeholder="Write the article, or paste it from Google Docs/Word…"
               />
             </div>
             {imageField(

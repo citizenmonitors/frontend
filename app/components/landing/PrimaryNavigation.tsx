@@ -5,7 +5,7 @@ import Hamburger from "@/public/assets/hamburger.svg";
 import HamburgerClose from "@/public/assets/hamburger-close.svg";
 import { primaryLinks, topLinks } from "@/app/data/navigation";
 import { Button, Dropdown } from "antd";
-import Link from "next/link";
+import SiteLink from "@/app/components/shared/SiteLink";
 import { ArrowDown2 } from "iconsax-react";
 import Logo from "../shared/svg/Logo";
 import LogoFlat from "../shared/svg/LogoFlat";
@@ -50,51 +50,51 @@ function PrimaryNavigation() {
 
   const authActions = isAuthenticated ? (
     <div className="flex items-center gap-3 lg:gap-4">
-      <Link href={dashboardHref}>
+      <SiteLink href={dashboardHref}>
         <Button size="large" type="primary" className="lg:h-[55px] lg:px-6">
           Dashboard
         </Button>
-      </Link>
+      </SiteLink>
       <DashboardProfile />
     </div>
   ) : (
     <>
-      <Link href={"/auth/login"} className="shrink-0">
+      <SiteLink href={"/auth/login"} className="shrink-0">
         <Button size="large" className="lg:h-[55px] lg:px-6">
           Login
         </Button>
-      </Link>
-      <Link href={"/auth/signup"} className="shrink-0">
+      </SiteLink>
+      <SiteLink href={"/auth/signup"} className="shrink-0">
         <Button size="large" className="lg:h-[55px] lg:px-6" type="primary">
           Sign up
         </Button>
-      </Link>
+      </SiteLink>
     </>
   );
 
   const mobileAuthActions = isAuthenticated ? (
     <div className="flex w-[90%] flex-col gap-4 mx-auto">
-      <Link href={dashboardHref}>
+      <SiteLink href={dashboardHref}>
         <Button block size="large" type="primary" className="text-sm h-[48px]">
           Dashboard
         </Button>
-      </Link>
+      </SiteLink>
       <div className="flex justify-center">
         <DashboardProfile />
       </div>
     </div>
   ) : (
     <>
-      <Link href={"/auth/login"} className="w-[90%] mx-auto">
+      <SiteLink href={"/auth/login"} className="w-[90%] mx-auto">
         <Button block size="large" className="text-sm h-[48px]">
           Login
         </Button>
-      </Link>
-      <Link href={"/auth/signup"} className="w-[90%] mx-auto">
+      </SiteLink>
+      <SiteLink href={"/auth/signup"} className="w-[90%] mx-auto">
         <Button block size="large" type="primary" className="text-sm h-[48px]">
           Sign up
         </Button>
-      </Link>
+      </SiteLink>
     </>
   );
 
@@ -105,7 +105,7 @@ function PrimaryNavigation() {
     >
       <nav className="container py-6 md:py-3 flex items-center">
         {/* Logo and auth sides share equal width so the menu sits in the true centre */}
-        <Link href={"/"} className="mr-4 md:flex md:flex-1 md:basis-0">
+        <SiteLink href={"/"} className="mr-4 md:flex md:flex-1 md:basis-0">
           <div className="logo-container md:hidden">
             <Logo size={40} />
           </div>
@@ -115,7 +115,7 @@ function PrimaryNavigation() {
           <div className="logo-container hidden lg:block">
             <Logo size={57} />
           </div>
-        </Link>
+        </SiteLink>
 
         <ul className="hidden md:flex md:shrink-0 md:justify-center">
           {primaryLinks.map((link, linkIndex) =>
@@ -130,7 +130,7 @@ function PrimaryNavigation() {
                   menu={{
                     items: link.subMenu.map((item) => ({
                       label: (
-                        <Link href={item.href}>
+                        <SiteLink href={item.href}>
                           <Button
                             size="large"
                             block
@@ -142,7 +142,7 @@ function PrimaryNavigation() {
                           >
                             <LinkLabel name={item.name} isNew={item.isNew} />
                           </Button>
-                        </Link>
+                        </SiteLink>
                       ),
                       key: item.href,
                     })),
@@ -167,7 +167,7 @@ function PrimaryNavigation() {
                   !mdLinks.has(linkIndex) ? "md:hidden lg:block" : ""
                 }`}
               >
-                <Link className="flex" href={link.href}>
+                <SiteLink className="flex" href={link.href}>
                   <Button
                     block
                     type="text"
@@ -181,7 +181,7 @@ function PrimaryNavigation() {
                   >
                     <LinkLabel name={link.name} isNew={link.isNew} />
                   </Button>
-                </Link>
+                </SiteLink>
               </li>
             )
           )}
@@ -241,11 +241,11 @@ function PrimaryNavigation() {
                       menu={{
                         items: link.subMenu.map((item) => ({
                           label: (
-                            <Link href={item.href}>
+                            <SiteLink href={item.href}>
                               <Button size="large" block type="text">
                                 <LinkLabel name={item.name} isNew={item.isNew} />
                               </Button>
-                            </Link>
+                            </SiteLink>
                           ),
                           key: item.href,
                         })),
@@ -266,7 +266,7 @@ function PrimaryNavigation() {
                   </li>
                 ) : (
                   <li key={link.name} className="last:hidden">
-                    <Link className="flex" href={link.href}>
+                    <SiteLink className="flex" href={link.href}>
                       <Button
                         block
                         size="large"
@@ -281,7 +281,7 @@ function PrimaryNavigation() {
                       >
                         <LinkLabel name={link.name} isNew={link.isNew} />
                       </Button>
-                    </Link>
+                    </SiteLink>
                   </li>
                 )
               )}
@@ -292,12 +292,12 @@ function PrimaryNavigation() {
             <ul className="flex flex-col items-center gap-6 text-sm">
               {topLinks.map((link) => (
                 <li key={link.name}>
-                  <Link
+                  <SiteLink
                     className="text-gray-500 hover:text-gray-800 transition-colors"
                     href={link.href}
                   >
                     {link.name}
-                  </Link>
+                  </SiteLink>
                 </li>
               ))}
             </ul>

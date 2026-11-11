@@ -1,3 +1,5 @@
+import { friendlyServerMessage } from "@/app/utils/friendlyError";
+
 type FetchInThunkParams = {
   asyncCallback: () => Promise<{ data: any }>;
   rejectWithValue: (value: unknown) => any;
@@ -40,12 +42,15 @@ function toErrorPayload(error: any) {
   return { message: "Something went wrong. Please try again." };
 }
 
+const GENERIC_ERROR = "Something went wrong. Please try again.";
+
 async function fetchInThunk({ asyncCallback, rejectWithValue }: FetchInThunkParams) {
   try {
     const { data } = await asyncCallback();
     return data;
   } catch (error: any) {
-    return rejectWithValue(toErrorPayload(error));
+    const payload = toErrorPayload(error);
+    return rejectWithValue({ message: friendlyServerMessage(payload.message, GENERIC_ERROR) });
   }
 }
 

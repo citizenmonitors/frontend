@@ -80,11 +80,8 @@ function routePulseHost(req: NextRequest): NextResponse | null {
   if (host === pulseHost) {
     if (pathname === "/") return NextResponse.rewrite(new URL(`/pulse${search}`, req.url));
     if (isPulsePath) return NextResponse.redirect(pulseRoot);
-    // The Newsletter page stands alone on the main site, not on the Pulse host
-    if (pathname === "/newsletter" || pathname.startsWith("/newsletter/")) {
-      return NextResponse.redirect(`${mainSiteOrigin(req)}${pathname}${search}`);
-    }
-    return null;
+    // Every other page (nav, footer, Newsletter, login…) lives on the main site
+    return NextResponse.redirect(`${mainSiteOrigin(req)}${pathname}${search}`);
   }
   return isPulsePath ? NextResponse.redirect(pulseRoot) : null;
 }
@@ -98,15 +95,7 @@ function mainSiteOrigin(req: NextRequest): string {
 }
 
 export const config = {
-  matcher: [
-    "/",
-    "/pulse",
-    "/pulse/:path*",
-    "/newsletter",
-    "/newsletter/:path*",
-    "/api/backend/:path*",
-    "/collation/:path*",
-    "/results/:path*",
-    "/elections/:path*",
-  ],
+  // All pages (so the Pulse host can send non-Pulse pages to the main site),
+  // plus the backend proxy. Skips Next.js assets, other API routes and files.
+  matcher: ["/api/backend/:path*", "/((?!api/|_next/|.*\\..*).*)"],
 };

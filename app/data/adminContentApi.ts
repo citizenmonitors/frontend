@@ -2,11 +2,12 @@ import axios, { AxiosRequestConfig } from "axios";
 import backendAxiosConfig, { backendMultipartAxiosConfig } from "./axiosConfig";
 import { backendRoutes } from "./backend";
 import { NewsInsightArticle, normalizeArticle } from "./newsInsightsApi";
+import { friendlyServerMessage } from "@/app/utils/friendlyError";
 
 /** Reads the API's `{ message }` error so it can be shown as-is. */
 export function apiErrorMessage(error: any, fallback: string): string {
   const message = error?.response?.data?.message;
-  if (typeof message === "string" && message.trim()) return message;
+  if (typeof message === "string" && message.trim()) return friendlyServerMessage(message, fallback);
   if (error?.message === "Network Error") {
     return "Couldn't connect. Check your internet connection and try again.";
   }

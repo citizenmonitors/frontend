@@ -1,6 +1,7 @@
 import axios from "axios";
 import backendAxiosConfig from "./axiosConfig";
 import { backendRoutes } from "./backend";
+import { UPLOAD_UNAVAILABLE_MESSAGE, friendlyServerMessage } from "@/app/utils/friendlyError";
 import {
   CreatePulseCommentPayload,
   CreatePulsePostPayload,
@@ -245,7 +246,10 @@ function multipartConfig() {
 function readPostResponse(data: unknown): { post: PulsePost; warning?: string } {
   const record = (data && typeof data === "object" ? data : {}) as Record<string, unknown>;
   const source = extractRecord(data, "post") ?? record;
-  const warning = typeof record.warning === "string" ? record.warning : undefined;
+  const warning =
+    typeof record.warning === "string" && record.warning.trim()
+      ? friendlyServerMessage(record.warning, UPLOAD_UNAVAILABLE_MESSAGE)
+      : undefined;
   return { post: normalizePost(source), warning };
 }
 

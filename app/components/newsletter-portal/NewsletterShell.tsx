@@ -31,9 +31,8 @@ export default function NewsletterShell({
     <div className="min-h-[100dvh] bg-gray-50">
       <header className="sticky top-0 z-20 border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-[1180px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
-          <Link href="/newsletter" className="flex items-center gap-2">
+          <Link href="/newsletter" className="flex items-center" aria-label="Newsletter home">
             <LogoFlat size={28} />
-            <span className="font-league text-lg font-semibold text-gray-800">Newsletter</span>
           </Link>
           <nav className="order-3 flex w-full gap-1 sm:order-none sm:w-auto">
             {tabs.map((tab) => {

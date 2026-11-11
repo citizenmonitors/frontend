@@ -56,3 +56,19 @@
 .news-insight-content strong {
   @apply text-gray-800;
 }
+
+/* Rich text editor (Newsletter page / admin) */
+.rich-text-editor__content {
+  @apply px-4 py-3 outline-none max-h-[70vh] overflow-y-auto;
+}
+.rich-text-editor__content > :first-child {
+  @apply mt-0;
+}
+.rich-text-editor__content hr,
+.news-insight-content hr {
+  @apply my-6 border-gray-200;
+}
+.rich-text-editor__content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply pointer-events-none float-left h-0 text-gray-400;
+}
